@@ -1,0 +1,67 @@
+{
+  "name": "test benchmark",
+  "alternate": true,
+  "executions": 10,
+  "scenarios": [
+    {
+      "name": "scenario A",
+      "env": {},
+      "before": {
+        "name": null,
+        "description": null,
+        "cmd": [
+          "echo",
+          "beforeA"
+        ]
+      },
+      "after": {
+        "name": null,
+        "description": null,
+        "cmd": [
+          "echo",
+          "afterA"
+        ]
+      },
+      "script": [
+        {
+          "name": null,
+          "description": null,
+          "cmd": [
+            "sleep",
+            "2"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "scenario B",
+      "env": {},
+      "before": {
+        "name": null,
+        "description": null,
+        "cmd": [
+          "echo",
+          "beforeB"
+        ]
+      },
+      "after": {
+        "name": null,
+        "description": null,
+        "cmd": [
+          "echo",
+          "afterB"
+        ]
+      },
+      "script": [
+        {
+          "name": null,
+          "description": null,
+          "cmd": [
+            "sleep",
+            "1"
+          ]
+        }
+      ]
+    }
+  ]
+}
