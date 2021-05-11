@@ -5,8 +5,25 @@ import (
 	"testing"
 )
 
-func Test_Load(t *testing.T) {
-	expected := &Benchmark{
+func Test_LoadJson(t *testing.T) {
+	test_Load(t, "../../test_data/config_test_load.json")
+}
+
+func Test_LoadYaml(t *testing.T) {
+	test_Load(t, "../../test_data/config_test_load.yaml")
+}
+
+func test_Load(t *testing.T, configPath string) {
+	expected := expectedBenchmarkConfig()
+
+	benchmark, err := Load(configPath)
+
+	assert.NoError(t, err)
+	assert.Equal(t, expected, benchmark)
+}
+
+func expectedBenchmarkConfig() *Benchmark {
+	return &Benchmark{
 		Name:        "test benchmark",
 		Description: "",
 		Executions:  2,
@@ -42,8 +59,4 @@ func Test_Load(t *testing.T) {
 		},
 	}
 
-	benchmark, err := Load("../../test_data/config_test_load.json")
-
-	assert.NoError(t, err)
-	assert.Equal(t, expected, benchmark)
 }
