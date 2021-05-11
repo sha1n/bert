@@ -9,12 +9,13 @@ func Test_Load(t *testing.T) {
 	expected := &Benchmark{
 		Name:        "test benchmark",
 		Description: "",
-		Executions:  10,
+		Executions:  2,
 		Alternate:   true,
 		Scenarios: []*Scenario{
 			{
-				Name: "scenario A",
-				Env:  make(map[string]string),
+				Name:             "scenario A",
+				WorkingDirectory: "/tmp",
+				Env:              map[string]string{"KEY": "value"},
 				Before: &Command{
 					Cmd: []string{"echo", "beforeA"},
 				},
@@ -23,20 +24,16 @@ func Test_Load(t *testing.T) {
 				},
 				Script: []*Command{
 					{
-						Cmd: []string{"sleep", "2"},
+						Cmd: []string{"sleep", "1"},
 					},
 				},
 			},
 			{
 				Name: "scenario B",
-				Env:  make(map[string]string),
-				Before: &Command{
-					Cmd: []string{"echo", "beforeB"},
-				},
-				After: &Command{
-					Cmd: []string{"echo", "afterB"},
-				},
 				Script: []*Command{
+					{
+						Cmd: []string{"sleep", "0"},
+					},
 					{
 						Cmd: []string{"sleep", "1"},
 					},
@@ -48,5 +45,5 @@ func Test_Load(t *testing.T) {
 	benchmark, err := Load("../../test_data/config_test_load.json")
 
 	assert.NoError(t, err)
-	assert.Equal(t, benchmark, expected)
+	assert.Equal(t, expected, benchmark)
 }
