@@ -6,6 +6,31 @@ import (
 	"os"
 )
 
+type Command struct {
+	Cmd []string `json:"cmd" binding:"required"`
+}
+
+type Scenario struct {
+	Name             string `json:"name" binding:"required"`
+	WorkingDirectory string `json:"workingDir"`
+	Env              map[string]string
+	Before           *Command
+	After            *Command
+	Script           []*Command `json:"script" binding:"required"`
+}
+
+type Benchmark struct {
+	Name        string `json:"name" binding:"required"`
+	Description string
+	Scenarios   []*Scenario `json:"scenarios" binding:"required"`
+	Executions  int
+	Alternate   bool
+}
+
+func (s *Scenario) Id() string {
+	return s.Name
+}
+
 func Load(path string) (*Benchmark, error) {
 	var benchmark Benchmark
 

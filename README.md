@@ -1,0 +1,96 @@
+[![Build Status](https://travis-ci.com/sha1n/benchy.svg?branch=master)](https://travis-ci.com/sha1n/benchy)
+
+# benchy
+`benchy` is a simple CLI benchmarking tool that allows you to easily compare key performance metrics of different CLI commands. It was developed very quickly for a very specific use-case I had, but it is already very useful and can easily evolve into something even better.
+
+## Main Features
+- Compare any number of commands
+- Set the working directory for every scenario
+- Set the number of times every scenario is executed
+- Set optional custom environment variables per scenario
+- Set optional before/after commands for each run
+- Choose between alternate executions and sequencial execution of the same command
+
+## Usage
+```bash
+$ benchy --config test_data/config_test_load.json
+```
+
+## Example Summary 
+```bash
+=========================
+ Summary of 'scenario A'
+=========================
+    samples: 10
+    min (s): 1.005
+    max (s): 1.014
+   mean (s): 1.009
+ median (s): 1.008
+    p90 (s): 1.013
+
+=========================
+ Summary of 'scenario B'
+=========================
+    samples: 10
+    min (s): 1.009
+    max (s): 1.017
+   mean (s): 1.013
+ median (s): 1.013
+    p90 (s): 1.016
+```
+
+## Example Config
+```json
+{
+  "name": "my benchmark",
+  "alternate": true,
+  "executions": 10,
+  "scenarios": [
+    {
+      "name": "scenario A",
+      "workingDir": "/tmp",
+      "env": {
+        "KEY": "value"
+      },
+      "before": {
+        "cmd": [
+          "echo",
+          "beforeA"
+        ]
+      },
+      "after": {
+        "cmd": [
+          "echo",
+          "afterA"
+        ]
+      },
+      "script": [
+        {
+          "cmd": [
+            "sleep",
+            "1"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "scenario B",
+      "script": [
+        {
+          "cmd": [
+            "sleep",
+            "0"
+          ]
+        },
+        {
+          "cmd": [
+            "sleep",
+            "1"
+          ]
+        }
+
+      ]
+    }
+  ]
+}
+```

@@ -1,7 +1,7 @@
 # Set VERSION to the latest version tag name. Assuming version tags are formatted 'v*'
 VERSION := $(shell git describe --always --abbrev=0 --tags --match "v*" $(git rev-list --tags --max-count=1))
 BUILD := $(shell git rev-parse $(VERSION))
-PROJECTNAME := "bency"
+PROJECTNAME := "benchy"
 # We pass that to the main module to generate the correct help text
 PROGRAMNAME := $(PROJECTNAME)
 
@@ -66,19 +66,19 @@ go-format:
 go-compile: go-get go-build-linux go-build-darwin go-build-windows
 
 go-test:
-	go test -v `go list ./...`
+	go test -mod=readonly -v `go list -mod=readonly ./...`
 
 go-build-linux:
 	@echo "  >  Building linux binaries..."
-	@GOPATH=$(GOPATH) GOOS=$(GOOS_LINUX) GOARCH=$(GOARCH) GOBIN=$(GOBIN) go build $(LDFLAGS) -o $(GOBIN)/$(PROGRAMNAME)-$(GOOS_LINUX)-$(GOARCH) ./cmd
+	@GOPATH=$(GOPATH) GOOS=$(GOOS_LINUX) GOARCH=$(GOARCH) GOBIN=$(GOBIN) go build -mod=readonly $(LDFLAGS) -o $(GOBIN)/$(PROGRAMNAME)-$(GOOS_LINUX)-$(GOARCH) ./cmd
 
 go-build-darwin:
 	@echo "  >  Building darwin binaries..."
-	@GOPATH=$(GOPATH) GOOS=$(GOOS_DARWIN) GOARCH=$(GOARCH) GOBIN=$(GOBIN) go build $(LDFLAGS) -o $(GOBIN)/$(PROGRAMNAME)-$(GOOS_DARWIN)-$(GOARCH) ./cmd
+	@GOPATH=$(GOPATH) GOOS=$(GOOS_DARWIN) GOARCH=$(GOARCH) GOBIN=$(GOBIN) go build -mod=readonly $(LDFLAGS) -o $(GOBIN)/$(PROGRAMNAME)-$(GOOS_DARWIN)-$(GOARCH) ./cmd
 
 go-build-windows:
 	@echo "  >  Building windows binaries..."
-	@GOPATH=$(GOPATH) GOOS=$(GOOS_WINDOWS) GOARCH=$(GOARCH) GOBIN=$(GOBIN) go build $(LDFLAGS) -o $(GOBIN)/$(PROGRAMNAME)-$(GOOS_WINDOWS)-$(GOARCH).exe ./cmd
+	@GOPATH=$(GOPATH) GOOS=$(GOOS_WINDOWS) GOARCH=$(GOARCH) GOBIN=$(GOBIN) go build -mod=readonly $(LDFLAGS) -o $(GOBIN)/$(PROGRAMNAME)-$(GOOS_WINDOWS)-$(GOARCH).exe ./cmd
 
 go-generate:
 	@echo "  >  Generating dependency files..."
