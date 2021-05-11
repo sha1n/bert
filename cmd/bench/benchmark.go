@@ -11,7 +11,7 @@ func Run(configFilePath string) {
 
 	config := loadConfig(configFilePath)
 	summary := Execute(config, NewContext(NewTracer()))
-	writeReport(summary)
+	writeReport(summary, config)
 }
 
 func loadConfig(configFilePath string) *Benchmark {
@@ -25,7 +25,8 @@ func loadConfig(configFilePath string) *Benchmark {
 	return benchmark
 }
 
-func writeReport(summary TraceSummary) {
-	writer := NewTextReportWriter(bufio.NewWriter(os.Stdout))
-	writer.Write(summary)
+func writeReport(summary TracerSummary, config *Benchmark) {
+	console := bufio.NewWriter(os.Stdout)
+	writer := NewTextReportWriter(console)
+	writer.Write(summary, config)
 }

@@ -21,10 +21,16 @@ $ benchy --config test_data/config_test_load.json
 
 ## Example Summary 
 ```bash
+===================
+ Benchmark Summary
+===================
+  scenarios: 2
+ executions: 10
+  alternate: true
+
 =========================
  Summary of 'scenario A'
 =========================
-    samples: 10
     min (s): 1.005
     max (s): 1.014
    mean (s): 1.009
@@ -34,7 +40,6 @@ $ benchy --config test_data/config_test_load.json
 =========================
  Summary of 'scenario B'
 =========================
-    samples: 10
     min (s): 1.009
     max (s): 1.017
    mean (s): 1.013

@@ -11,7 +11,7 @@ type Identifiable interface {
 
 type Tracer interface {
 	Start(i Identifiable) End
-	Summary() TraceSummary
+	Summary() TracerSummary
 }
 
 type Trace interface {
@@ -66,6 +66,6 @@ func (tr *tracer) Start(i Identifiable) End {
 	return t.end
 }
 
-func (tr *tracer) Summary() TraceSummary {
-	return NewTraceSummary(tr.traces)
+func (tr *tracer) Summary() TracerSummary {
+	return NewTracerSummary(tr.traces)
 }
