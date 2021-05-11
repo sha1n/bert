@@ -24,10 +24,8 @@ func test_Load(t *testing.T, configPath string) {
 
 func expectedBenchmarkConfig() *Benchmark {
 	return &Benchmark{
-		Name:        "test benchmark",
-		Description: "",
-		Executions:  2,
-		Alternate:   true,
+		Executions: 2,
+		Alternate:  true,
 		Scenarios: []*Scenario{
 			{
 				Name:             "scenario A",

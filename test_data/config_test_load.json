@@ -1,5 +1,4 @@
 {
-  "name": "test benchmark",
   "alternate": true,
   "executions": 2,
   "scenarios": [
