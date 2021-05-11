@@ -9,22 +9,22 @@ import (
 )
 
 type Command struct {
-	Cmd []string `json:"cmd" binding:"required" yaml:"cmd" binding:"required"`
+	Cmd []string `json:"cmd" yaml:"cmd" binding:"required"`
 }
 
 type Scenario struct {
-	Name             string `json:"name" binding:"required" yaml:"name" binding:"required"`
+	Name             string `json:"name" yaml:"name" binding:"required"`
 	WorkingDirectory string `json:"workingDir" yaml:"workingDir"`
 	Env              map[string]string
 	Before           *Command
 	After            *Command
-	Script           []*Command `json:"script" binding:"required" yaml:"script" binding:"required"`
+	Script           []*Command `json:"script" yaml:"script" binding:"required"`
 }
 
 type Benchmark struct {
-	Name        string `json:"name" binding:"required" yaml:"name" binding:"required"`
+	Name        string `json:"name" yaml:"name" binding:"required"`
 	Description string
-	Scenarios   []*Scenario `json:"scenarios" binding:"required" yaml:"scenarios" binding:"required"`
+	Scenarios   []*Scenario `json:"scenarios" yaml:"scenarios" binding:"required"`
 	Executions  int
 	Alternate   bool
 }
