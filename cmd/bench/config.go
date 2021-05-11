@@ -22,11 +22,9 @@ type Scenario struct {
 }
 
 type Benchmark struct {
-	Name        string `json:"name" yaml:"name" binding:"required"`
-	Description string
-	Scenarios   []*Scenario `json:"scenarios" yaml:"scenarios" binding:"required"`
-	Executions  int
-	Alternate   bool
+	Scenarios  []*Scenario `json:"scenarios" yaml:"scenarios" binding:"required"`
+	Executions int
+	Alternate  bool
 }
 
 func (s *Scenario) Id() string {
