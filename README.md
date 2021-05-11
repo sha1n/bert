@@ -43,6 +43,9 @@ $ benchy --config test_data/config_test_load.json
 ```
 
 ## Example Config
+The config file can be either in JSON format or YAML. `benchy` assumes a file with the `yml` or `yaml` extension to be YAML, otherwise JSON is assumed.
+
+**Example JSON config:**
 ```json
 {
   "name": "my benchmark",
@@ -96,4 +99,39 @@ $ benchy --config test_data/config_test_load.json
     }
   ]
 }
+```
+
+
+**Equivalent YAML config:**
+```yaml
+---
+name: my benchmark
+alternate: true
+executions: 10
+scenarios:
+- name: scenario A
+  workingDir: "/tmp"
+  env:
+    KEY: value
+  before:
+    cmd:
+    - echo
+    - beforeA
+  after:
+    cmd:
+    - echo
+    - afterA
+  script:
+  - cmd:
+    - sleep
+    - '1'
+- name: scenario B
+  script:
+  - cmd:
+    - sleep
+    - '0'
+  - cmd:
+    - sleep
+    - '1'
+
 ```

@@ -2,27 +2,29 @@ package bench
 
 import (
 	"encoding/json"
+	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
+	"strings"
 )
 
 type Command struct {
-	Cmd []string `json:"cmd" binding:"required"`
+	Cmd []string `json:"cmd" binding:"required" yaml:"cmd" binding:"required"`
 }
 
 type Scenario struct {
-	Name             string `json:"name" binding:"required"`
-	WorkingDirectory string `json:"workingDir"`
+	Name             string `json:"name" binding:"required" yaml:"name" binding:"required"`
+	WorkingDirectory string `json:"workingDir" yaml:"workingDir"`
 	Env              map[string]string
 	Before           *Command
 	After            *Command
-	Script           []*Command `json:"script" binding:"required"`
+	Script           []*Command `json:"script" binding:"required" yaml:"script" binding:"required"`
 }
 
 type Benchmark struct {
-	Name        string `json:"name" binding:"required"`
+	Name        string `json:"name" binding:"required" yaml:"name" binding:"required"`
 	Description string
-	Scenarios   []*Scenario `json:"scenarios" binding:"required"`
+	Scenarios   []*Scenario `json:"scenarios" binding:"required" yaml:"scenarios" binding:"required"`
 	Executions  int
 	Alternate   bool
 }
@@ -32,6 +34,14 @@ func (s *Scenario) Id() string {
 }
 
 func Load(path string) (*Benchmark, error) {
+	if strings.HasSuffix(path, ".yaml") || strings.HasSuffix(path, ".yml") {
+		return load_yaml(path)
+	} else {
+		return load_json(path)
+	}
+}
+
+func load_json(path string) (*Benchmark, error) {
 	var benchmark Benchmark
 
 	jsonFile, err := os.Open(path)
@@ -41,6 +51,21 @@ func Load(path string) (*Benchmark, error) {
 
 		bytes, _ := ioutil.ReadAll(jsonFile)
 		json.Unmarshal(bytes, &benchmark)
+	}
+
+	return &benchmark, err
+}
+
+func load_yaml(path string) (*Benchmark, error) {
+	var benchmark Benchmark
+
+	jsonFile, err := os.Open(path)
+
+	if err == nil {
+		defer jsonFile.Close()
+
+		bytes, _ := ioutil.ReadAll(jsonFile)
+		yaml.Unmarshal(bytes, &benchmark)
 	}
 
 	return &benchmark, err
