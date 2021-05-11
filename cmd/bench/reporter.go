@@ -8,7 +8,7 @@ import (
 )
 
 type ReportWriter interface {
-	Write(TraceSummary)
+	Write(TracerSummary, *Benchmark)
 }
 
 type TextReportWriter struct {
@@ -21,13 +21,18 @@ func NewTextReportWriter(writer *bufio.Writer) ReportWriter {
 	}
 }
 
-func (trw *TextReportWriter) Write(ts TraceSummary) {
+func (trw *TextReportWriter) Write(ts TracerSummary, config *Benchmark) {
+	trw.writeTitle("Benchmark Summary")
+	trw.writeInt64Stat("scenarios", func() (int64, error) { return int64(len(config.Scenarios)), nil })
+	trw.writeInt64Stat("executions", func() (int64, error) { return int64(config.Executions), nil })
+	trw.writeBool("alternate", config.Alternate)
+	trw.writeNewLine()
+
 	for id := range ts.AllStats() {
 		stats := ts.StatsOf(id)
 
 		title := fmt.Sprintf("Summary of '%s'", id)
 		trw.writeTitle(title)
-		trw.writeIntStat("samples", func() (int64, error) { return int64(len(stats.Traces())), nil })
 		trw.writeStatNano2Sec("min (s)", stats.Min)
 		trw.writeStatNano2Sec("max (s)", stats.Max)
 		trw.writeStatNano2Sec("mean (s)", stats.Mean)
@@ -62,11 +67,15 @@ func (trw *TextReportWriter) writeStatNano2Sec(name string, f func() (float64, e
 	}
 }
 
-func (trw *TextReportWriter) writeIntStat(name string, f func() (int64, error)) {
+func (trw *TextReportWriter) writeInt64Stat(name string, f func() (int64, error)) {
 	value, err := f()
 	if err == nil {
 		trw.writer.WriteString(fmt.Sprintf("%11s: %d\r\n", name, value))
 	} else {
 		trw.writer.WriteString(fmt.Sprintf("%11s: %s\r\n", name, "ERROR"))
 	}
+}
+
+func (trw *TextReportWriter) writeBool(name string, value bool) {
+	trw.writer.WriteString(fmt.Sprintf("%11s: %v\r\n", name, value))
 }

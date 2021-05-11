@@ -17,7 +17,7 @@ func NewContext(tracer Tracer) *Context {
 	}
 }
 
-func Execute(b *Benchmark, ctx *Context) TraceSummary {
+func Execute(b *Benchmark, ctx *Context) TracerSummary {
 	if b.Alternate {
 		executeAlternately(b, ctx)
 	} else {
