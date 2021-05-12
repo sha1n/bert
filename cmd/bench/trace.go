@@ -17,6 +17,7 @@ type Tracer interface {
 type Trace interface {
 	Id() string
 	Elapsed() time.Duration
+	Error() error
 }
 
 type tracer struct {
@@ -41,6 +42,10 @@ func (t *trace) Id() string {
 
 func (t *trace) Elapsed() time.Duration {
 	return t.elapsed
+}
+
+func (t *trace) Error() error {
+	return t.error
 }
 
 func newTrace(id string) *trace {
