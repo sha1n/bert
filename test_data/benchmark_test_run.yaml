@@ -1,0 +1,14 @@
+---
+alternate: true
+executions: 2
+scenarios:
+- name: scenario A
+  command:
+    cmd:
+    - echo
+    - 'A'
+- name: scenario B
+  command:
+    cmd:
+    - echo
+    - 'B'
