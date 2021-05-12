@@ -8,23 +8,38 @@ import (
 	"github.com/sha1n/benchy/pkg"
 )
 
-func Run(configFilePath string) {
+type WriteReport = func(summary pkg.TracerSummary, config *Benchmark)
+
+func Run(configFilePath string) error {
 	log.Println("Starting benchy...")
 
-	config := loadConfig(configFilePath)
-	summary := Execute(config, NewContext(pkg.NewTracer()))
-	writeReport(summary, config)
+	return run(configFilePath, writeReport)
 }
 
-func loadConfig(configFilePath string) *Benchmark {
+func run(configFilePath string, writeReport WriteReport) (error error) {
+	log.Println("Starting benchy...")
+
+	config, err := loadConfig(configFilePath)
+	if err != nil {
+		return err
+	}
+
+	summary := Execute(config, NewContext(pkg.NewTracer()))
+	writeReport(summary, config)
+
+	return error
+}
+
+func loadConfig(configFilePath string) (rtn *Benchmark, error error) {
 	log.Printf("Loading configuration file '%s'...\r\n", configFilePath)
 
 	benchmark, err := Load(configFilePath)
 	if err != nil {
 		log.Println(err)
+		error = err
 	}
 
-	return benchmark
+	return benchmark, error
 }
 
 func writeReport(summary pkg.TracerSummary, config *Benchmark) {
