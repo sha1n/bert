@@ -1,6 +1,6 @@
 ---
 alternate: true
-executions: 2
+executions: 10
 scenarios:
 - name: scenario A
   workingDir: "/tmp"
@@ -14,15 +14,12 @@ scenarios:
     cmd:
     - echo
     - afterA
-  script:
-  - cmd:
+  command:
+    cmd:
     - sleep
     - '1'
 - name: scenario B
-  script:
-  - cmd:
+  command:
+    cmd:
     - sleep
     - '0'
-  - cmd:
-    - sleep
-    - '1'

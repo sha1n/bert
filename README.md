@@ -16,44 +16,74 @@
 
 ## Usage
 ```bash
-$ benchy --config test_data/config_test_load.json
+$ benchy --config test_data/config_test_load.yaml
 ```
 
 ## Example Summary 
 ```bash
-===================
+-------------------
  Benchmark Summary
-===================
+-------------------
   scenarios: 2
  executions: 10
   alternate: true
 
-=========================
+-------------------------
  Summary of 'scenario A'
-=========================
-    min (s): 1.005
-    max (s): 1.014
-   mean (s): 1.009
- median (s): 1.008
-    p90 (s): 1.013
+-------------------------
+        min: 1.003s
+        max: 1.007s
+       mean: 1.005s
+     median: 1.005s
+        p90: 1.006s
+     errors: 0%
 
-=========================
+-------------------------
  Summary of 'scenario B'
-=========================
-    min (s): 1.009
-    max (s): 1.017
-   mean (s): 1.013
- median (s): 1.013
-    p90 (s): 1.016
+-------------------------
+        min: 0.003s
+        max: 0.004s
+       mean: 0.003s
+     median: 0.003s
+        p90: 0.004s
+     errors: 0%
 ```
 
 ## Example Config
 The config file can be either in JSON format or YAML. `benchy` assumes a file with the `yml` or `yaml` extension to be YAML, otherwise JSON is assumed.
 
-**Example JSON config:**
+**Example YAML config:**
+```yaml
+---
+alternate: true
+executions: 10
+scenarios:
+- name: scenario A
+  workingDir: "/tmp"
+  env:
+    KEY: value
+  before:
+    cmd:
+    - echo
+    - beforeA
+  after:
+    cmd:
+    - echo
+    - afterA
+  command:
+    cmd:
+    - sleep
+    - '1'
+- name: scenario B
+  command:
+    cmd:
+    - sleep
+    - '0'
+```
+
+**Equivalent JSON config:**
 ```json
 {
-  "name": "my benchmark",
   "alternate": true,
   "executions": 10,
   "scenarios": [
@@ -75,68 +105,22 @@ The config file can be either in JSON format or YAML. `benchy` assumes a file wi
           "afterA"
         ]
       },
-      "script": [
-        {
-          "cmd": [
-            "sleep",
-            "1"
-          ]
-        }
-      ]
+      "command": {
+        "cmd": [
+          "sleep",
+          "1"
+        ]
+      }
     },
     {
       "name": "scenario B",
-      "script": [
-        {
-          "cmd": [
-            "sleep",
-            "0"
-          ]
-        },
-        {
-          "cmd": [
-            "sleep",
-            "1"
-          ]
-        }
-
-      ]
+      "command": {
+        "cmd": [
+          "sleep",
+          "0"
+        ]
+      }
     }
   ]
 }
-```
-
-
-**Equivalent YAML config:**
-```yaml
----
-name: my benchmark
-alternate: true
-executions: 10
-scenarios:
-- name: scenario A
-  workingDir: "/tmp"
-  env:
-    KEY: value
-  before:
-    cmd:
-    - echo
-    - beforeA
-  after:
-    cmd:
-    - echo
-    - afterA
-  script:
-  - cmd:
-    - sleep
-    - '1'
-- name: scenario B
-  script:
-  - cmd:
-    - sleep
-    - '0'
-  - cmd:
-    - sleep
-    - '1'
-
 ```
