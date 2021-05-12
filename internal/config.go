@@ -1,4 +1,4 @@
-package bench
+package internal
 
 import (
 	"encoding/json"
