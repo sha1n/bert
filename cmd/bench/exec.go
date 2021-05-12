@@ -48,18 +48,16 @@ func executeScenario(scenario *Scenario, ctx *Context) {
 	log.Printf("Executing scenario '%s'...\r\n", scenario.Name)
 	executeCommand(scenario.Before, scenario.WorkingDirectory, scenario.Env, ctx)
 
-	end := ctx.tracer.Start(scenario)
-	for ci := range scenario.Script {
-		executeCommand(scenario.Script[ci], scenario.WorkingDirectory, scenario.Env, ctx)
-	}
-	end()
+	ctx.tracer.Start(scenario)(
+		executeCommand(scenario.Command, scenario.WorkingDirectory, scenario.Env, ctx),
+	)
 
 	executeCommand(scenario.After, scenario.WorkingDirectory, scenario.Env, ctx)
 }
 
-func executeCommand(cmd *Command, wd string, env map[string]string, ctx *Context) {
+func executeCommand(cmd *Command, wd string, env map[string]string, ctx *Context) (exitError error) {
 	if cmd == nil {
-		return
+		return nil
 	}
 
 	log.Printf("Going to execute command %v", cmd.Cmd)
@@ -77,7 +75,13 @@ func executeCommand(cmd *Command, wd string, env map[string]string, ctx *Context
 	benchCmd.Stdout = os.Stdout
 	benchCmd.Stderr = os.Stderr
 
-	benchCmd.Run()
+	exitError = benchCmd.Run()
+
+	if exitError != nil {
+		log.Printf("[ERROR] Command '%s' failed. Error: %s", cmd.Cmd, exitError.Error())
+	}
+
+	return exitError
 }
 
 func toEnvVarsArray(env map[string]string) []string {

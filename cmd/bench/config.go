@@ -18,7 +18,7 @@ type Scenario struct {
 	Env              map[string]string
 	Before           *Command
 	After            *Command
-	Script           []*Command `json:"script" yaml:"script" binding:"required"`
+	Command          *Command `json:"command" yaml:"command" binding:"required"`
 }
 
 type Benchmark struct {
