@@ -1,4 +1,4 @@
-package bench
+package internal
 
 import (
 	"github.com/stretchr/testify/assert"
@@ -6,11 +6,11 @@ import (
 )
 
 func Test_LoadJson(t *testing.T) {
-	test_Load(t, "../../test_data/config_test_load.json")
+	test_Load(t, "../test_data/config_test_load.json")
 }
 
 func Test_LoadYaml(t *testing.T) {
-	test_Load(t, "../../test_data/config_test_load.yaml")
+	test_Load(t, "../test_data/config_test_load.yaml")
 }
 
 func test_Load(t *testing.T, configPath string) {
