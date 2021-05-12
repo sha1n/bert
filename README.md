@@ -31,20 +31,20 @@ $ benchy --config test_data/config_test_load.json
 =========================
  Summary of 'scenario A'
 =========================
-    min (s): 1.005
-    max (s): 1.014
-   mean (s): 1.009
- median (s): 1.008
-    p90 (s): 1.013
+    min (s): 1.003
+    max (s): 1.008
+   mean (s): 1.006
+ median (s): 1.005
+    p90 (s): 1.007
 
 =========================
  Summary of 'scenario B'
 =========================
-    min (s): 1.009
-    max (s): 1.017
-   mean (s): 1.013
- median (s): 1.013
-    p90 (s): 1.016
+    min (s): 0.003
+    max (s): 0.004
+   mean (s): 0.004
+ median (s): 0.004
+    p90 (s): 0.004
 ```
 
 ## Example Config
@@ -53,7 +53,6 @@ The config file can be either in JSON format or YAML. `benchy` assumes a file wi
 **Example JSON config:**
 ```json
 {
-  "name": "my benchmark",
   "alternate": true,
   "executions": 10,
   "scenarios": [
@@ -75,32 +74,21 @@ The config file can be either in JSON format or YAML. `benchy` assumes a file wi
           "afterA"
         ]
       },
-      "script": [
-        {
-          "cmd": [
-            "sleep",
-            "1"
-          ]
-        }
-      ]
+      "command": {
+        "cmd": [
+          "sleep",
+          "1"
+        ]
+      }
     },
     {
       "name": "scenario B",
-      "script": [
-        {
-          "cmd": [
-            "sleep",
-            "0"
-          ]
-        },
-        {
-          "cmd": [
-            "sleep",
-            "1"
-          ]
-        }
-
-      ]
+      "command": {
+        "cmd": [
+          "sleep",
+          "0"
+        ]
+      }
     }
   ]
 }
@@ -110,7 +98,6 @@ The config file can be either in JSON format or YAML. `benchy` assumes a file wi
 **Equivalent YAML config:**
 ```yaml
 ---
-name: my benchmark
 alternate: true
 executions: 10
 scenarios:
@@ -126,17 +113,13 @@ scenarios:
     cmd:
     - echo
     - afterA
-  script:
-  - cmd:
+  command:
+    cmd:
     - sleep
     - '1'
 - name: scenario B
-  script:
-  - cmd:
+  command:
+    cmd:
     - sleep
     - '0'
-  - cmd:
-    - sleep
-    - '1'
-
 ```

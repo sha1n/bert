@@ -2,7 +2,7 @@ package bench
 
 import "time"
 
-type End = func()
+type End = func(error)
 type Id = string
 
 type Identifiable interface {
@@ -27,10 +27,12 @@ type trace struct {
 	id      string
 	start   time.Time
 	elapsed time.Duration
+	error   error
 }
 
-func (t *trace) end() {
+func (t *trace) end(exitError error) {
 	t.elapsed = time.Since(t.start)
+	t.error = exitError
 }
 
 func (t *trace) Id() string {

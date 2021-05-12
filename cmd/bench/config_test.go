@@ -24,7 +24,7 @@ func test_Load(t *testing.T, configPath string) {
 
 func expectedBenchmarkConfig() *Benchmark {
 	return &Benchmark{
-		Executions: 2,
+		Executions: 10,
 		Alternate:  true,
 		Scenarios: []*Scenario{
 			{
@@ -37,21 +37,14 @@ func expectedBenchmarkConfig() *Benchmark {
 				After: &Command{
 					Cmd: []string{"echo", "afterA"},
 				},
-				Script: []*Command{
-					{
-						Cmd: []string{"sleep", "1"},
-					},
+				Command: &Command{
+					Cmd: []string{"sleep", "1"},
 				},
 			},
 			{
 				Name: "scenario B",
-				Script: []*Command{
-					{
-						Cmd: []string{"sleep", "0"},
-					},
-					{
-						Cmd: []string{"sleep", "1"},
-					},
+				Command: &Command{
+					Cmd: []string{"sleep", "0"},
 				},
 			},
 		},

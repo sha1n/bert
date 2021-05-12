@@ -1,6 +1,6 @@
 {
   "alternate": true,
-  "executions": 2,
+  "executions": 10,
   "scenarios": [
     {
       "name": "scenario A",
@@ -20,32 +20,21 @@
           "afterA"
         ]
       },
-      "script": [
-        {
-          "cmd": [
-            "sleep",
-            "1"
-          ]
-        }
-      ]
+      "command": {
+        "cmd": [
+          "sleep",
+          "1"
+        ]
+      }
     },
     {
       "name": "scenario B",
-      "script": [
-        {
-          "cmd": [
-            "sleep",
-            "0"
-          ]
-        },
-        {
-          "cmd": [
-            "sleep",
-            "1"
-          ]
-        }
-
-      ]
+      "command": {
+        "cmd": [
+          "sleep",
+          "0"
+        ]
+      }
     }
   ]
 }
