@@ -1,4 +1,4 @@
-package bench
+package internal
 
 import (
 	"bufio"
@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
+	"github.com/sha1n/benchy/pkg"
 )
 
 var red = color.New(color.FgRed).Sprintf
@@ -15,7 +16,7 @@ var yellow = color.New(color.FgYellow).Sprintf
 var bold = color.New(color.Bold).Sprintf
 
 type ReportWriter interface {
-	Write(TracerSummary, *Benchmark)
+	Write(pkg.TracerSummary, *Benchmark)
 }
 
 type TextReportWriter struct {
@@ -28,7 +29,7 @@ func NewTextReportWriter(writer *bufio.Writer) ReportWriter {
 	}
 }
 
-func (trw *TextReportWriter) Write(ts TracerSummary, config *Benchmark) {
+func (trw *TextReportWriter) Write(ts pkg.TracerSummary, config *Benchmark) {
 	trw.writeTitle("Benchmark Summary")
 	trw.writeInt64Stat("scenarios", func() (int64, error) { return int64(len(config.Scenarios)), nil })
 	trw.writeInt64Stat("executions", func() (int64, error) { return int64(config.Executions), nil })

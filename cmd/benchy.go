@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"github.com/fatih/color"
-	"github.com/sha1n/benchy/cmd/bench"
+	"github.com/sha1n/benchy/internal"
 	"github.com/spf13/cobra"
 )
 
@@ -44,5 +44,5 @@ Build label: %s`, Version, Build),
 
 func doRun(cmd *cobra.Command, args []string) {
 	configFilePath, _ := cmd.Flags().GetString("config")
-	bench.Run(configFilePath)
+	internal.Run(configFilePath)
 }

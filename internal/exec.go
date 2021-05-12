@@ -1,23 +1,25 @@
-package bench
+package internal
 
 import (
 	"fmt"
 	"log"
 	"os"
 	"os/exec"
+
+	"github.com/sha1n/benchy/pkg"
 )
 
 type Context struct {
-	tracer Tracer
+	tracer pkg.Tracer
 }
 
-func NewContext(tracer Tracer) *Context {
+func NewContext(tracer pkg.Tracer) *Context {
 	return &Context{
 		tracer: tracer,
 	}
 }
 
-func Execute(b *Benchmark, ctx *Context) TracerSummary {
+func Execute(b *Benchmark, ctx *Context) pkg.TracerSummary {
 	if b.Alternate {
 		executeAlternately(b, ctx)
 	} else {

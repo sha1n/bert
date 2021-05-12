@@ -1,4 +1,4 @@
-package bench
+package pkg
 
 import (
 	"github.com/montanaflynn/stats"
