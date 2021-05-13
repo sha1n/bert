@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	// "github.com/fatih/color"
 	"github.com/sha1n/benchy/internal"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -20,8 +19,6 @@ var Build string
 var Version string
 
 func init() {
-	// prefixColor := color.New(color.FgWhite, color.Bold)
-
 	log.SetFormatter(&log.TextFormatter{
 		DisableTimestamp: true,
 	})
