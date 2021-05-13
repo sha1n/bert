@@ -2,11 +2,11 @@ package internal
 
 import (
 	"bufio"
-	"log"
-	"os"
 
 	"github.com/sha1n/benchy/pkg"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"os"
 )
 
 type WriteReport = func(summary pkg.TracerSummary, config *BenchmarkSpec)
@@ -15,6 +15,10 @@ func Run(cmd *cobra.Command, args []string) error {
 	specFilePath, _ := cmd.Flags().GetString("config")
 	pipeStdOut, _ := cmd.Flags().GetBool("pipe-stdout")
 	pipeStdErr, _ := cmd.Flags().GetBool("pipe-stderr")
+
+	if debug, _ := cmd.Flags().GetBool("debug"); debug {
+		log.StandardLogger().SetLevel(log.DebugLevel)
+	}
 
 	executor := NewCommandExecutor(
 		pipeStdOut,
@@ -25,7 +29,7 @@ func Run(cmd *cobra.Command, args []string) error {
 }
 
 func run(specFilePath string, executor CommandExecutor, writeReport WriteReport) (error error) {
-	log.Println("Starting benchy...")
+	log.Info("Starting benchy...")
 
 	spec, err := loadSpec(specFilePath)
 	if err != nil {
@@ -39,11 +43,11 @@ func run(specFilePath string, executor CommandExecutor, writeReport WriteReport)
 }
 
 func loadSpec(filePath string) (rtn *BenchmarkSpec, error error) {
-	log.Printf("Loading benchmark specs from '%s'...\r\n", filePath)
+	log.Infof("Loading benchmark specs from '%s'...", filePath)
 
 	benchmark, err := Load(filePath)
 	if err != nil {
-		log.Println(err)
+		log.Error(err.Error())
 		error = err
 	}
 

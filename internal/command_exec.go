@@ -2,7 +2,7 @@ package internal
 
 import (
 	"fmt"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"os"
 	"os/exec"
 )
@@ -32,7 +32,7 @@ func (ce *commandExecutor) Execute(cmdSpec *CommandSpec, defaultWorkingDir strin
 		return nil
 	}
 
-	log.Printf("Going to execute command %v", cmdSpec.Cmd)
+	log.Debugf("Going to execute command %v", cmdSpec.Cmd)
 
 	execCmd := exec.Command(cmdSpec.Cmd[0], cmdSpec.Cmd[1:]...)
 	ce.configureCommand(cmdSpec, execCmd, defaultWorkingDir, env, ctx)
@@ -40,7 +40,7 @@ func (ce *commandExecutor) Execute(cmdSpec *CommandSpec, defaultWorkingDir strin
 	exitError = execCmd.Run()
 
 	if exitError != nil {
-		log.Printf("[ERROR] Command '%s' failed. Error: %s", cmdSpec.Cmd, exitError.Error())
+		log.Errorf("Command '%s' failed. Error: %s", cmdSpec.Cmd, exitError.Error())
 	}
 
 	return exitError
@@ -48,18 +48,18 @@ func (ce *commandExecutor) Execute(cmdSpec *CommandSpec, defaultWorkingDir strin
 
 func (ce *commandExecutor) configureCommand(cmd *CommandSpec, execCmd *exec.Cmd, defaultWorkingDir string, env map[string]string, ctx *ExecutionContext) {
 	if cmd.WorkingDirectory != "" {
-		log.Printf("Setting command working directory to '%s'", cmd.WorkingDirectory)
+		log.Debugf("Setting command working directory to '%s'", cmd.WorkingDirectory)
 		execCmd.Dir = cmd.WorkingDirectory
 	} else {
 		if defaultWorkingDir != "" {
-			log.Printf("Setting command working directory to '%s'", defaultWorkingDir)
+			log.Debugf("Setting command working directory to '%s'", defaultWorkingDir)
 			execCmd.Dir = defaultWorkingDir
 		}
 	}
 
 	if env != nil {
 		cmdEnv := toEnvVarsArray(env)
-		log.Printf("Populating command environment variables '%v'", cmdEnv)
+		log.Debugf("Populating command environment variables '%v'", cmdEnv)
 		execCmd.Env = append(execCmd.Env, cmdEnv...)
 	}
 

@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	"log"
+	"os"
 
-	"github.com/fatih/color"
+	// "github.com/fatih/color"
 	"github.com/sha1n/benchy/internal"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -19,9 +20,13 @@ var Build string
 var Version string
 
 func init() {
-	prefixColor := color.New(color.FgWhite, color.Bold)
-	log.SetPrefix(prefixColor.Sprint("[BENCHY] "))
-	log.SetFlags(log.Ldate | log.Ltime)
+	// prefixColor := color.New(color.FgWhite, color.Bold)
+
+	log.SetFormatter(&log.TextFormatter{
+		DisableTimestamp: true,
+	})
+	log.SetOutput(os.Stdout)
+	log.SetLevel(log.InfoLevel)
 }
 
 func main() {
@@ -35,8 +40,9 @@ Build label: %s`, Version, Build),
 	}
 
 	rootCmd.Flags().StringP("config", "c", "", `config file path`)
-	rootCmd.Flags().BoolP("pipe-stdout", "", true, `whether or not commands' standard output should be piped to benchy's standard out`)
-	rootCmd.Flags().BoolP("pipe-stderr", "", true, `whether or not commands' standard error should be piped to benchy's standard error`)
+	rootCmd.Flags().BoolP("pipe-stdout", "", true, `redirects external commands standard out to benchy's standard out`)
+	rootCmd.Flags().BoolP("pipe-stderr", "", true, `redirects external commands standard error to benchy's standard error`)
+	rootCmd.Flags().BoolP("debug", "d", false, `logs extra debug information`)
 
 	cobra.MarkFlagRequired(rootCmd.Flags(), "config")
 
@@ -49,6 +55,6 @@ func doRun(cmd *cobra.Command, args []string) {
 	error := internal.Run(cmd, args)
 
 	if error != nil {
-		log.Println(error.Error())
+		log.Error(error.Error())
 	}
 }
