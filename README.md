@@ -50,7 +50,7 @@ $ benchy --config test_data/config_test_load.yaml
 ```
 
 ## Example Config
-The config file can be either in JSON format or YAML. `benchy` assumes a file with the `yml` or `yaml` extension to be YAML, otherwise JSON is assumed.
+The config file can be either in JSON format or YAML. `benchy` assumes a file with the `yml` or `yaml` extension to be YAML, otherwise JSON is assumed. More about configuration [here](docs/configuration.md).
 
 **Example YAML config:**
 ```yaml
@@ -62,21 +62,20 @@ scenarios:
   workingDir: "/tmp"
   env:
     KEY: value
-  setup:
+  beforeAll:
     cmd:
     - echo
     - setupA
-  teardown:
+  afterAll:
     cmd:
     - echo
     - teardownA
-
-  beforeCommand:
+  beforeEach:
     workingDir: "/another-path"
     cmd:
     - echo
     - beforeA
-  afterCommand:
+  afterEach:
     cmd:
     - echo
     - afterA
@@ -103,26 +102,26 @@ scenarios:
       "env": {
         "KEY": "value"
       },
-      "setup": {
+      "beforeAll": {
         "cmd": [
           "echo",
           "setupA"
         ]
       },
-      "teardown": {
+      "afterAll": {
         "cmd": [
           "echo",
           "teardownA"
         ]
       },
-      "beforeCommand": {
+      "beforeEach": {
         "workingDir": "/another-path",
         "cmd": [
           "echo",
           "beforeA"
         ]
       },
-      "afterCommand": {
+      "afterEach": {
         "cmd": [
           "echo",
           "afterA"

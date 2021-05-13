@@ -9,7 +9,7 @@ import (
 
 var silentCommandExecutor = NewCommandExecutor(false, false)
 
-func Test_run(t *testing.T) {
+func TestRun(t *testing.T) {
 	var actualSummary pkg.TracerSummary
 	var actualConfig *BenchmarkSpec
 	interceptSummary := func(summary pkg.TracerSummary, config *BenchmarkSpec) {
@@ -29,7 +29,7 @@ func Test_run(t *testing.T) {
 	assertFullScenarioStats(t, actualSummary.StatsOf("scenario B"))
 }
 
-func Test_runWithMissingConfigFile(t *testing.T) {
+func TestRunWithMissingConfigFile(t *testing.T) {
 	err := run("../test_data/non-existing-file.yaml", silentCommandExecutor, failingWriteSummaryFn(t))
 
 	assert.Error(t, err)

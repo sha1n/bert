@@ -58,28 +58,28 @@ func executeSequencially(b *BenchmarkSpec, ctx *ExecutionContext) {
 
 func executeScenarioSetup(scenario *ScenarioSpec, ctx *ExecutionContext) {
 	log.Debugf("Running setup for scenario '%s'...", scenario.Name)
-	ctx.executor.Execute(scenario.Setup, scenario.WorkingDirectory, scenario.Env, ctx)
+	ctx.executor.Execute(scenario.BeforeAll, scenario.WorkingDirectory, scenario.Env, ctx)
 }
 
 func executeScenarioTeardown(scenario *ScenarioSpec, ctx *ExecutionContext) {
 	log.Debugf("Running teardown for scenario '%s'...", scenario.Name)
-	ctx.executor.Execute(scenario.Teardown, scenario.WorkingDirectory, scenario.Env, ctx)
+	ctx.executor.Execute(scenario.AfterAll, scenario.WorkingDirectory, scenario.Env, ctx)
 }
 
 func executeScenarioCommand(scenario *ScenarioSpec, ctx *ExecutionContext) {
 	log.Infof("Executing scenario '%s'...", scenario.Name)
 
-	if scenario.BeforeCommand != nil {
-		log.Debugf("Executing 'before' command %v", scenario.BeforeCommand.Cmd)
-		ctx.executor.Execute(scenario.BeforeCommand, scenario.WorkingDirectory, scenario.Env, ctx)
+	if scenario.BeforeEach != nil {
+		log.Debugf("Executing 'before' command %v", scenario.BeforeEach.Cmd)
+		ctx.executor.Execute(scenario.BeforeEach, scenario.WorkingDirectory, scenario.Env, ctx)
 	}
 
 	ctx.tracer.Start(scenario)(
 		ctx.executor.Execute(scenario.Command, scenario.WorkingDirectory, scenario.Env, ctx),
 	)
 
-	if scenario.AfterCommand != nil {
-		log.Debugf("Executing 'after' command %v", scenario.AfterCommand.Cmd)
-		ctx.executor.Execute(scenario.AfterCommand, scenario.WorkingDirectory, scenario.Env, ctx)
+	if scenario.AfterEach != nil {
+		log.Debugf("Executing 'after' command %v", scenario.AfterEach.Cmd)
+		ctx.executor.Execute(scenario.AfterEach, scenario.WorkingDirectory, scenario.Env, ctx)
 	}
 }

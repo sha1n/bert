@@ -5,15 +5,15 @@ import (
 	"testing"
 )
 
-func Test_LoadJson(t *testing.T) {
-	test_Load(t, "../test_data/spec_test_load.json")
+func TestLoadJson(t *testing.T) {
+	testLoad(t, "../test_data/spec_test_load.json")
 }
 
-func Test_LoadYaml(t *testing.T) {
-	test_Load(t, "../test_data/spec_test_load.yaml")
+func TestLoadYaml(t *testing.T) {
+	testLoad(t, "../test_data/spec_test_load.yaml")
 }
 
-func test_Load(t *testing.T, filePath string) {
+func testLoad(t *testing.T, filePath string) {
 	expected := expectedBenchmarkSpec()
 
 	benchmark, err := Load(filePath)
@@ -31,17 +31,17 @@ func expectedBenchmarkSpec() *BenchmarkSpec {
 				Name:             "scenario A",
 				WorkingDirectory: "/tmp",
 				Env:              map[string]string{"KEY": "value"},
-				Setup: &CommandSpec{
+				BeforeAll: &CommandSpec{
 					Cmd: []string{"echo", "setupA"},
 				},
-				Teardown: &CommandSpec{
+				AfterAll: &CommandSpec{
 					Cmd: []string{"echo", "teardownA"},
 				},
-				BeforeCommand: &CommandSpec{
+				BeforeEach: &CommandSpec{
 					WorkingDirectory: "/another-path",
 					Cmd:              []string{"echo", "beforeA"},
 				},
-				AfterCommand: &CommandSpec{
+				AfterEach: &CommandSpec{
 					Cmd: []string{"echo", "afterA"},
 				},
 				Command: &CommandSpec{
