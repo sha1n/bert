@@ -32,7 +32,15 @@ func Execute(b *Benchmark, ctx *Context) pkg.TracerSummary {
 func executeAlternately(b *Benchmark, ctx *Context) {
 	for i := 1; i <= b.Executions; i++ {
 		for si := range b.Scenarios {
-			executeScenario(b.Scenarios[si], ctx)
+			scenario := b.Scenarios[si]
+
+			if i == 1 {
+				executeScenarioSetup(scenario, ctx)
+			}
+			executeScenarioCommand(scenario, ctx)
+			if i == b.Executions {
+				executeScenarioTeardown(scenario, ctx)
+			}
 		}
 	}
 }
@@ -40,21 +48,34 @@ func executeAlternately(b *Benchmark, ctx *Context) {
 func executeSequencially(b *Benchmark, ctx *Context) {
 	for si := range b.Scenarios {
 		scenario := b.Scenarios[si]
+
+		executeScenarioSetup(scenario, ctx)
 		for i := 1; i <= b.Executions; i++ {
-			executeScenario(scenario, ctx)
+			executeScenarioCommand(scenario, ctx)
 		}
+		executeScenarioTeardown(scenario, ctx)
 	}
 }
 
-func executeScenario(scenario *Scenario, ctx *Context) {
+func executeScenarioSetup(scenario *Scenario, ctx *Context) {
+	log.Printf("Running setup for scenario '%s'...\r\n", scenario.Name)
+	executeCommand(scenario.Setup, scenario.WorkingDirectory, scenario.Env, ctx)
+}
+
+func executeScenarioTeardown(scenario *Scenario, ctx *Context) {
+	log.Printf("Running teardown for scenario '%s'...\r\n", scenario.Name)
+	executeCommand(scenario.Teardown, scenario.WorkingDirectory, scenario.Env, ctx)
+}
+
+func executeScenarioCommand(scenario *Scenario, ctx *Context) {
 	log.Printf("Executing scenario '%s'...\r\n", scenario.Name)
-	executeCommand(scenario.Before, scenario.WorkingDirectory, scenario.Env, ctx)
+	executeCommand(scenario.BeforeCommand, scenario.WorkingDirectory, scenario.Env, ctx)
 
 	ctx.tracer.Start(scenario)(
 		executeCommand(scenario.Command, scenario.WorkingDirectory, scenario.Env, ctx),
 	)
 
-	executeCommand(scenario.After, scenario.WorkingDirectory, scenario.Env, ctx)
+	executeCommand(scenario.AfterCommand, scenario.WorkingDirectory, scenario.Env, ctx)
 }
 
 func executeCommand(cmd *Command, defaultWorkingDir string, env map[string]string, ctx *Context) (exitError error) {

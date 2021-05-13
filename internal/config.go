@@ -17,8 +17,10 @@ type Scenario struct {
 	Name             string `json:"name" yaml:"name" binding:"required"`
 	WorkingDirectory string `json:"workingDir" yaml:"workingDir"`
 	Env              map[string]string
-	Before           *Command
-	After            *Command
+	Setup            *Command
+	Teardown         *Command
+	BeforeCommand    *Command `json:"beforeCommand" yaml:"beforeCommand" binding:"required"`
+	AfterCommand     *Command `json:"aftercommand" yaml:"afterCommand" binding:"required"`
 	Command          *Command `json:"command" yaml:"command" binding:"required"`
 }
 

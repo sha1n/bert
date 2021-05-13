@@ -8,14 +8,26 @@
       "env": {
         "KEY": "value"
       },
-      "before": {
+      "setup": {
+        "cmd": [
+          "echo",
+          "setupA"
+        ]
+      },
+      "teardown": {
+        "cmd": [
+          "echo",
+          "teardownA"
+        ]
+      },
+      "beforeCommand": {
         "workingDir": "/another-path",
         "cmd": [
           "echo",
           "beforeA"
         ]
       },
-      "after": {
+      "afterCommand": {
         "cmd": [
           "echo",
           "afterA"
