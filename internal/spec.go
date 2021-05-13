@@ -2,6 +2,7 @@ package internal
 
 import (
 	"encoding/json"
+	"gopkg.in/go-playground/validator.v9"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
@@ -10,23 +11,23 @@ import (
 
 type CommandSpec struct {
 	WorkingDirectory string   `json:"workingDir" yaml:"workingDir"`
-	Cmd              []string `json:"cmd" yaml:"cmd" binding:"required"`
+	Cmd              []string `json:"cmd" yaml:"cmd" validate:"required"`
 }
 
 type ScenarioSpec struct {
-	Name             string `json:"name" yaml:"name" binding:"required"`
+	Name             string `json:"name" yaml:"name" validate:"required"`
 	WorkingDirectory string `json:"workingDir" yaml:"workingDir"`
 	Env              map[string]string
-	Setup            *CommandSpec
-	Teardown         *CommandSpec
-	BeforeCommand    *CommandSpec `json:"beforeCommand" yaml:"beforeCommand" binding:"required"`
-	AfterCommand     *CommandSpec `json:"aftercommand" yaml:"afterCommand" binding:"required"`
-	Command          *CommandSpec `json:"command" yaml:"command" binding:"required"`
+	BeforeAll        *CommandSpec `json:"beforeAll" yaml:"beforeAll"`
+	AfterAll         *CommandSpec `json:"afterAll" yaml:"afterAll"`
+	BeforeEach       *CommandSpec `json:"beforeEach" yaml:"beforeEach"`
+	AfterEach        *CommandSpec `json:"afterEach" yaml:"afterEach"`
+	Command          *CommandSpec `json:"command" yaml:"command" validate:"required"`
 }
 
 type BenchmarkSpec struct {
-	Scenarios  []*ScenarioSpec `json:"scenarios" yaml:"scenarios" binding:"required"`
-	Executions int
+	Scenarios  []*ScenarioSpec `json:"scenarios" yaml:"scenarios" validate:"required"`
+	Executions int             `validate:"gte=1,required"`
 	Alternate  bool
 }
 
@@ -34,15 +35,22 @@ func (s *ScenarioSpec) Id() string {
 	return s.Name
 }
 
-func Load(path string) (*BenchmarkSpec, error) {
+func Load(path string) (rtn *BenchmarkSpec, err error) {
 	if strings.HasSuffix(path, ".yaml") || strings.HasSuffix(path, ".yml") {
-		return load_yaml(path)
+		rtn, err = loadYaml(path)
 	} else {
-		return load_json(path)
+		rtn, err = loadJson(path)
 	}
+
+	if err == nil {
+		v := validator.New()
+		err = v.Struct(rtn)
+	}
+
+	return rtn, err
 }
 
-func load_json(path string) (*BenchmarkSpec, error) {
+func loadJson(path string) (*BenchmarkSpec, error) {
 	var benchmark BenchmarkSpec
 
 	jsonFile, err := os.Open(path)
@@ -57,17 +65,15 @@ func load_json(path string) (*BenchmarkSpec, error) {
 	return &benchmark, err
 }
 
-func load_yaml(path string) (*BenchmarkSpec, error) {
-	var benchmark BenchmarkSpec
-
+func loadYaml(path string) (rtn *BenchmarkSpec, err error) {
 	jsonFile, err := os.Open(path)
 
 	if err == nil {
 		defer jsonFile.Close()
 
 		bytes, _ := ioutil.ReadAll(jsonFile)
-		yaml.Unmarshal(bytes, &benchmark)
+		yaml.Unmarshal(bytes, &rtn)
 	}
 
-	return &benchmark, err
+	return rtn, err
 }
