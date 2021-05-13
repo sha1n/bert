@@ -7,6 +7,7 @@ import (
 	"os/exec"
 )
 
+// CommandExecutor is an abstraction for commands executed as subprocesses.
 type CommandExecutor interface {
 	Execute(cmd *CommandSpec, defaultWorkingDir string, env map[string]string, ctx *ExecutionContext) error
 }
@@ -16,6 +17,7 @@ type commandExecutor struct {
 	pipeStderr bool
 }
 
+// NewCommandExecutor creates a new command executor.
 func NewCommandExecutor(pipeStdout bool, pipeStderr bool) CommandExecutor {
 	return &commandExecutor{
 		pipeStdout: pipeStdout,
@@ -23,10 +25,7 @@ func NewCommandExecutor(pipeStdout bool, pipeStderr bool) CommandExecutor {
 	}
 }
 
-func NewDefaultCommandExecutor() CommandExecutor {
-	return NewCommandExecutor(true, true)
-}
-
+// Executes a single command in a subprocess based on the specified specs.
 func (ce *commandExecutor) Execute(cmdSpec *CommandSpec, defaultWorkingDir string, env map[string]string, ctx *ExecutionContext) (exitError error) {
 	if cmdSpec == nil {
 		return nil

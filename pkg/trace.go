@@ -2,26 +2,32 @@ package pkg
 
 import "time"
 
+// End ends a trace
 type End = func(error)
-type Id = string
 
+// ID well..
+type ID = string
+
+// Identifiable an abstraction for identifiable objects
 type Identifiable interface {
-	Id() Id
+	ID() ID
 }
 
+// Tracer a global tracing handler that accumulates trace data and provides access to it.
 type Tracer interface {
 	Start(i Identifiable) End
 	Summary() TracerSummary
 }
 
+// Trace a single time trace
 type Trace interface {
-	Id() string
+	ID() string
 	Elapsed() time.Duration
 	Error() error
 }
 
 type tracer struct {
-	traces map[Id][]Trace
+	traces map[ID][]Trace
 }
 
 type trace struct {
@@ -36,7 +42,7 @@ func (t *trace) end(exitError error) {
 	t.error = exitError
 }
 
-func (t *trace) Id() string {
+func (t *trace) ID() string {
 	return t.id
 }
 
@@ -55,20 +61,21 @@ func newTrace(id string) *trace {
 	}
 }
 
+// NewTracer creates a new tracer
 func NewTracer() Tracer {
 	return &tracer{
-		traces: make(map[Id][]Trace),
+		traces: make(map[ID][]Trace),
 	}
 }
 
 func (tr *tracer) Start(i Identifiable) End {
-	t := newTrace(i.Id())
+	t := newTrace(i.ID())
 
-	if tr.traces[i.Id()] == nil {
-		tr.traces[i.Id()] = []Trace{}
+	if tr.traces[i.ID()] == nil {
+		tr.traces[i.ID()] = []Trace{}
 	}
 
-	tr.traces[i.Id()] = append(tr.traces[i.Id()], t)
+	tr.traces[i.ID()] = append(tr.traces[i.ID()], t)
 
 	return t.end
 }

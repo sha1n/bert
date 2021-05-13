@@ -9,8 +9,10 @@ import (
 	"os"
 )
 
+// WriteReport writes a benchmark report.
 type WriteReport = func(summary pkg.TracerSummary, config *BenchmarkSpec)
 
+// Run accepts the program arguments and runs a benchmark.
 func Run(cmd *cobra.Command, args []string) error {
 	specFilePath, _ := cmd.Flags().GetString("config")
 	pipeStdOut, _ := cmd.Flags().GetBool("pipe-stdout")

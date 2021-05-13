@@ -15,14 +15,17 @@ var green = color.New(color.FgGreen).Sprintf
 var yellow = color.New(color.FgYellow).Sprintf
 var bold = color.New(color.Bold).Sprintf
 
+// ReportWriter an abstraction for an object that benchmark results to any target.
 type ReportWriter interface {
 	Write(pkg.TracerSummary, *BenchmarkSpec)
 }
 
+// TextReportWriter a simple human readable test report writer
 type TextReportWriter struct {
 	writer *bufio.Writer
 }
 
+// NewTextReportWriter creates a new TextReportWriter.
 func NewTextReportWriter(writer *bufio.Writer) ReportWriter {
 	return &TextReportWriter{
 		writer: writer,

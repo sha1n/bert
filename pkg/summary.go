@@ -4,6 +4,7 @@ import (
 	"github.com/montanaflynn/stats"
 )
 
+// Stats provides access to statistics. Statistics are not necessarily cached and might be calculated on call.
 type Stats interface {
 	Min() (float64, error)
 	Max() (float64, error)
@@ -11,6 +12,38 @@ type Stats interface {
 	Median() (float64, error)
 	Percentile(percent float64) (float64, error)
 	ErrorRate() float64
+}
+
+// TracerSummary provides access a cpollection of identifiable statistics.
+type TracerSummary interface {
+	StatsOf(ID) Stats
+	AllStats() map[ID]Stats
+}
+
+// NewTracerSummary create a new TracerSummary with the specified data.
+func NewTracerSummary(tracesById map[ID][]Trace) TracerSummary {
+	summary := &tracerSummary{
+		samples: make(map[ID]Stats),
+	}
+
+	for id, traces := range tracesById {
+		float64Samples := []float64{}
+		errorCount := 0
+
+		for ti := range traces {
+			float64Samples = append(float64Samples, float64(traces[ti].Elapsed().Nanoseconds()))
+			if traces[ti].Error() != nil {
+				errorCount++
+			}
+		}
+
+		summary.samples[id] = &sstats{
+			float64Samples: float64Samples,
+			errorRate:      float64(errorCount / len(traces)),
+		}
+	}
+
+	return summary
 }
 
 type sstats struct {
@@ -42,44 +75,14 @@ func (ss *sstats) ErrorRate() float64 {
 	return ss.errorRate
 }
 
-type TracerSummary interface {
-	StatsOf(Id) Stats
-	AllStats() map[Id]Stats
-}
-
 type tracerSummary struct {
-	samples map[Id]Stats
+	samples map[ID]Stats
 }
 
-func (tracerSummary *tracerSummary) StatsOf(id Id) Stats {
+func (tracerSummary *tracerSummary) StatsOf(id ID) Stats {
 	return tracerSummary.samples[id]
 }
 
-func (tracerSummary *tracerSummary) AllStats() map[Id]Stats {
+func (tracerSummary *tracerSummary) AllStats() map[ID]Stats {
 	return tracerSummary.samples
-}
-
-func NewTracerSummary(tracesById map[Id][]Trace) TracerSummary {
-	summary := &tracerSummary{
-		samples: make(map[Id]Stats),
-	}
-
-	for id, traces := range tracesById {
-		float64Samples := []float64{}
-		errorCount := 0
-
-		for ti := range traces {
-			float64Samples = append(float64Samples, float64(traces[ti].Elapsed().Nanoseconds()))
-			if traces[ti].Error() != nil {
-				errorCount += 1
-			}
-		}
-
-		summary.samples[id] = &sstats{
-			float64Samples: float64Samples,
-			errorRate:      float64(errorCount / len(traces)),
-		}
-	}
-
-	return summary
 }
