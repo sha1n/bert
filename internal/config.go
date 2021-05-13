@@ -9,7 +9,8 @@ import (
 )
 
 type Command struct {
-	Cmd []string `json:"cmd" yaml:"cmd" binding:"required"`
+	WorkingDirectory string   `json:"workingDir" yaml:"workingDir"`
+	Cmd              []string `json:"cmd" yaml:"cmd" binding:"required"`
 }
 
 type Scenario struct {

@@ -55,6 +55,7 @@ The config file can be either in JSON format or YAML. `benchy` assumes a file wi
 **Example YAML config:**
 ```yaml
 ---
+---
 alternate: true
 executions: 10
 scenarios:
@@ -63,6 +64,7 @@ scenarios:
   env:
     KEY: value
   before:
+    workingDir: "/another-path"
     cmd:
     - echo
     - beforeA
@@ -94,6 +96,7 @@ scenarios:
         "KEY": "value"
       },
       "before": {
+        "workingDir": "/another-path",
         "cmd": [
           "echo",
           "beforeA"

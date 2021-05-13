@@ -9,6 +9,7 @@
         "KEY": "value"
       },
       "before": {
+        "workingDir": "/another-path",
         "cmd": [
           "echo",
           "beforeA"
