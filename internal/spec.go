@@ -9,11 +9,13 @@ import (
 	"strings"
 )
 
+// CommandSpec benchmark command execution specs
 type CommandSpec struct {
 	WorkingDirectory string   `json:"workingDir" yaml:"workingDir"`
 	Cmd              []string `json:"cmd" yaml:"cmd" validate:"required"`
 }
 
+// ScenarioSpec benchmark scenario specs
 type ScenarioSpec struct {
 	Name             string `json:"name" yaml:"name" validate:"required"`
 	WorkingDirectory string `json:"workingDir" yaml:"workingDir"`
@@ -25,21 +27,24 @@ type ScenarioSpec struct {
 	Command          *CommandSpec `json:"command" yaml:"command" validate:"required"`
 }
 
+// BenchmarkSpec benchmark specs top level structure
 type BenchmarkSpec struct {
 	Scenarios  []*ScenarioSpec `json:"scenarios" yaml:"scenarios" validate:"required"`
 	Executions int             `validate:"gte=1,required"`
 	Alternate  bool
 }
 
-func (s *ScenarioSpec) Id() string {
+// ID returns a unique identifier
+func (s *ScenarioSpec) ID() string {
 	return s.Name
 }
 
+// Load loads benchmark specs from the specified file.
 func Load(path string) (rtn *BenchmarkSpec, err error) {
 	if strings.HasSuffix(path, ".yaml") || strings.HasSuffix(path, ".yml") {
 		rtn, err = loadYaml(path)
 	} else {
-		rtn, err = loadJson(path)
+		rtn, err = loadJSON(path)
 	}
 
 	if err == nil {
@@ -50,7 +55,7 @@ func Load(path string) (rtn *BenchmarkSpec, err error) {
 	return rtn, err
 }
 
-func loadJson(path string) (*BenchmarkSpec, error) {
+func loadJSON(path string) (*BenchmarkSpec, error) {
 	var benchmark BenchmarkSpec
 
 	jsonFile, err := os.Open(path)

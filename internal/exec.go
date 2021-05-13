@@ -6,11 +6,13 @@ import (
 	"github.com/sha1n/benchy/pkg"
 )
 
+// ExecutionContext provides access to benchmark global resources
 type ExecutionContext struct {
 	executor CommandExecutor
 	tracer   pkg.Tracer
 }
 
+// NewExecutionContext creates a new ExecutionContext.
 func NewExecutionContext(tracer pkg.Tracer, executor CommandExecutor) *ExecutionContext {
 	return &ExecutionContext{
 		executor: executor,
@@ -18,6 +20,7 @@ func NewExecutionContext(tracer pkg.Tracer, executor CommandExecutor) *Execution
 	}
 }
 
+// ExecuteBenchmark executes a benchmark and returns an object that provides access to collected stats.
 func ExecuteBenchmark(spec *BenchmarkSpec, ctx *ExecutionContext) pkg.TracerSummary {
 	if spec.Alternate {
 		executeAlternately(spec, ctx)
