@@ -6,51 +6,51 @@ import (
 )
 
 func Test_LoadJson(t *testing.T) {
-	test_Load(t, "../test_data/config_test_load.json")
+	test_Load(t, "../test_data/spec_test_load.json")
 }
 
 func Test_LoadYaml(t *testing.T) {
-	test_Load(t, "../test_data/config_test_load.yaml")
+	test_Load(t, "../test_data/spec_test_load.yaml")
 }
 
-func test_Load(t *testing.T, configPath string) {
-	expected := expectedBenchmarkConfig()
+func test_Load(t *testing.T, filePath string) {
+	expected := expectedBenchmarkSpec()
 
-	benchmark, err := Load(configPath)
+	benchmark, err := Load(filePath)
 
 	assert.NoError(t, err)
 	assert.Equal(t, expected, benchmark)
 }
 
-func expectedBenchmarkConfig() *Benchmark {
-	return &Benchmark{
+func expectedBenchmarkSpec() *BenchmarkSpec {
+	return &BenchmarkSpec{
 		Executions: 10,
 		Alternate:  true,
-		Scenarios: []*Scenario{
+		Scenarios: []*ScenarioSpec{
 			{
 				Name:             "scenario A",
 				WorkingDirectory: "/tmp",
 				Env:              map[string]string{"KEY": "value"},
-				Setup: &Command{
+				Setup: &CommandSpec{
 					Cmd: []string{"echo", "setupA"},
 				},
-				Teardown: &Command{
+				Teardown: &CommandSpec{
 					Cmd: []string{"echo", "teardownA"},
 				},
-				BeforeCommand: &Command{
+				BeforeCommand: &CommandSpec{
 					WorkingDirectory: "/another-path",
 					Cmd:              []string{"echo", "beforeA"},
 				},
-				AfterCommand: &Command{
+				AfterCommand: &CommandSpec{
 					Cmd: []string{"echo", "afterA"},
 				},
-				Command: &Command{
+				Command: &CommandSpec{
 					Cmd: []string{"sleep", "1"},
 				},
 			},
 			{
 				Name: "scenario B",
-				Command: &Command{
+				Command: &CommandSpec{
 					Cmd: []string{"sleep", "0"},
 				},
 			},

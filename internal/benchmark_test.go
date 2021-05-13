@@ -7,15 +7,17 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+var silentCommandExecutor = NewCommandExecutor(false, false)
+
 func Test_run(t *testing.T) {
 	var actualSummary pkg.TracerSummary
-	var actualConfig *Benchmark
-	interceptSummary := func(summary pkg.TracerSummary, config *Benchmark) {
+	var actualConfig *BenchmarkSpec
+	interceptSummary := func(summary pkg.TracerSummary, config *BenchmarkSpec) {
 		actualSummary = summary
 		actualConfig = config
 	}
 
-	err := run("../test_data/benchmark_test_run.yaml", interceptSummary)
+	err := run("../test_data/benchmark_test_run.yaml", silentCommandExecutor, interceptSummary)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, actualSummary)
@@ -28,7 +30,7 @@ func Test_run(t *testing.T) {
 }
 
 func Test_runWithMissingConfigFile(t *testing.T) {
-	err := run("../test_data/non-existing-file.yaml", func(summary pkg.TracerSummary, config *Benchmark) { t.Fail() })
+	err := run("../test_data/non-existing-file.yaml", silentCommandExecutor, failingWriteSummaryFn(t))
 
 	assert.Error(t, err)
 }
@@ -47,4 +49,8 @@ func assertStatValue(t *testing.T, get func() (float64, error)) {
 
 	assert.NoError(t, err)
 	assert.GreaterOrEqual(t, value, 0.0)
+}
+
+func failingWriteSummaryFn(t *testing.T) WriteReport {
+	return func(summary pkg.TracerSummary, config *BenchmarkSpec) { t.Fail() }
 }

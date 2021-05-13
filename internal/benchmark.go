@@ -2,47 +2,59 @@ package internal
 
 import (
 	"bufio"
-	"log"
-	"os"
 
 	"github.com/sha1n/benchy/pkg"
+	log "github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
+	"os"
 )
 
-type WriteReport = func(summary pkg.TracerSummary, config *Benchmark)
+type WriteReport = func(summary pkg.TracerSummary, config *BenchmarkSpec)
 
-func Run(configFilePath string) error {
-	log.Println("Starting benchy...")
+func Run(cmd *cobra.Command, args []string) error {
+	specFilePath, _ := cmd.Flags().GetString("config")
+	pipeStdOut, _ := cmd.Flags().GetBool("pipe-stdout")
+	pipeStdErr, _ := cmd.Flags().GetBool("pipe-stderr")
 
-	return run(configFilePath, writeReport)
+	if debug, _ := cmd.Flags().GetBool("debug"); debug {
+		log.StandardLogger().SetLevel(log.DebugLevel)
+	}
+
+	executor := NewCommandExecutor(
+		pipeStdOut,
+		pipeStdErr,
+	)
+
+	return run(specFilePath, executor, writeReport)
 }
 
-func run(configFilePath string, writeReport WriteReport) (error error) {
-	log.Println("Starting benchy...")
+func run(specFilePath string, executor CommandExecutor, writeReport WriteReport) (error error) {
+	log.Info("Starting benchy...")
 
-	config, err := loadConfig(configFilePath)
+	spec, err := loadSpec(specFilePath)
 	if err != nil {
 		return err
 	}
 
-	summary := Execute(config, NewContext(pkg.NewTracer()))
-	writeReport(summary, config)
+	summary := ExecuteBenchmark(spec, NewExecutionContext(pkg.NewTracer(), executor))
+	writeReport(summary, spec)
 
 	return error
 }
 
-func loadConfig(configFilePath string) (rtn *Benchmark, error error) {
-	log.Printf("Loading configuration file '%s'...\r\n", configFilePath)
+func loadSpec(filePath string) (rtn *BenchmarkSpec, error error) {
+	log.Infof("Loading benchmark specs from '%s'...", filePath)
 
-	benchmark, err := Load(configFilePath)
+	benchmark, err := Load(filePath)
 	if err != nil {
-		log.Println(err)
+		log.Error(err.Error())
 		error = err
 	}
 
 	return benchmark, error
 }
 
-func writeReport(summary pkg.TracerSummary, config *Benchmark) {
+func writeReport(summary pkg.TracerSummary, config *BenchmarkSpec) {
 	console := bufio.NewWriter(os.Stdout)
 	writer := NewTextReportWriter(console)
 	writer.Write(summary, config)
