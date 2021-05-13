@@ -32,7 +32,8 @@ func expectedBenchmarkConfig() *Benchmark {
 				WorkingDirectory: "/tmp",
 				Env:              map[string]string{"KEY": "value"},
 				Before: &Command{
-					Cmd: []string{"echo", "beforeA"},
+					WorkingDirectory: "/another-path",
+					Cmd:              []string{"echo", "beforeA"},
 				},
 				After: &Command{
 					Cmd: []string{"echo", "afterA"},

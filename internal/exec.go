@@ -57,20 +57,28 @@ func executeScenario(scenario *Scenario, ctx *Context) {
 	executeCommand(scenario.After, scenario.WorkingDirectory, scenario.Env, ctx)
 }
 
-func executeCommand(cmd *Command, wd string, env map[string]string, ctx *Context) (exitError error) {
+func executeCommand(cmd *Command, defaultWorkingDir string, env map[string]string, ctx *Context) (exitError error) {
 	if cmd == nil {
 		return nil
 	}
 
 	log.Printf("Going to execute command %v", cmd.Cmd)
+
 	benchCmd := exec.Command(cmd.Cmd[0], cmd.Cmd[1:]...)
-	if wd != "" {
-		log.Printf("Setting custom command working directory '%s'", wd)
-		benchCmd.Dir = wd
+
+	if cmd.WorkingDirectory != "" {
+		log.Printf("Setting command working directory to '%s'", cmd.WorkingDirectory)
+		benchCmd.Dir = cmd.WorkingDirectory
+	} else {
+		if defaultWorkingDir != "" {
+			log.Printf("Setting command working directory to '%s'", defaultWorkingDir)
+			benchCmd.Dir = defaultWorkingDir
+		}
 	}
+
 	if env != nil {
 		cmdEnv := toEnvVarsArray(env)
-		log.Printf("Appending custom command environment variables '%v'", cmdEnv)
+		log.Printf("Populating command environment variables '%v'", cmdEnv)
 		benchCmd.Env = append(benchCmd.Env, cmdEnv...)
 	}
 
