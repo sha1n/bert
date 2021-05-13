@@ -61,7 +61,7 @@ scenarios:                # list of scenarios
 ```
 
 ## Command Configuration
-The following elements share the same structure: `setupCommand`, `teardownCommand`, `beforeCommand`, `afterCommand`, `command`. 
+The following elements share the same structure: `beforeAll`, `afterAll`, `beforeEach`, `afterEach`, `command`. 
 
 `workingDir` - the `workingDir` property can be set globally for a scenario and optionally be overriden per command. If no working directory is set the default is the directory `benchy` is executed from.
 
