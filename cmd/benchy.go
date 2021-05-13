@@ -35,6 +35,9 @@ Build label: %s`, Version, Build),
 	}
 
 	rootCmd.Flags().StringP("config", "c", "", `config file path`)
+	rootCmd.Flags().BoolP("pipe-stdout", "", true, `whether or not commands' standard output should be piped to benchy's standard out`)
+	rootCmd.Flags().BoolP("pipe-stderr", "", true, `whether or not commands' standard error should be piped to benchy's standard error`)
+
 	cobra.MarkFlagRequired(rootCmd.Flags(), "config")
 
 	rootCmd.SetVersionTemplate(`{{printf "%s" .Version}}`)
@@ -43,6 +46,9 @@ Build label: %s`, Version, Build),
 }
 
 func doRun(cmd *cobra.Command, args []string) {
-	configFilePath, _ := cmd.Flags().GetString("config")
-	internal.Run(configFilePath)
+	error := internal.Run(cmd, args)
+
+	if error != nil {
+		log.Println(error.Error())
+	}
 }
