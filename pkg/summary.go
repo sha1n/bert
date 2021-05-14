@@ -21,12 +21,12 @@ type TracerSummary interface {
 }
 
 // NewTracerSummary create a new TracerSummary with the specified data.
-func NewTracerSummary(tracesById map[ID][]Trace) TracerSummary {
+func NewTracerSummary(tracesByID map[ID][]Trace) TracerSummary {
 	summary := &tracerSummary{
 		samples: make(map[ID]Stats),
 	}
 
-	for id, traces := range tracesById {
+	for id, traces := range tracesByID {
 		float64Samples := []float64{}
 		errorCount := 0
 
