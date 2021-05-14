@@ -28,57 +28,54 @@ PID := $(GOBUILD)/.$(PROJECTNAME).pid
 # Make is verbose in Linux. Make it silent.
 MAKEFLAGS += --silent
 
-default: install format test compile
+default: clean install lint format test compile
 
-
-## install: Install missing dependencies.
 install: go-get
 
 format: go-format
 
-#lint: go-lint
+lint: go-lint
 
-## compile: Compile the binary.
 compile:
 	@[ -d $(GOBUILD) ] || mkdir -p $(GOBUILD)
 	@-touch $(STDERR)
 	@-rm $(STDERR)
-	@-$(MAKE) -s go-compile 2> $(STDERR)
+	@-$(MAKE) -s go-build 2> $(STDERR)
 	@cat $(STDERR) | sed -e '1s/.*/\nError:\n/'  | sed 's/make\[.*/ /' | sed "/^/s/^/     /" 1>&2
 
 
 test: go-test
 
-## clean: Clean build files. Runs `go clean` internally.
 clean:
 	@-rm $(GOBIN)/$(PROGRAMNAME)* 2> /dev/null
 	@-$(MAKE) go-clean
 
 go-lint:
-	# TODO: golint is no longer available - need to download or build it from sources here.
 	@echo "  >  Linting source files..."
-	golint $(GOFILES)
+	go vet -mod=readonly -c=10 $(GOBASE)/cmd
+	go vet -mod=readonly -c=10 $(GOBASE)/internal
+	go vet -mod=readonly -c=10 $(GOBASE)/pkg
 
 go-format:
 	@echo "  >  Formating source files..."
 	gofmt -s -w $(GOFILES)
 
-go-compile: go-get go-build-linux go-build-darwin go-build-windows
+go-build: go-get go-build-linux go-build-darwin go-build-windows
 
 go-test:
 	go test -mod=readonly -v `go list -mod=readonly ./...`
 
 go-build-linux:
 	@echo "  >  Building linux binaries..."
-	@GOPATH=$(GOPATH) GOOS=$(GOOS_LINUX) GOARCH=$(GOARCH) GOBIN=$(GOBIN) go build -mod=readonly $(LDFLAGS) -o $(GOBIN)/$(PROGRAMNAME)-$(GOOS_LINUX)-$(GOARCH) ./cmd
+	@GOPATH=$(GOPATH) GOOS=$(GOOS_LINUX) GOARCH=$(GOARCH) GOBIN=$(GOBIN) go build -mod=readonly $(LDFLAGS) -o $(GOBIN)/$(PROGRAMNAME)-$(GOOS_LINUX)-$(GOARCH) $(GOBASE)/cmd
 
 go-build-darwin:
 	@echo "  >  Building darwin binaries..."
-	@GOPATH=$(GOPATH) GOOS=$(GOOS_DARWIN) GOARCH=$(GOARCH) GOBIN=$(GOBIN) go build -mod=readonly $(LDFLAGS) -o $(GOBIN)/$(PROGRAMNAME)-$(GOOS_DARWIN)-$(GOARCH) ./cmd
+	@GOPATH=$(GOPATH) GOOS=$(GOOS_DARWIN) GOARCH=$(GOARCH) GOBIN=$(GOBIN) go build -mod=readonly $(LDFLAGS) -o $(GOBIN)/$(PROGRAMNAME)-$(GOOS_DARWIN)-$(GOARCH) $(GOBASE)/cmd
 
 go-build-windows:
 	@echo "  >  Building windows binaries..."
-	@GOPATH=$(GOPATH) GOOS=$(GOOS_WINDOWS) GOARCH=$(GOARCH) GOBIN=$(GOBIN) go build -mod=readonly $(LDFLAGS) -o $(GOBIN)/$(PROGRAMNAME)-$(GOOS_WINDOWS)-$(GOARCH).exe ./cmd
+	@GOPATH=$(GOPATH) GOOS=$(GOOS_WINDOWS) GOARCH=$(GOARCH) GOBIN=$(GOBIN) go build -mod=readonly $(LDFLAGS) -o $(GOBIN)/$(PROGRAMNAME)-$(GOOS_WINDOWS)-$(GOARCH).exe $(GOBASE)/cmd
 
 go-generate:
 	@echo "  >  Generating dependency files..."
@@ -93,7 +90,7 @@ go-install:
 
 go-clean:
 	@echo "  >  Cleaning build cache"
-	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go clean ./cmd/benchy
+	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go clean -mod=readonly $(GOBASE)/cmd
 
 
 .PHONY: help
