@@ -5,7 +5,7 @@ import "time"
 // End ends a trace
 type End = func(error)
 
-// ID well..
+// ID ...
 type ID = string
 
 // Identifiable an abstraction for identifiable objects

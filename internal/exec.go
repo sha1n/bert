@@ -60,13 +60,17 @@ func executeSequencially(b *BenchmarkSpec, ctx *ExecutionContext) {
 }
 
 func executeScenarioSetup(scenario *ScenarioSpec, ctx *ExecutionContext) {
-	log.Debugf("Running setup for scenario '%s'...", scenario.Name)
-	ctx.executor.Execute(scenario.BeforeAll, scenario.WorkingDirectory, scenario.Env, ctx)
+	if scenario.BeforeAll != nil {
+		log.Debugf("Running setup for scenario '%s'...", scenario.Name)
+		ctx.executor.Execute(scenario.BeforeAll, scenario.WorkingDirectory, scenario.Env, ctx)
+	}
 }
 
 func executeScenarioTeardown(scenario *ScenarioSpec, ctx *ExecutionContext) {
-	log.Debugf("Running teardown for scenario '%s'...", scenario.Name)
-	ctx.executor.Execute(scenario.AfterAll, scenario.WorkingDirectory, scenario.Env, ctx)
+	if scenario.BeforeAll != nil {
+		log.Debugf("Running teardown for scenario '%s'...", scenario.Name)
+		ctx.executor.Execute(scenario.AfterAll, scenario.WorkingDirectory, scenario.Env, ctx)
+	}
 }
 
 func executeScenarioCommand(scenario *ScenarioSpec, ctx *ExecutionContext) {
