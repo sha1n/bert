@@ -18,19 +18,19 @@ type CommandSpec struct {
 // ScenarioSpec benchmark scenario specs
 type ScenarioSpec struct {
 	Name             string `json:"name" yaml:"name" validate:"required"`
-	WorkingDirectory string `json:"workingDir" yaml:"workingDir"`
+	WorkingDirectory string `json:"workingDir" yaml:"workingDir" validate:"required"`
 	Env              map[string]string
 	BeforeAll        *CommandSpec `json:"beforeAll" yaml:"beforeAll"`
 	AfterAll         *CommandSpec `json:"afterAll" yaml:"afterAll"`
 	BeforeEach       *CommandSpec `json:"beforeEach" yaml:"beforeEach"`
 	AfterEach        *CommandSpec `json:"afterEach" yaml:"afterEach"`
-	Command          *CommandSpec `json:"command" yaml:"command" validate:"required"`
+	Command          *CommandSpec `validate:"required"`
 }
 
 // BenchmarkSpec benchmark specs top level structure
 type BenchmarkSpec struct {
 	Scenarios  []*ScenarioSpec `json:"scenarios" yaml:"scenarios" validate:"required"`
-	Executions int             `validate:"gte=1,required"`
+	Executions int             `validate:"gte=1"`
 	Alternate  bool
 }
 
@@ -40,45 +40,33 @@ func (s *ScenarioSpec) ID() string {
 }
 
 // Load loads benchmark specs from the specified file.
-func Load(path string) (rtn *BenchmarkSpec, err error) {
+func Load(path string) (*BenchmarkSpec, error) {
+	var unmarshalFn func([]byte, interface{}) error
+
 	if strings.HasSuffix(path, ".yaml") || strings.HasSuffix(path, ".yml") {
-		rtn, err = loadYaml(path)
+		unmarshalFn = yaml.Unmarshal
 	} else {
-		rtn, err = loadJSON(path)
+		unmarshalFn = json.Unmarshal
 	}
 
-	if err == nil {
-		v := validator.New()
-		err = v.Struct(rtn)
-	}
-
-	return rtn, err
+	return load(path, unmarshalFn)
 }
 
-func loadJSON(path string) (*BenchmarkSpec, error) {
-	var benchmark BenchmarkSpec
-
-	jsonFile, err := os.Open(path)
-
-	if err == nil {
+func load(path string, unmarshal func([]byte, interface{}) error) (spec *BenchmarkSpec, err error) {
+	var jsonFile *os.File
+	if jsonFile, err = os.Open(path); err == nil {
 		defer jsonFile.Close()
 
-		bytes, _ := ioutil.ReadAll(jsonFile)
-		json.Unmarshal(bytes, &benchmark)
+		var bytes []byte
+		if bytes, err = ioutil.ReadAll(jsonFile); err == nil {
+			err = unmarshal(bytes, &spec)
+		}
+
+		if err == nil {
+			v := validator.New()
+			err = v.Struct(spec)
+		}
 	}
 
-	return &benchmark, err
-}
-
-func loadYaml(path string) (rtn *BenchmarkSpec, err error) {
-	jsonFile, err := os.Open(path)
-
-	if err == nil {
-		defer jsonFile.Close()
-
-		bytes, _ := ioutil.ReadAll(jsonFile)
-		yaml.Unmarshal(bytes, &rtn)
-	}
-
-	return rtn, err
+	return spec, err
 }
