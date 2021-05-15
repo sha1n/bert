@@ -49,6 +49,7 @@ func (trw *TextReportWriter) Write(ts pkg.TracerSummary, config *BenchmarkSpec) 
 		trw.writeStatNano2Sec("mean", stats.Mean)
 		trw.writeStatNano2Sec("median", stats.Median)
 		trw.writeStatNano2Sec("p90", func() (float64, error) { return stats.Percentile(90) })
+		trw.writeStatNano2Sec("stddev", stats.StdDev)
 		trw.writeErrorRateStat("errors", stats.ErrorRate)
 		trw.writeNewLine()
 		trw.writer.Flush()
@@ -75,6 +76,16 @@ func (trw *TextReportWriter) writeStatNano2Sec(name string, f func() (float64, e
 	if err == nil {
 		trw.writeStatTitle(name)
 		trw.writer.WriteString(fmt.Sprintf("%.3fs\r\n", value/math.Pow(10, 9)))
+	} else {
+		trw.writeStatError(name)
+	}
+}
+
+func (trw *TextReportWriter) writeNumericStat(name string, f func() (float64, error)) {
+	value, err := f()
+	if err == nil {
+		trw.writeStatTitle(name)
+		trw.writer.WriteString(fmt.Sprintf("%.3f\r\n", value))
 	} else {
 		trw.writeStatError(name)
 	}

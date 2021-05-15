@@ -11,6 +11,7 @@ type Stats interface {
 	Mean() (float64, error)
 	Median() (float64, error)
 	Percentile(percent float64) (float64, error)
+	StdDev() (float64, error)
 	ErrorRate() float64
 }
 
@@ -61,6 +62,10 @@ func (ss *sstats) Max() (float64, error) {
 
 func (ss *sstats) Mean() (float64, error) {
 	return stats.Mean(ss.float64Samples)
+}
+
+func (ss *sstats) StdDev() (float64, error) {
+	return stats.StandardDeviation(ss.float64Samples)
 }
 
 func (ss *sstats) Median() (float64, error) {
