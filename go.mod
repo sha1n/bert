@@ -4,6 +4,8 @@ go 1.15
 
 require (
 	github.com/fatih/color v1.10.0
+	github.com/go-playground/locales v0.13.0
+	github.com/go-playground/universal-translator v0.17.0
 	github.com/go-playground/validator/v10 v10.6.1
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/montanaflynn/stats v0.6.6

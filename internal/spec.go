@@ -2,11 +2,18 @@ package internal
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
+	log "github.com/sirupsen/logrus"
+
+	"github.com/go-playground/locales/en"
+	ut "github.com/go-playground/universal-translator"
 
 	"github.com/go-playground/validator/v10"
+	en_translations "github.com/go-playground/validator/v10/translations/en"
+
 	"gopkg.in/yaml.v2"
 )
 
@@ -73,5 +80,30 @@ func load(path string, unmarshal func([]byte, interface{}) error) (spec *Benchma
 
 func validate(spec *BenchmarkSpec) (err error) {
 	v := validator.New()
-	return v.Struct(spec)
+	english := en.New()
+	uni := ut.New(english, english)
+	trans, _ := uni.GetTranslator("en")
+	_ = en_translations.RegisterDefaultTranslations(v, trans)
+
+	if err = v.Struct(spec); err != nil {
+		var errstrings []string
+		errstrings = append(errstrings, "Invalid configuration:")
+		errstrings = append(errstrings, translateError(err, trans)...)
+		err = fmt.Errorf(strings.Join(errstrings, "\n\t- "))
+	}
+
+	return err
+}
+
+func translateError(err error, trans ut.Translator) (errs []string) {
+	if err == nil {
+		return nil
+	}
+	validatorErrs := err.(validator.ValidationErrors)
+	for _, e := range validatorErrs {
+		translatedErr := fmt.Errorf(e.Translate(trans))
+		log.Debug(e)
+		errs = append(errs, translatedErr.Error())
+	}
+	return errs
 }
