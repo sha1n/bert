@@ -13,6 +13,18 @@ func TestLoadYaml(t *testing.T) {
 	testLoad(t, "../test_data/spec_test_load.yaml")
 }
 
+func TestLoadYamlWithMissingRequiredCommand(t *testing.T) {
+	_, err := Load("../test_data/spec_test_load_with_missing_command.yaml")
+
+	assert.Error(t, err)
+}
+
+func TestLoadYamlWithMissingCmdFieldOfOptionalCommand(t *testing.T) {
+	_, err := Load("../test_data/spec_test_load_with_missing_cmd_of_optional_command.yaml")
+
+	assert.Error(t, err)
+}
+
 func testLoad(t *testing.T, filePath string) {
 	expected := expectedBenchmarkSpec()
 

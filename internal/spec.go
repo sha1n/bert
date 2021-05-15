@@ -2,11 +2,12 @@ package internal
 
 import (
 	"encoding/json"
-	"gopkg.in/go-playground/validator.v9"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
 	"strings"
+
+	"github.com/go-playground/validator/v10"
+	"gopkg.in/yaml.v2"
 )
 
 // CommandSpec benchmark command execution specs
@@ -18,19 +19,19 @@ type CommandSpec struct {
 // ScenarioSpec benchmark scenario specs
 type ScenarioSpec struct {
 	Name             string `json:"name" yaml:"name" validate:"required"`
-	WorkingDirectory string `json:"workingDir" yaml:"workingDir" validate:"required"`
+	WorkingDirectory string `json:"workingDir" yaml:"workingDir"`
 	Env              map[string]string
 	BeforeAll        *CommandSpec `json:"beforeAll" yaml:"beforeAll"`
 	AfterAll         *CommandSpec `json:"afterAll" yaml:"afterAll"`
 	BeforeEach       *CommandSpec `json:"beforeEach" yaml:"beforeEach"`
 	AfterEach        *CommandSpec `json:"afterEach" yaml:"afterEach"`
-	Command          *CommandSpec `validate:"required"`
+	Command          *CommandSpec `validate:"required,dive"`
 }
 
 // BenchmarkSpec benchmark specs top level structure
 type BenchmarkSpec struct {
-	Scenarios  []*ScenarioSpec `json:"scenarios" yaml:"scenarios" validate:"required"`
-	Executions int             `validate:"gte=1"`
+	Scenarios  []*ScenarioSpec `json:"scenarios" yaml:"scenarios" validate:"required,dive"`
+	Executions int             `validate:"required,gte=1"`
 	Alternate  bool
 }
 
@@ -63,10 +64,14 @@ func load(path string, unmarshal func([]byte, interface{}) error) (spec *Benchma
 		}
 
 		if err == nil {
-			v := validator.New()
-			err = v.Struct(spec)
+			err = validate(spec)
 		}
 	}
 
 	return spec, err
+}
+
+func validate(spec *BenchmarkSpec) (err error) {
+	v := validator.New()
+	return v.Struct(spec)
 }

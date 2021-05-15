@@ -1,0 +1,6 @@
+---
+alternate: true
+executions: 10
+scenarios:
+- name: scenario
+  workingDir: "/"
