@@ -1,0 +1,10 @@
+---
+alternate: true
+executions: 10
+scenarios:
+- name: scenario
+  afterEach:
+    workingDir: "/d"
+  command:
+    cmd: 
+    - ll

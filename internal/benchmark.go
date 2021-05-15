@@ -44,16 +44,10 @@ func run(specFilePath string, executor CommandExecutor, writeReport WriteReport)
 	return error
 }
 
-func loadSpec(filePath string) (rtn *BenchmarkSpec, error error) {
+func loadSpec(filePath string) (*BenchmarkSpec, error) {
 	log.Infof("Loading benchmark specs from '%s'...", filePath)
 
-	benchmark, err := Load(filePath)
-	if err != nil {
-		log.Error(err.Error())
-		error = err
-	}
-
-	return benchmark, error
+	return Load(filePath)
 }
 
 func writeReport(summary pkg.TracerSummary, config *BenchmarkSpec) {
