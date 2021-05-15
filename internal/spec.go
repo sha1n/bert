@@ -3,10 +3,10 @@ package internal
 import (
 	"encoding/json"
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"os"
 	"strings"
-	log "github.com/sirupsen/logrus"
 
 	"github.com/go-playground/locales/en"
 	ut "github.com/go-playground/universal-translator"
