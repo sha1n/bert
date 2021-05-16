@@ -1,16 +1,13 @@
-package internal
+package pkg
 
 import (
 	"fmt"
-	log "github.com/sirupsen/logrus"
 	"os"
 	"os/exec"
-)
 
-// CommandExecutor is an abstraction for commands executed as subprocesses.
-type CommandExecutor interface {
-	Execute(cmd *CommandSpec, defaultWorkingDir string, env map[string]string, ctx *ExecutionContext) error
-}
+	"github.com/sha1n/benchy/api"
+	log "github.com/sirupsen/logrus"
+)
 
 type commandExecutor struct {
 	pipeStdout bool
@@ -18,7 +15,7 @@ type commandExecutor struct {
 }
 
 // NewCommandExecutor creates a new command executor.
-func NewCommandExecutor(pipeStdout bool, pipeStderr bool) CommandExecutor {
+func NewCommandExecutor(pipeStdout bool, pipeStderr bool) api.CommandExecutor {
 	return &commandExecutor{
 		pipeStdout: pipeStdout,
 		pipeStderr: pipeStderr,
@@ -26,7 +23,7 @@ func NewCommandExecutor(pipeStdout bool, pipeStderr bool) CommandExecutor {
 }
 
 // Executes a single command in a subprocess based on the specified specs.
-func (ce *commandExecutor) Execute(cmdSpec *CommandSpec, defaultWorkingDir string, env map[string]string, ctx *ExecutionContext) (exitError error) {
+func (ce *commandExecutor) Execute(cmdSpec *api.CommandSpec, defaultWorkingDir string, env map[string]string) (exitError error) {
 	if cmdSpec == nil {
 		return nil
 	}
@@ -34,7 +31,7 @@ func (ce *commandExecutor) Execute(cmdSpec *CommandSpec, defaultWorkingDir strin
 	log.Debugf("Going to execute command %v", cmdSpec.Cmd)
 
 	execCmd := exec.Command(cmdSpec.Cmd[0], cmdSpec.Cmd[1:]...)
-	ce.configureCommand(cmdSpec, execCmd, defaultWorkingDir, env, ctx)
+	ce.configureCommand(cmdSpec, execCmd, defaultWorkingDir, env)
 
 	exitError = execCmd.Run()
 
@@ -45,7 +42,7 @@ func (ce *commandExecutor) Execute(cmdSpec *CommandSpec, defaultWorkingDir strin
 	return exitError
 }
 
-func (ce *commandExecutor) configureCommand(cmd *CommandSpec, execCmd *exec.Cmd, defaultWorkingDir string, env map[string]string, ctx *ExecutionContext) {
+func (ce *commandExecutor) configureCommand(cmd *api.CommandSpec, execCmd *exec.Cmd, defaultWorkingDir string, env map[string]string) {
 	if cmd.WorkingDirectory != "" {
 		log.Debugf("Setting command working directory to '%s'", cmd.WorkingDirectory)
 		execCmd.Dir = cmd.WorkingDirectory
