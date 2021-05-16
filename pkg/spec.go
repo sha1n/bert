@@ -1,12 +1,14 @@
-package internal
+package pkg
 
 import (
 	"encoding/json"
 	"fmt"
-	log "github.com/sirupsen/logrus"
+	"github.com/sha1n/benchy/api"
 	"io/ioutil"
 	"os"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/go-playground/locales/en"
 	ut "github.com/go-playground/universal-translator"
@@ -17,38 +19,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// CommandSpec benchmark command execution specs
-type CommandSpec struct {
-	WorkingDirectory string   `json:"workingDir" yaml:"workingDir"`
-	Cmd              []string `json:"cmd" yaml:"cmd" validate:"required"`
-}
-
-// ScenarioSpec benchmark scenario specs
-type ScenarioSpec struct {
-	Name             string `json:"name" yaml:"name" validate:"required"`
-	WorkingDirectory string `json:"workingDir" yaml:"workingDir"`
-	Env              map[string]string
-	BeforeAll        *CommandSpec `json:"beforeAll" yaml:"beforeAll"`
-	AfterAll         *CommandSpec `json:"afterAll" yaml:"afterAll"`
-	BeforeEach       *CommandSpec `json:"beforeEach" yaml:"beforeEach"`
-	AfterEach        *CommandSpec `json:"afterEach" yaml:"afterEach"`
-	Command          *CommandSpec `validate:"required,dive"`
-}
-
-// BenchmarkSpec benchmark specs top level structure
-type BenchmarkSpec struct {
-	Scenarios  []*ScenarioSpec `json:"scenarios" yaml:"scenarios" validate:"required,dive"`
-	Executions int             `validate:"required,gte=1"`
-	Alternate  bool
-}
-
-// ID returns a unique identifier
-func (s *ScenarioSpec) ID() string {
-	return s.Name
-}
-
-// Load loads benchmark specs from the specified file.
-func Load(path string) (*BenchmarkSpec, error) {
+// LoadSpec loads benchmark specs from the specified file.
+func LoadSpec(path string) (*api.BenchmarkSpec, error) {
 	var unmarshalFn func([]byte, interface{}) error
 
 	if strings.HasSuffix(path, ".yaml") || strings.HasSuffix(path, ".yml") {
@@ -60,7 +32,7 @@ func Load(path string) (*BenchmarkSpec, error) {
 	return load(path, unmarshalFn)
 }
 
-func load(path string, unmarshal func([]byte, interface{}) error) (spec *BenchmarkSpec, err error) {
+func load(path string, unmarshal func([]byte, interface{}) error) (spec *api.BenchmarkSpec, err error) {
 	var jsonFile *os.File
 	if jsonFile, err = os.Open(path); err == nil {
 		defer jsonFile.Close()
@@ -78,7 +50,7 @@ func load(path string, unmarshal func([]byte, interface{}) error) (spec *Benchma
 	return spec, err
 }
 
-func validate(spec *BenchmarkSpec) (err error) {
+func validate(spec *api.BenchmarkSpec) (err error) {
 	v := validator.New()
 	english := en.New()
 	uni := ut.New(english, english)

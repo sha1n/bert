@@ -1,33 +1,12 @@
 package pkg
 
-import "time"
-
-// End ends a trace
-type End = func(error)
-
-// ID ...
-type ID = string
-
-// Identifiable an abstraction for identifiable objects
-type Identifiable interface {
-	ID() ID
-}
-
-// Tracer a global tracing handler that accumulates trace data and provides access to it.
-type Tracer interface {
-	Start(i Identifiable) End
-	Summary() TracerSummary
-}
-
-// Trace a single time trace
-type Trace interface {
-	ID() string
-	Elapsed() time.Duration
-	Error() error
-}
+import (
+	"github.com/sha1n/benchy/api"
+	"time"
+)
 
 type tracer struct {
-	traces map[ID][]Trace
+	traces map[api.ID][]api.Trace
 }
 
 type trace struct {
@@ -62,17 +41,17 @@ func newTrace(id string) *trace {
 }
 
 // NewTracer creates a new tracer
-func NewTracer() Tracer {
+func NewTracer() api.Tracer {
 	return &tracer{
-		traces: make(map[ID][]Trace),
+		traces: make(map[api.ID][]api.Trace),
 	}
 }
 
-func (tr *tracer) Start(i Identifiable) End {
+func (tr *tracer) Start(i api.Identifiable) api.End {
 	t := newTrace(i.ID())
 
 	if tr.traces[i.ID()] == nil {
-		tr.traces[i.ID()] = []Trace{}
+		tr.traces[i.ID()] = []api.Trace{}
 	}
 
 	tr.traces[i.ID()] = append(tr.traces[i.ID()], t)
@@ -80,6 +59,6 @@ func (tr *tracer) Start(i Identifiable) End {
 	return t.end
 }
 
-func (tr *tracer) Summary() TracerSummary {
-	return NewTracerSummary(tr.traces)
+func (tr *tracer) Summary() api.Summary {
+	return NewSummary(tr.traces)
 }

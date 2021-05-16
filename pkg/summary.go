@@ -2,29 +2,13 @@ package pkg
 
 import (
 	"github.com/montanaflynn/stats"
+	"github.com/sha1n/benchy/api"
 )
 
-// Stats provides access to statistics. Statistics are not necessarily cached and might be calculated on call.
-type Stats interface {
-	Min() (float64, error)
-	Max() (float64, error)
-	Mean() (float64, error)
-	Median() (float64, error)
-	Percentile(percent float64) (float64, error)
-	StdDev() (float64, error)
-	ErrorRate() float64
-}
-
-// TracerSummary provides access a cpollection of identifiable statistics.
-type TracerSummary interface {
-	StatsOf(ID) Stats
-	AllStats() map[ID]Stats
-}
-
-// NewTracerSummary create a new TracerSummary with the specified data.
-func NewTracerSummary(tracesByID map[ID][]Trace) TracerSummary {
-	summary := &tracerSummary{
-		samples: make(map[ID]Stats),
+// NewSummary create a new TracerSummary with the specified data.
+func NewSummary(tracesByID map[api.ID][]api.Trace) api.Summary {
+	summary := &_summary{
+		samples: make(map[api.ID]api.Stats),
 	}
 
 	for id, traces := range tracesByID {
@@ -38,7 +22,7 @@ func NewTracerSummary(tracesByID map[ID][]Trace) TracerSummary {
 			}
 		}
 
-		summary.samples[id] = &sstats{
+		summary.samples[id] = &_stats{
 			float64Samples: float64Samples,
 			errorRate:      float64(errorCount / len(traces)),
 		}
@@ -47,47 +31,47 @@ func NewTracerSummary(tracesByID map[ID][]Trace) TracerSummary {
 	return summary
 }
 
-type sstats struct {
+type _stats struct {
 	float64Samples []float64
 	errorRate      float64
 }
 
-func (ss *sstats) Min() (float64, error) {
-	return stats.Min(ss.float64Samples)
+func (s *_stats) Min() (float64, error) {
+	return stats.Min(s.float64Samples)
 }
 
-func (ss *sstats) Max() (float64, error) {
-	return stats.Max(ss.float64Samples)
+func (s *_stats) Max() (float64, error) {
+	return stats.Max(s.float64Samples)
 }
 
-func (ss *sstats) Mean() (float64, error) {
-	return stats.Mean(ss.float64Samples)
+func (s *_stats) Mean() (float64, error) {
+	return stats.Mean(s.float64Samples)
 }
 
-func (ss *sstats) StdDev() (float64, error) {
-	return stats.StandardDeviation(ss.float64Samples)
+func (s *_stats) StdDev() (float64, error) {
+	return stats.StandardDeviation(s.float64Samples)
 }
 
-func (ss *sstats) Median() (float64, error) {
-	return stats.Median(ss.float64Samples)
+func (s *_stats) Median() (float64, error) {
+	return stats.Median(s.float64Samples)
 }
 
-func (ss *sstats) Percentile(percent float64) (float64, error) {
-	return stats.Percentile(ss.float64Samples, percent)
+func (s *_stats) Percentile(percent float64) (float64, error) {
+	return stats.Percentile(s.float64Samples, percent)
 }
 
-func (ss *sstats) ErrorRate() float64 {
-	return ss.errorRate
+func (s *_stats) ErrorRate() float64 {
+	return s.errorRate
 }
 
-type tracerSummary struct {
-	samples map[ID]Stats
+type _summary struct {
+	samples map[api.ID]api.Stats
 }
 
-func (tracerSummary *tracerSummary) StatsOf(id ID) Stats {
-	return tracerSummary.samples[id]
+func (summary *_summary) Get(id api.ID) api.Stats {
+	return summary.samples[id]
 }
 
-func (tracerSummary *tracerSummary) AllStats() map[ID]Stats {
-	return tracerSummary.samples
+func (summary *_summary) All() map[api.ID]api.Stats {
+	return summary.samples
 }

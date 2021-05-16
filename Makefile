@@ -55,6 +55,7 @@ go-lint:
 	go vet -mod=readonly -c=10 $(GOBASE)/cmd
 	go vet -mod=readonly -c=10 $(GOBASE)/internal
 	go vet -mod=readonly -c=10 $(GOBASE)/pkg
+	go vet -mod=readonly -c=10 $(GOBASE)/api
 
 go-format:
 	@echo "  >  Formating source files..."

@@ -1,10 +1,41 @@
-package internal
+package pkg
 
 import (
-	"github.com/sha1n/benchy/pkg"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/sha1n/benchy/api"
+	"github.com/stretchr/testify/assert"
 )
+
+var silentCommandExecutor = NewCommandExecutor(false, false)
+
+func TestRun(t *testing.T) {
+	var actualSummary api.Summary
+	var actualConfig *api.BenchmarkSpec
+	interceptSummary := func(summary api.Summary, config *api.BenchmarkSpec) error {
+		actualSummary = summary
+		actualConfig = config
+
+		return nil
+	}
+
+	err := Run("../test/data/benchmark_test_run.yaml", silentExecutionContext(), interceptSummary)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, actualSummary)
+
+	assert.Equal(t, 2, len(actualConfig.Scenarios))
+	assert.Equal(t, len(actualConfig.Scenarios), len(actualSummary.All()))
+
+	assertFullScenarioStats(t, actualSummary.Get("scenario A"))
+	assertFullScenarioStats(t, actualSummary.Get("scenario B"))
+}
+
+func TestRunWithMissingConfigFile(t *testing.T) {
+	err := Run("../test_data/non-existing-file.yaml", silentExecutionContext(), failingWriteSummaryFn(t))
+
+	assert.Error(t, err)
+}
 
 func TestExecuteBenchmarkWithMinimalSpec(t *testing.T) {
 	spec := aBasicSpecWith(false, 2)
@@ -60,44 +91,51 @@ func TestExecuteBenchmarkWithSetupAndTeardownSpecs(t *testing.T) {
 	assertScenarioCommand(spec.Scenarios[0].AfterAll, execRecordingMock.RecordedCommandSeq[7])
 }
 
-func executeWith(spec *BenchmarkSpec) *CmdRecordingExecutor {
+func executeWith(spec *api.BenchmarkSpec) *CmdRecordingExecutor {
 	recordingCtx := recordingExecutionContext()
 
-	_ = ExecuteBenchmark(spec, recordingCtx)
+	_ = Execute(spec, recordingCtx)
 
-	return recordingCtx.executor.(*CmdRecordingExecutor)
+	return recordingCtx.Executor.(*CmdRecordingExecutor)
 }
 
-func assertRecordedCommandWith(t *testing.T, scenario *ScenarioSpec) func(expected *CommandSpec, actual *RecordedExecutionParams) {
-	return func(expected *CommandSpec, actual *RecordedExecutionParams) {
+func assertRecordedCommandWith(t *testing.T, scenario *api.ScenarioSpec) func(expected *api.CommandSpec, actual *RecordedExecutionParams) {
+	return func(expected *api.CommandSpec, actual *RecordedExecutionParams) {
 		assert.Equal(t, expected, actual.Spec)
 		assert.Equal(t, scenario.WorkingDirectory, actual.DefaultWorkingDir)
 		assert.Equal(t, scenario.Env, actual.Env)
 	}
 }
 
-func recordingExecutionContext() *ExecutionContext {
-	return NewExecutionContext(
-		pkg.NewTracer(),
+func recordingExecutionContext() *api.ExecutionContext {
+	return api.NewExecutionContext(
+		NewTracer(),
 		&CmdRecordingExecutor{},
 	)
 }
 
-func aBasicSpecWith(alternate bool, executions int) *BenchmarkSpec {
-	return &BenchmarkSpec{
+func silentExecutionContext() *api.ExecutionContext {
+	return api.NewExecutionContext(
+		NewTracer(),
+		silentCommandExecutor,
+	)
+}
+
+func aBasicSpecWith(alternate bool, executions int) *api.BenchmarkSpec {
+	return &api.BenchmarkSpec{
 		Executions: executions,
 		Alternate:  alternate,
-		Scenarios: []*ScenarioSpec{
+		Scenarios: []*api.ScenarioSpec{
 			{
 				Name: "scenario A",
-				Command: &CommandSpec{
+				Command: &api.CommandSpec{
 					WorkingDirectory: "/dir-a",
 					Cmd:              []string{"cmd", "a"},
 				},
 			},
 			{
 				Name: "scenario B",
-				Command: &CommandSpec{
+				Command: &api.CommandSpec{
 					WorkingDirectory: "/dir-b",
 					Cmd:              []string{"cmd", "b"},
 				},
@@ -106,22 +144,42 @@ func aBasicSpecWith(alternate bool, executions int) *BenchmarkSpec {
 	}
 }
 
-func aSpecWithSetupAndTeardownCommands(executions int) *BenchmarkSpec {
-	return &BenchmarkSpec{
+func aSpecWithSetupAndTeardownCommands(executions int) *api.BenchmarkSpec {
+	return &api.BenchmarkSpec{
 		Executions: executions,
 		Alternate:  false,
-		Scenarios: []*ScenarioSpec{
+		Scenarios: []*api.ScenarioSpec{
 			{
 				Name:       "scenario",
-				BeforeAll:  &CommandSpec{Cmd: []string{"before", "all"}},
-				AfterAll:   &CommandSpec{Cmd: []string{"after", "all"}},
-				BeforeEach: &CommandSpec{Cmd: []string{"before", "each"}},
-				AfterEach:  &CommandSpec{Cmd: []string{"after", "each"}},
-				Command: &CommandSpec{
+				BeforeAll:  &api.CommandSpec{Cmd: []string{"before", "all"}},
+				AfterAll:   &api.CommandSpec{Cmd: []string{"after", "all"}},
+				BeforeEach: &api.CommandSpec{Cmd: []string{"before", "each"}},
+				AfterEach:  &api.CommandSpec{Cmd: []string{"after", "each"}},
+				Command: &api.CommandSpec{
 					WorkingDirectory: "/home",
 					Cmd:              []string{"cmd", "args"},
 				},
 			},
 		},
 	}
+}
+
+func assertFullScenarioStats(t *testing.T, stats api.Stats) {
+	assert.NotNil(t, stats)
+	assert.Equal(t, 0.0, stats.ErrorRate())
+	assertStatValue(t, stats.Min)
+	assertStatValue(t, stats.Max)
+	assertStatValue(t, stats.Mean)
+	assertStatValue(t, stats.Median)
+}
+
+func assertStatValue(t *testing.T, get func() (float64, error)) {
+	value, err := get()
+
+	assert.NoError(t, err)
+	assert.GreaterOrEqual(t, value, 0.0)
+}
+
+func failingWriteSummaryFn(t *testing.T) api.WriteReportFn {
+	return func(summary api.Summary, config *api.BenchmarkSpec) error { t.Fail(); return nil }
 }
