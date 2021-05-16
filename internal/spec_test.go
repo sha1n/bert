@@ -6,21 +6,21 @@ import (
 )
 
 func TestLoadJson(t *testing.T) {
-	testLoad(t, "../test_data/spec_test_load.json")
+	testLoad(t, "../test/data/spec_test_load.json")
 }
 
 func TestLoadYaml(t *testing.T) {
-	testLoad(t, "../test_data/spec_test_load.yaml")
+	testLoad(t, "../test/data/spec_test_load.yaml")
 }
 
 func TestLoadYamlWithMissingRequiredCommand(t *testing.T) {
-	_, err := Load("../test_data/spec_test_load_with_missing_command.yaml")
+	_, err := Load("../test/data/spec_test_load_with_missing_command.yaml")
 
 	assert.Error(t, err)
 }
 
 func TestLoadYamlWithMissingCmdFieldOfOptionalCommand(t *testing.T) {
-	_, err := Load("../test_data/spec_test_load_with_missing_cmd_of_optional_command.yaml")
+	_, err := Load("../test/data/spec_test_load_with_missing_cmd_of_optional_command.yaml")
 
 	assert.Error(t, err)
 }

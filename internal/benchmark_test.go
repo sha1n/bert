@@ -17,7 +17,7 @@ func TestRun(t *testing.T) {
 		actualConfig = config
 	}
 
-	err := run("../test_data/benchmark_test_run.yaml", silentCommandExecutor, interceptSummary)
+	err := run("../test/data/benchmark_test_run.yaml", silentCommandExecutor, interceptSummary)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, actualSummary)
