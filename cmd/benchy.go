@@ -12,14 +12,27 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// ProgramName : passed from build environment
-var ProgramName string
+const (
+	// CLIArgConfig : program arg name
+	CLIArgConfig = "config"
+	// CLIArgFormat : program arg name
+	CLIArgFormat = "format"
+	// CLIArgPipeStdout : program arg name
+	CLIArgPipeStdout = "pipe-stdout"
+	// CLIArgPipeStderr : program arg name
+	CLIArgPipeStderr = "pipe-stderr"
+	// CLIArgDebug : program arg name
+	CLIArgDebug = "debug"
+)
 
-// Build : passed from build environment
-var Build string
-
-// Version : passed from build environment
-var Version string
+var (
+	// ProgramName : passed from build environment
+	ProgramName string
+	// Build : passed from build environment
+	Build string
+	// Version : passed from build environment
+	Version string
+)
 
 func init() {
 	log.SetFormatter(&log.TextFormatter{
@@ -34,15 +47,16 @@ func main() {
 		Use: ProgramName,
 		Version: fmt.Sprintf(`Version: %s
 Build label: %s`, Version, Build),
-		Example:      fmt.Sprintf("%s --config <config file path>", ProgramName),
+		Example:      fmt.Sprintf("%s --%s <config file path>", ProgramName, CLIArgConfig),
 		SilenceUsage: false,
 		Run:          doRun,
 	}
 
-	rootCmd.Flags().StringP("config", "c", "", `config file path`)
-	rootCmd.Flags().BoolP("pipe-stdout", "", true, `redirects external commands standard out to benchy's standard out`)
-	rootCmd.Flags().BoolP("pipe-stderr", "", true, `redirects external commands standard error to benchy's standard error`)
-	rootCmd.Flags().BoolP("debug", "d", false, `logs extra debug information`)
+	rootCmd.Flags().StringP(CLIArgConfig, "c", "", `config file path`)
+	rootCmd.Flags().StringP(CLIArgFormat, "f", "txt", `summary format. One of: 'txt', 'csv' (default: txt)`)
+	rootCmd.Flags().BoolP(CLIArgPipeStdout, "", true, `redirects external commands standard out to benchy's standard out`)
+	rootCmd.Flags().BoolP(CLIArgPipeStderr, "", true, `redirects external commands standard error to benchy's standard error`)
+	rootCmd.Flags().BoolP(CLIArgDebug, "d", false, `logs extra debug information`)
 
 	cobra.MarkFlagRequired(rootCmd.Flags(), "config")
 
@@ -52,18 +66,34 @@ Build label: %s`, Version, Build),
 }
 
 func doRun(cmd *cobra.Command, args []string) {
-	specFilePath, _ := cmd.Flags().GetString("config")
-	pipeStdOut, _ := cmd.Flags().GetBool("pipe-stdout")
-	pipeStdErr, _ := cmd.Flags().GetBool("pipe-stderr")
-
-	if debug, _ := cmd.Flags().GetBool("debug"); debug {
+	if debug, _ := cmd.Flags().GetBool(CLIArgDebug); debug {
 		log.StandardLogger().SetLevel(log.DebugLevel)
 	}
 
-	ctx := api.NewExecutionContext(pkg.NewTracer(), pkg.NewCommandExecutor(pipeStdOut, pipeStdErr))
-	writeReportFn := internal.NewTextReportWriter(bufio.NewWriter(os.Stdout))
-
+	writeReportFn := resolveReportWriter(cmd, os.Stdout)
+	ctx := resolveExecutionContext(cmd)
+	specFilePath, _ := cmd.Flags().GetString(CLIArgConfig)
 	if err := pkg.Run(specFilePath, ctx, writeReportFn); err != nil {
 		log.Error(err.Error())
 	}
+}
+
+func resolveExecutionContext(cmd *cobra.Command) *api.ExecutionContext {
+	pipeStdOut, _ := cmd.Flags().GetBool(CLIArgPipeStdout)
+	pipeStdErr, _ := cmd.Flags().GetBool(CLIArgPipeStderr)
+
+	return api.NewExecutionContext(pkg.NewTracer(), pkg.NewCommandExecutor(pipeStdOut, pipeStdErr))
+}
+
+func resolveReportWriter(cmd *cobra.Command, outputFile *os.File) api.WriteReportFn {
+	resolvedWriterFn := func() api.WriteReportFn {
+		writer := bufio.NewWriter(outputFile)
+		if outputFilePath, _ := cmd.Flags().GetString(CLIArgFormat); outputFilePath == "csv" {
+			return internal.NewCsvReportWriter(writer)
+		}
+
+		return internal.NewTextReportWriter(writer, true)
+	}()
+
+	return internal.WriteReportFnFor(resolvedWriterFn)
 }
