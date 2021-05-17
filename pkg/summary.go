@@ -1,6 +1,8 @@
 package pkg
 
 import (
+	"time"
+
 	"github.com/montanaflynn/stats"
 	"github.com/sha1n/benchy/api"
 )
@@ -9,6 +11,7 @@ import (
 func NewSummary(tracesByID map[api.ID][]api.Trace) api.Summary {
 	summary := &_summary{
 		samples: make(map[api.ID]api.Stats),
+		time:    time.Now(),
 	}
 
 	for id, traces := range tracesByID {
@@ -66,6 +69,7 @@ func (s *_stats) ErrorRate() float64 {
 
 type _summary struct {
 	samples map[api.ID]api.Stats
+	time    time.Time
 }
 
 func (summary *_summary) Get(id api.ID) api.Stats {
@@ -74,4 +78,8 @@ func (summary *_summary) Get(id api.ID) api.Stats {
 
 func (summary *_summary) All() map[api.ID]api.Stats {
 	return summary.samples
+}
+
+func (summary *_summary) Time() time.Time {
+	return summary.time
 }

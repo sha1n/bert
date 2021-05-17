@@ -5,39 +5,57 @@ import (
 	"fmt"
 	"math"
 	"strings"
+	"time"
 
 	"github.com/fatih/color"
 	"github.com/sha1n/benchy/api"
 )
 
-var red = color.New(color.FgRed).Sprintf
-var green = color.New(color.FgGreen).Sprintf
-var yellow = color.New(color.FgYellow).Sprintf
-var bold = color.New(color.Bold).Sprintf
+type format = func(string, ...interface{}) string
 
 // textReportWriter a simple human readable test report writer
 type textReportWriter struct {
-	writer *bufio.Writer
+	writer    *bufio.Writer
+	fmtRed    func(string, ...interface{}) string
+	fmtGreen  func(string, ...interface{}) string
+	fmtYellow func(string, ...interface{}) string
+	fmtBold   func(string, ...interface{}) string
 }
 
 // NewTextReportWriter returns a text report write handler.
-func NewTextReportWriter(writer *bufio.Writer) api.WriteReportFn {
+func NewTextReportWriter(writer *bufio.Writer, colorsOn bool) api.WriteReportFn {
+	var fmtRed, fmtGreen, fmtYellow, fmtBold format
+
+	if colorsOn {
+		fmtRed = color.New(color.FgRed).Sprintf
+		fmtGreen = color.New(color.FgGreen).Sprintf
+		fmtYellow = color.New(color.FgYellow).Sprintf
+		fmtBold = color.New(color.Bold).Sprintf
+	} else {
+		fmtRed, fmtGreen, fmtYellow, fmtBold = fmt.Sprintf, fmt.Sprintf, fmt.Sprintf, fmt.Sprintf
+	}
+
 	w := &textReportWriter{
-		writer: writer,
+		writer:    writer,
+		fmtRed:    fmtRed,
+		fmtGreen:  fmtGreen,
+		fmtYellow: fmtYellow,
+		fmtBold:   fmtBold,
 	}
 
 	return w.Write
 }
 
-func (trw *textReportWriter) Write(ts api.Summary, config *api.BenchmarkSpec) (err error) {
+func (trw *textReportWriter) Write(summary api.Summary, config *api.BenchmarkSpec) (err error) {
 	trw.writeTitle("Benchmark Summary")
+	trw.writeTime(summary.Time())
 	trw.writeInt64Stat("scenarios", func() (int64, error) { return int64(len(config.Scenarios)), nil })
 	trw.writeInt64Stat("executions", func() (int64, error) { return int64(config.Executions), nil })
 	trw.writeBoolProperty("alternate", config.Alternate)
 	trw.writeNewLine()
 
-	for id := range ts.All() {
-		stats := ts.Get(id)
+	for id := range summary.All() {
+		stats := summary.Get(id)
 
 		title := fmt.Sprintf("Summary of '%s'", id)
 		trw.writeTitle(title)
@@ -66,8 +84,14 @@ func (trw *textReportWriter) println(s string) {
 func (trw *textReportWriter) writeTitle(title string) {
 	line := strings.Repeat("-", len(title)+2)
 	trw.println(line)
-	trw.println(green(" %s ", title))
+	trw.println(trw.fmtGreen(" %s ", title))
 	trw.println(line)
+}
+
+func (trw *textReportWriter) writeTime(time time.Time) {
+	trw.writeStatTitle("time")
+	timeStr := time.Format("2006-01-02T15:04:05Z07:00")
+	trw.writer.WriteString(fmt.Sprintf("%s\r\n", timeStr))
 }
 
 func (trw *textReportWriter) writeStatNano2Sec(name string, f func() (float64, error)) {
@@ -96,7 +120,7 @@ func (trw *textReportWriter) writeErrorRateStat(name string, f func() float64) {
 	value := f()
 	errorRate := int(value * 100)
 	if errorRate > 0 {
-		trw.writer.WriteString(yellow("%d%%\r\n", errorRate))
+		trw.writer.WriteString(trw.fmtYellow("%d%%\r\n", errorRate))
 	} else {
 		trw.writer.WriteString(fmt.Sprintf("%d%%\r\n", errorRate))
 	}
@@ -118,10 +142,10 @@ func (trw *textReportWriter) writeBoolProperty(name string, value bool) {
 }
 
 func (trw *textReportWriter) writeStatTitle(name string) {
-	trw.writer.WriteString(bold("%11s: ", name))
+	trw.writer.WriteString(trw.fmtBold("%11s: ", name))
 }
 
 func (trw *textReportWriter) writeStatError(name string) {
-	trw.writer.WriteString(bold("%11s: ", name))
-	trw.writer.WriteString(red("%s\r\n", "ERROR"))
+	trw.writer.WriteString(trw.fmtBold("%11s: ", name))
+	trw.writer.WriteString(trw.fmtRed("%s\r\n", "ERROR"))
 }
