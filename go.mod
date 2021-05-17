@@ -3,7 +3,7 @@ module github.com/sha1n/benchy
 go 1.15
 
 require (
-	github.com/fatih/color v1.10.0
+	github.com/fatih/color v1.11.0
 	github.com/go-playground/locales v0.13.0
 	github.com/go-playground/universal-translator v0.17.0
 	github.com/go-playground/validator/v10 v10.6.1
