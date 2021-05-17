@@ -8,22 +8,27 @@
 
 ## Main Features
 - Compare any number of commands
-- Set the working directory for every scenario
+- Set your working directory per scenario and/or command
 - Set the number of times every scenario is executed
 - Set optional custom environment variables per scenario
 - Set optional before/after commands for each run
+- Set optional setup/teardown commands per scenario
 - Choose between alternate executions and sequencial execution of the same command
+- Choose between `txt` and `csv` output formats
 
 ## Usage
 ```bash
-$ benchy --config test_data/config_test_load.yaml
+$ benchy --config test/data/spec_test_load.yaml
+
+$ benchy --help   # for full options list
 ```
 
-## Example Summary 
+## Example Text Summary 
 ```bash
 -------------------
  Benchmark Summary
 -------------------
+       time: 2021-05-18T00:56:26+03:00
   scenarios: 2
  executions: 10
   alternate: true
@@ -31,11 +36,12 @@ $ benchy --config test_data/config_test_load.yaml
 -------------------------
  Summary of 'scenario A'
 -------------------------
-        min: 1.003s
-        max: 1.007s
-       mean: 1.005s
-     median: 1.005s
-        p90: 1.006s
+        min: 1.004s
+        max: 1.019s
+       mean: 1.007s
+     median: 1.007s
+        p90: 1.008s
+     stddev: 0.004s
      errors: 0%
 
 -------------------------
@@ -43,9 +49,10 @@ $ benchy --config test_data/config_test_load.yaml
 -------------------------
         min: 0.003s
         max: 0.004s
-       mean: 0.003s
-     median: 0.003s
+       mean: 0.004s
+     median: 0.004s
         p90: 0.004s
+     stddev: 0.000s
      errors: 0%
 ```
 
