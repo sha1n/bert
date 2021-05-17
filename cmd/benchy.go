@@ -15,6 +15,8 @@ import (
 const (
 	// CLIArgConfig : program arg name
 	CLIArgConfig = "config"
+	// CLIArgOutputFile : program arg name
+	CLIArgOutputFile = "out-file"
 	// CLIArgFormat : program arg name
 	CLIArgFormat = "format"
 	// CLIArgPipeStdout : program arg name
@@ -53,6 +55,7 @@ Build label: %s`, Version, Build),
 	}
 
 	rootCmd.Flags().StringP(CLIArgConfig, "c", "", `config file path`)
+	rootCmd.Flags().StringP(CLIArgOutputFile, "o", "", `output file path`)
 	rootCmd.Flags().StringP(CLIArgFormat, "f", "txt", `summary format. One of: 'txt', 'csv' (default: txt)`)
 	rootCmd.Flags().BoolP(CLIArgPipeStdout, "", true, `redirects external commands standard out to benchy's standard out`)
 	rootCmd.Flags().BoolP(CLIArgPipeStderr, "", true, `redirects external commands standard error to benchy's standard error`)
@@ -66,15 +69,20 @@ Build label: %s`, Version, Build),
 }
 
 func doRun(cmd *cobra.Command, args []string) {
+	var err error
+	var outputFile *os.File
+
 	if debug, _ := cmd.Flags().GetBool(CLIArgDebug); debug {
 		log.StandardLogger().SetLevel(log.DebugLevel)
 	}
 
-	writeReportFn := resolveReportWriter(cmd, os.Stdout)
-	ctx := resolveExecutionContext(cmd)
-	specFilePath, _ := cmd.Flags().GetString(CLIArgConfig)
-	if err := pkg.Run(specFilePath, ctx, writeReportFn); err != nil {
-		log.Error(err.Error())
+	if outputFile, err = resolveOutputFile(cmd); err == nil {
+		writeReportFn := resolveReportWriter(cmd, outputFile)
+		ctx := resolveExecutionContext(cmd)
+		specFilePath, _ := cmd.Flags().GetString(CLIArgConfig)
+		if err = pkg.Run(specFilePath, ctx, writeReportFn); err != nil {
+			log.Errorf("Failed to execute benchark. Error: %s", err.Error())
+		}
 	}
 }
 
@@ -92,8 +100,22 @@ func resolveReportWriter(cmd *cobra.Command, outputFile *os.File) api.WriteRepor
 			return internal.NewCsvReportWriter(writer)
 		}
 
-		return internal.NewTextReportWriter(writer, true)
+		var colorsOn = false
+		if file, _ := cmd.Flags().GetString(CLIArgOutputFile); file == "" {
+			colorsOn = true
+		}
+
+		return internal.NewTextReportWriter(writer, colorsOn)
 	}()
 
 	return internal.WriteReportFnFor(resolvedWriterFn)
+}
+
+func resolveOutputFile(cmd *cobra.Command) (outputFile *os.File, err error) {
+	outputFile = os.Stdout
+	if outputFilePath, _ := cmd.Flags().GetString(CLIArgOutputFile); outputFilePath != "" {
+		return os.OpenFile(outputFilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	}
+
+	return outputFile, nil
 }
