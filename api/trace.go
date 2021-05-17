@@ -41,4 +41,5 @@ type Stats interface {
 type Summary interface {
 	Get(ID) Stats
 	All() map[ID]Stats
+	Time() time.Time
 }
