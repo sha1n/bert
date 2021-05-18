@@ -52,7 +52,7 @@ func expectedBenchmarkSpec() *api.BenchmarkSpec {
 					Cmd: []string{"echo", "teardownA"},
 				},
 				BeforeEach: &api.CommandSpec{
-					WorkingDirectory: "/another-path",
+					WorkingDirectory: "~/tmp",
 					Cmd:              []string{"echo", "beforeA"},
 				},
 				AfterEach: &api.CommandSpec{

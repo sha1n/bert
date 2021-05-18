@@ -21,7 +21,7 @@
         ]
       },
       "beforeEach": {
-        "workingDir": "/another-path",
+        "workingDir": "~/tmp",
         "cmd": [
           "echo",
           "beforeA"
