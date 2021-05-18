@@ -3,6 +3,7 @@ package internal
 import (
 	"bufio"
 	"fmt"
+	"strings"
 
 	"encoding/csv"
 
@@ -23,8 +24,8 @@ func NewCsvReportWriter(writer *bufio.Writer) api.WriteReportFn {
 	return w.Write
 }
 
-func (rw *csvReportWriter) Write(summary api.Summary, config *api.BenchmarkSpec) (err error) {
-	rw.writer.Write([]string{"Timestamp", "Scenario", "Min", "Max", "Mean", "Median", "Percentile 90", "StdDev", "Errors"})
+func (rw *csvReportWriter) Write(summary api.Summary, config *api.BenchmarkSpec, ctx *api.ReportContext) (err error) {
+	rw.writer.Write([]string{"Timestamp", "Scenario", "Labels", "Min", "Max", "Mean", "Median", "Percentile 90", "StdDev", "Errors"})
 
 	timeStr := summary.Time().Format("2006-01-02T15:04:05Z07:00")
 	sortedIds := GetSortedScenarioIds(summary)
@@ -36,6 +37,7 @@ func (rw *csvReportWriter) Write(summary api.Summary, config *api.BenchmarkSpec)
 		rw.writer.Write([]string{
 			timeStr,
 			id,
+			strings.Join(ctx.Labels, ","),
 			rw.writeStatNano(stats.Min),
 			rw.writeStatNano(stats.Max),
 			rw.writeStatNano(stats.Mean),

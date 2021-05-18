@@ -5,25 +5,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// Run runs a benchmark.
-func Run(specFilePath string, executioinCtx *api.ExecutionContext, write api.WriteReportFn) (err error) {
-	log.Info("Starting benchy...")
-
-	var spec *api.BenchmarkSpec
-	if spec, err = loadSpec(specFilePath); err == nil {
-		summary := Execute(spec, executioinCtx)
-		err = write(summary, spec)
-	}
-
-	return err
-}
-
-func loadSpec(filePath string) (*api.BenchmarkSpec, error) {
-	log.Infof("Loading benchmark specs from '%s'...", filePath)
-
-	return LoadSpec(filePath)
-}
-
 // Execute executes a benchmark and returns an object that provides access to collected stats.
 func Execute(spec *api.BenchmarkSpec, ctx *api.ExecutionContext) api.Summary {
 	if spec.Alternate {

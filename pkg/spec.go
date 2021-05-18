@@ -23,6 +23,8 @@ import (
 func LoadSpec(path string) (*api.BenchmarkSpec, error) {
 	var unmarshalFn func([]byte, interface{}) error
 
+	log.Infof("Loading benchmark specs from '%s'...", path)
+
 	if strings.HasSuffix(path, ".yaml") || strings.HasSuffix(path, ".yml") {
 		unmarshalFn = yaml.Unmarshal
 	} else {
