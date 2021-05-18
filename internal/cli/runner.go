@@ -26,6 +26,8 @@ const (
 	ArgNameDebug = "debug"
 	// ArgNameLabel : program arg name
 	ArgNameLabel = "label"
+	// ArgNameHeaders : program arg name
+	ArgNameHeaders = "headers"
 )
 
 func init() {
@@ -57,11 +59,23 @@ func Run(cmd *cobra.Command, args []string) {
 			summary := pkg.Execute(spec, ctx)
 
 			writeReportFn := resolveReportWriter(cmd, outputFile)
-			labels, _ := cmd.Flags().GetStringSlice(ArgNameLabel)
-			writeReportFn(summary, spec, &api.ReportContext{Labels: labels})
+			reportCtx := resolveReportContext(cmd)
+
+			writeReportFn(summary, spec, reportCtx)
+
 		} else {
 			log.Errorf("Failed to execute benchark. Error: %s", err.Error())
 		}
+	}
+}
+
+func resolveReportContext(cmd *cobra.Command) *api.ReportContext {
+	labels, _ := cmd.Flags().GetStringSlice(ArgNameLabel)
+	includeHeaders, _ := cmd.Flags().GetBool(ArgNameHeaders)
+
+	return &api.ReportContext{
+		Labels:         labels,
+		IncludeHeaders: includeHeaders,
 	}
 }
 
@@ -78,7 +92,7 @@ func resolveExecutionContext(cmd *cobra.Command) *api.ExecutionContext {
 func resolveReportWriter(cmd *cobra.Command, outputFile *os.File) api.WriteReportFn {
 	resolvedWriterFn := func() api.WriteReportFn {
 		writer := bufio.NewWriter(outputFile)
-		if outputFilePath, _ := cmd.Flags().GetString(ArgNameFormat); outputFilePath == "csv" {
+		if reportFormat, _ := cmd.Flags().GetString(ArgNameFormat); reportFormat == "csv" {
 			return internal.NewCsvReportWriter(writer)
 		}
 

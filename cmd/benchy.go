@@ -33,6 +33,7 @@ Build label: %s`, Version, Build),
 	rootCmd.Flags().BoolP(cli.ArgNamePipeStderr, "", true, `redirects external commands standard error to benchy's standard error`)
 	rootCmd.Flags().BoolP(cli.ArgNameDebug, "d", false, `logs extra debug information`)
 	rootCmd.Flags().StringSliceP(cli.ArgNameLabel, "l", []string{}, `labels to attach to this benchmark.`)
+	rootCmd.Flags().BoolP(cli.ArgNameHeaders, "", true, `in supported formats, whether to include headers in the report (default: true).`)
 
 	cobra.MarkFlagRequired(rootCmd.Flags(), "config")
 

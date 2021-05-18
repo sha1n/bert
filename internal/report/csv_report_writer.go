@@ -25,7 +25,9 @@ func NewCsvReportWriter(writer *bufio.Writer) api.WriteReportFn {
 }
 
 func (rw *csvReportWriter) Write(summary api.Summary, config *api.BenchmarkSpec, ctx *api.ReportContext) (err error) {
-	rw.writer.Write([]string{"Timestamp", "Scenario", "Labels", "Min", "Max", "Mean", "Median", "Percentile 90", "StdDev", "Errors"})
+	if ctx.IncludeHeaders {
+		rw.writer.Write([]string{"Timestamp", "Scenario", "Labels", "Min", "Max", "Mean", "Median", "Percentile 90", "StdDev", "Errors"})
+	}
 
 	timeStr := summary.Time().Format("2006-01-02T15:04:05Z07:00")
 	sortedIds := GetSortedScenarioIds(summary)
