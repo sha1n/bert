@@ -26,13 +26,13 @@ Build label: %s`, Version, Build),
 		Run:          cli.Run,
 	}
 
-	rootCmd.Flags().StringP(cli.ArgNameConfig, "c", "", `config file path`)
-	rootCmd.Flags().StringP(cli.ArgNameOutputFile, "o", "", `output file path`)
+	rootCmd.Flags().StringP(cli.ArgNameConfig, "c", "", `config file path. '~' will be expanded.`)
+	rootCmd.Flags().StringP(cli.ArgNameOutputFile, "o", "", `output file path. Optional. Writes to stdout by default.`)
 	rootCmd.Flags().StringP(cli.ArgNameFormat, "f", "txt", `summary format. One of: 'txt', 'csv' (default: txt)`)
-	rootCmd.Flags().BoolP(cli.ArgNamePipeStdout, "", true, `redirects external commands standard out to benchy's standard out`)
-	rootCmd.Flags().BoolP(cli.ArgNamePipeStderr, "", true, `redirects external commands standard error to benchy's standard error`)
+	rootCmd.Flags().BoolP(cli.ArgNamePipeStdout, "", true, `redirects external commands standard out to benchy's standard out (default: true)`)
+	rootCmd.Flags().BoolP(cli.ArgNamePipeStderr, "", true, `redirects external commands standard error to benchy's standard error (default: true)`)
 	rootCmd.Flags().BoolP(cli.ArgNameDebug, "d", false, `logs extra debug information`)
-	rootCmd.Flags().StringSliceP(cli.ArgNameLabel, "l", []string{}, `labels to attach to this benchmark.`)
+	rootCmd.Flags().StringSliceP(cli.ArgNameLabel, "l", []string{}, `labels to attach to be included in the benchmark report.`)
 	rootCmd.Flags().BoolP(cli.ArgNameHeaders, "", true, `in supported formats, whether to include headers in the report (default: true).`)
 
 	cobra.MarkFlagRequired(rootCmd.Flags(), "config")
