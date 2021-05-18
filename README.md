@@ -54,10 +54,7 @@ $ benchy --help   # for full options list
 ## Config File
 The config file can be either in JSON format or YAML. `benchy` assumes a file with the `yml` or `yaml` extension to be YAML, otherwise JSON is assumed. More about configuration [here](docs/configuration.md).
 
-<details><summary>Examples:</summary>
-<p>
-
-**YAML:**
+**YAML Example:**
 ```yaml
 ---
 alternate: true
@@ -95,7 +92,7 @@ scenarios:
     - '0'
 ```
 
-**Equivalent JSON:**
+**Equivalent JSON Example:**
 ```json
 {
   "alternate": true,
@@ -151,16 +148,11 @@ scenarios:
   ]
 }
 ```
-</p>
-</details>
 
 ## Report Formats
 There are two supported report formats; `txt` and `csv`. `txt` is the default format and is primarily designed to be used in a terminal. `csv` is especially useful when you want to accumulate stats from multiple benchmarks in a CSV file. In which case you can combine the `csv` format with `-o` and possibly `--header=false`. Use `benchy --help` for more details.
 
-<details><summary>Examples:</summary>
-<p>
-
-**TXT:**
+**TXT Example:**
 ```bash
 -------------------
  BENCHMARK SUMMARY
@@ -196,11 +188,9 @@ There are two supported report formats; `txt` and `csv`. `txt` is the default fo
 ```
 
 
-**Equivalent CSV:**
+**Equivalent CSV Example:**
 ```csv
 Timestamp,Scenario,Labels,Min,Max,Mean,Median,Percentile 90,StdDev,Errors
 2021-05-18T23:38:49+03:00,scenario A,example-label,1003508458.000,1009577781.000,1006281483.700,1006164208.500,1008256954.000,2122427.909,0
 2021-05-18T23:38:49+03:00,scenario B,example-label,2953009.000,4218971.000,3818925.400,3854585.000,4048263.000,317884.931,0
 ```
-</p>
-</details>
