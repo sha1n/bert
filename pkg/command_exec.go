@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
+	"strings"
 
 	"github.com/sha1n/benchy/api"
 	log "github.com/sirupsen/logrus"
@@ -45,11 +47,11 @@ func (ce *commandExecutor) Execute(cmdSpec *api.CommandSpec, defaultWorkingDir s
 func (ce *commandExecutor) configureCommand(cmd *api.CommandSpec, execCmd *exec.Cmd, defaultWorkingDir string, env map[string]string) {
 	if cmd.WorkingDirectory != "" {
 		log.Debugf("Setting command working directory to '%s'", cmd.WorkingDirectory)
-		execCmd.Dir = cmd.WorkingDirectory
+		execCmd.Dir = expandPath(cmd.WorkingDirectory)
 	} else {
 		if defaultWorkingDir != "" {
 			log.Debugf("Setting command working directory to '%s'", defaultWorkingDir)
-			execCmd.Dir = defaultWorkingDir
+			execCmd.Dir = expandPath(defaultWorkingDir)
 		}
 	}
 
@@ -65,6 +67,17 @@ func (ce *commandExecutor) configureCommand(cmd *api.CommandSpec, execCmd *exec.
 	if ce.pipeStdout {
 		execCmd.Stderr = os.Stderr
 	}
+}
+
+func expandPath(path string) string {
+	if strings.HasPrefix(path, "~") {
+		if p, err := os.UserHomeDir(); err == nil {
+			return filepath.Join(p, path[1:])
+		}
+		log.Warnf("Failed to resolve user home for path '%s'", path)
+	}
+
+	return path
 }
 
 func toEnvVarsArray(env map[string]string) []string {
