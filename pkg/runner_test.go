@@ -7,36 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var silentCommandExecutor = NewCommandExecutor(false, false)
-
-func TestRun(t *testing.T) {
-	var actualSummary api.Summary
-	var actualConfig *api.BenchmarkSpec
-	interceptSummary := func(summary api.Summary, config *api.BenchmarkSpec) error {
-		actualSummary = summary
-		actualConfig = config
-
-		return nil
-	}
-
-	err := Run("../test/data/benchmark_test_run.yaml", silentExecutionContext(), interceptSummary)
-
-	assert.NoError(t, err)
-	assert.NotNil(t, actualSummary)
-
-	assert.Equal(t, 2, len(actualConfig.Scenarios))
-	assert.Equal(t, len(actualConfig.Scenarios), len(actualSummary.All()))
-
-	assertFullScenarioStats(t, actualSummary.Get("scenario A"))
-	assertFullScenarioStats(t, actualSummary.Get("scenario B"))
-}
-
-func TestRunWithMissingConfigFile(t *testing.T) {
-	err := Run("../test_data/non-existing-file.yaml", silentExecutionContext(), failingWriteSummaryFn(t))
-
-	assert.Error(t, err)
-}
-
 func TestExecuteBenchmarkWithMinimalSpec(t *testing.T) {
 	spec := aBasicSpecWith(false, 2)
 
@@ -114,13 +84,6 @@ func recordingExecutionContext() *api.ExecutionContext {
 	)
 }
 
-func silentExecutionContext() *api.ExecutionContext {
-	return api.NewExecutionContext(
-		NewTracer(),
-		silentCommandExecutor,
-	)
-}
-
 func aBasicSpecWith(alternate bool, executions int) *api.BenchmarkSpec {
 	return &api.BenchmarkSpec{
 		Executions: executions,
@@ -181,5 +144,8 @@ func assertStatValue(t *testing.T, get func() (float64, error)) {
 }
 
 func failingWriteSummaryFn(t *testing.T) api.WriteReportFn {
-	return func(summary api.Summary, config *api.BenchmarkSpec) error { t.Fail(); return nil }
+	return func(summary api.Summary, config *api.BenchmarkSpec, ctx *api.ReportContext) error {
+		t.Fail()
+		return nil
+	}
 }
