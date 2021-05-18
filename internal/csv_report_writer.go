@@ -3,7 +3,6 @@ package internal
 import (
 	"bufio"
 	"fmt"
-	"sort"
 
 	"encoding/csv"
 
@@ -28,7 +27,7 @@ func (rw *csvReportWriter) Write(summary api.Summary, config *api.BenchmarkSpec)
 	rw.writer.Write([]string{"Timestamp", "Scenario", "Min", "Max", "Mean", "Median", "Percentile 90", "StdDev", "Errors"})
 
 	timeStr := summary.Time().Format("2006-01-02T15:04:05Z07:00")
-	sortedIds := getSortedScenarioIds(summary)
+	sortedIds := GetSortedScenarioIds(summary)
 
 	for i := range sortedIds {
 		id := sortedIds[i]
@@ -50,17 +49,6 @@ func (rw *csvReportWriter) Write(summary api.Summary, config *api.BenchmarkSpec)
 	}
 
 	return nil
-}
-
-func getSortedScenarioIds(summary api.Summary) []api.ID {
-	statsMap := summary.All()
-	sortedIds := make([]api.ID, 0, len(statsMap))
-	for k := range statsMap {
-		sortedIds = append(sortedIds, k)
-	}
-	sort.Strings(sortedIds)
-
-	return sortedIds
 }
 
 func (rw *csvReportWriter) writeStatNano(f func() (float64, error)) string {
