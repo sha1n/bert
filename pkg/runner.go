@@ -43,7 +43,7 @@ func executeAlternately(b *api.BenchmarkSpec, ctx *api.ExecutionContext) {
 			if i == 1 {
 				executeScenarioSetup(scenario, ctx)
 			}
-			executeScenarioCommand(scenario, ctx)
+			executeScenarioCommand(scenario, i, b.Executions, ctx)
 			if i == b.Executions {
 				executeScenarioTeardown(scenario, ctx)
 			}
@@ -57,7 +57,7 @@ func executeSequencially(b *api.BenchmarkSpec, ctx *api.ExecutionContext) {
 
 		executeScenarioSetup(scenario, ctx)
 		for i := 1; i <= b.Executions; i++ {
-			executeScenarioCommand(scenario, ctx)
+			executeScenarioCommand(scenario, i, b.Executions, ctx)
 		}
 		executeScenarioTeardown(scenario, ctx)
 	}
@@ -77,9 +77,8 @@ func executeScenarioTeardown(scenario *api.ScenarioSpec, ctx *api.ExecutionConte
 	}
 }
 
-func executeScenarioCommand(scenario *api.ScenarioSpec, ctx *api.ExecutionContext) {
-	log.Infof("Executing scenario '%s'...", scenario.Name)
-
+func executeScenarioCommand(scenario *api.ScenarioSpec, execIndex int, totalExec int, ctx *api.ExecutionContext) {
+	log.Infof("Executing scenario '%s'... (%d/%d)", scenario.Name, execIndex, totalExec)
 	if scenario.BeforeEach != nil {
 		log.Debugf("Executing 'before' command %v", scenario.BeforeEach.Cmd)
 		ctx.Executor.Execute(scenario.BeforeEach, scenario.WorkingDirectory, scenario.Env)
