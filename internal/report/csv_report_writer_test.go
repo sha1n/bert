@@ -20,7 +20,7 @@ func TestWrite(t *testing.T) {
 	var scenario1, scenario2 = scenario{id: "1-id"}, scenario{id: "2-id"}
 	summary := aSummaryFor(scenario1, scenario2)
 
-	allRecords := writeCsvReport(t, summary)
+	allRecords := writeCsvReport(t, summary, true)
 
 	assert.Equal(t, 1+2, len(allRecords))
 
@@ -35,6 +35,20 @@ func TestWrite(t *testing.T) {
 
 	assertRecord(t, scenario1, summary, expectedTimestamp, allRecords[1])
 	assertRecord(t, scenario2, summary, expectedTimestamp, allRecords[2])
+}
+
+func TestWriteWithNoHeaders(t *testing.T) {
+	var scenario1, scenario2 = scenario{id: "1-id"}, scenario{id: "2-id"}
+	summary := aSummaryFor(scenario1, scenario2)
+
+	allRecords := writeCsvReport(t, summary, false)
+
+	assert.Equal(t, 2, len(allRecords))
+
+	expectedTimestamp := summary.Time().Format("2006-01-02T15:04:05Z07:00")
+
+	assertRecord(t, scenario1, summary, expectedTimestamp, allRecords[0])
+	assertRecord(t, scenario2, summary, expectedTimestamp, allRecords[1])
 }
 
 func assertRecord(t *testing.T, scenario api.Identifiable, summary api.Summary, expectedTimestamp string, actualRecord []string) {
@@ -65,11 +79,17 @@ func expectedFloatFormat(f func() (float64, error)) string {
 	return fmt.Sprintf("%.3f", v)
 }
 
-func writeCsvReport(t *testing.T, summary api.Summary) [][]string {
+func writeCsvReport(t *testing.T, summary api.Summary, includeHeaders bool) [][]string {
 	buf := new(bytes.Buffer)
 
 	csvWriter := NewCsvReportWriter(bufio.NewWriter(buf))
-	csvWriter(summary, nil /* unused */, &api.ReportContext{Labels: randomLabels})
+	csvWriter(
+		summary,
+		nil, /* unused */
+		&api.ReportContext{
+			Labels:         randomLabels,
+			IncludeHeaders: includeHeaders,
+		})
 
 	reader := csv.NewReader(buf)
 	allRecords, err := reader.ReadAll()
