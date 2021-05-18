@@ -56,7 +56,10 @@ func (trw *textReportWriter) Write(summary api.Summary, config *api.BenchmarkSpe
 	trw.writeBoolProperty("alternate", config.Alternate)
 	trw.writeNewLine()
 
-	for id := range summary.All() {
+	sortedIds := GetSortedScenarioIds(summary)
+
+	for i := range sortedIds {
+		id := sortedIds[i]
 		stats := summary.Get(id)
 
 		title := fmt.Sprintf("SCENARIO: '%s'", id)
