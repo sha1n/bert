@@ -41,7 +41,7 @@ scenarios:                # list of scenarios
     - echo
     - teardownA
   beforeEach:             # command to be executed before each execution of this scenario
-    workingDir: "/path"   # working directory only for this command
+    workingDir: "~/path"  # working directory only for this command
     cmd:                  # required. command line arguments.
     - echo
     - beforeA
@@ -63,12 +63,12 @@ scenarios:                # list of scenarios
 ## Command Configuration
 The following elements share the same structure: `beforeAll`, `afterAll`, `beforeEach`, `afterEach`, `command`. 
 
-`workingDir` - the `workingDir` property can be set globally for a scenario and optionally be overriden per command. If no working directory is set the default is the directory `benchy` is executed from.
+`workingDir` - the `workingDir` property can be set globally for a scenario and optionally be overriden per command. If no working directory is set the default is the directory `benchy` is executed from. `~` prefix willl be expanded to the current user home directory.
 
 **Command structure:**
 ```yaml
   command:                # required. the benchmarked command of this scenario - the one stats are collected for
-    workingDir: "/path"   # optional working directory for this command. 
+    workingDir: "~/path"  # optional working directory for this command. 
     cmd:                  # required command line arguments.
     - ls
     - -l
