@@ -46,7 +46,7 @@ func NewTextReportWriter(writer *bufio.Writer, colorsOn bool) api.WriteReportFn 
 	return w.Write
 }
 
-func (trw *textReportWriter) Write(summary api.Summary, config *api.BenchmarkSpec) (err error) {
+func (trw *textReportWriter) Write(summary api.Summary, config *api.BenchmarkSpec, ctx *api.ReportContext) (err error) {
 	trw.writeNewLine()
 	trw.writeTitle("BENCHMARK SUMMARY")
 	trw.writeDate(summary.Time())
@@ -64,6 +64,7 @@ func (trw *textReportWriter) Write(summary api.Summary, config *api.BenchmarkSpe
 
 		title := fmt.Sprintf("SCENARIO: '%s'", id)
 		trw.writeTitle(title)
+		trw.writeLabels(ctx.Labels)
 		trw.writeStatNano2Sec("min", stats.Min)
 		trw.writeStatNano2Sec("max", stats.Max)
 		trw.writeStatNano2Sec("mean", stats.Mean)
@@ -91,6 +92,11 @@ func (trw *textReportWriter) writeTitle(title string) {
 	trw.println(line)
 	trw.println(trw.fmtGreen(" %s ", title))
 	trw.println(line)
+}
+
+func (trw *textReportWriter) writeLabels(labels []string) {
+	trw.writeStatTitle("labels")
+	trw.writer.WriteString(fmt.Sprintf("%s\r\n", strings.Join(labels, ",")))
 }
 
 func (trw *textReportWriter) writeDate(time time.Time) {
