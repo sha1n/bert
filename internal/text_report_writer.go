@@ -47,7 +47,9 @@ func NewTextReportWriter(writer *bufio.Writer, colorsOn bool) api.WriteReportFn 
 }
 
 func (trw *textReportWriter) Write(summary api.Summary, config *api.BenchmarkSpec) (err error) {
-	trw.writeTitle("Benchmark Summary")
+	trw.writeNewLine()
+	trw.writeTitle("BENCHMARK SUMMARY")
+	trw.writeDate(summary.Time())
 	trw.writeTime(summary.Time())
 	trw.writeInt64Stat("scenarios", func() (int64, error) { return int64(len(config.Scenarios)), nil })
 	trw.writeInt64Stat("executions", func() (int64, error) { return int64(config.Executions), nil })
@@ -57,7 +59,7 @@ func (trw *textReportWriter) Write(summary api.Summary, config *api.BenchmarkSpe
 	for id := range summary.All() {
 		stats := summary.Get(id)
 
-		title := fmt.Sprintf("Summary of '%s'", id)
+		title := fmt.Sprintf("SCENARIO: '%s'", id)
 		trw.writeTitle(title)
 		trw.writeStatNano2Sec("min", stats.Min)
 		trw.writeStatNano2Sec("max", stats.Max)
@@ -88,9 +90,15 @@ func (trw *textReportWriter) writeTitle(title string) {
 	trw.println(line)
 }
 
+func (trw *textReportWriter) writeDate(time time.Time) {
+	trw.writeStatTitle("date")
+	timeStr := time.Format("Jan 02 2006")
+	trw.writer.WriteString(fmt.Sprintf("%s\r\n", timeStr))
+}
+
 func (trw *textReportWriter) writeTime(time time.Time) {
 	trw.writeStatTitle("time")
-	timeStr := time.Format("2006-01-02T15:04:05Z07:00")
+	timeStr := time.Format("15:04:05Z07:00")
 	trw.writer.WriteString(fmt.Sprintf("%s\r\n", timeStr))
 }
 
