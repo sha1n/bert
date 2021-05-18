@@ -3,6 +3,8 @@ package cli
 import (
 	"bufio"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/sha1n/benchy/api"
 	"github.com/sha1n/benchy/internal/report"
@@ -110,8 +112,21 @@ func resolveReportWriter(cmd *cobra.Command, outputFile *os.File) api.WriteRepor
 func resolveOutputFile(cmd *cobra.Command) (outputFile *os.File, err error) {
 	outputFile = os.Stdout
 	if outputFilePath, _ := cmd.Flags().GetString(ArgNameOutputFile); outputFilePath != "" {
-		return os.OpenFile(outputFilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		resolvedfilePath := expandPath(outputFilePath)
+		return os.OpenFile(resolvedfilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	}
 
 	return outputFile, nil
+}
+
+// FIXME this has been copied from pgk/command_exec.go. Maybe share or use an existing implementation if exists.
+func expandPath(path string) string {
+	if strings.HasPrefix(path, "~") {
+		if p, err := os.UserHomeDir(); err == nil {
+			return filepath.Join(p, path[1:])
+		}
+		log.Warnf("Failed to resolve user home for path '%s'", path)
+	}
+
+	return path
 }
