@@ -26,7 +26,7 @@ func NewCsvReportWriter(writer *bufio.Writer) api.WriteReportFn {
 
 func (rw *csvReportWriter) Write(summary api.Summary, config *api.BenchmarkSpec, ctx *api.ReportContext) (err error) {
 	if ctx.IncludeHeaders {
-		rw.writer.Write([]string{"Timestamp", "Scenario", "Labels", "Min", "Max", "Mean", "Median", "Percentile 90", "StdDev", "Errors"})
+		rw.writer.Write([]string{"Timestamp", "Scenario", "Samples", "Labels", "Min", "Max", "Mean", "Median", "Percentile 90", "StdDev", "Errors"})
 	}
 
 	timeStr := summary.Time().Format("2006-01-02T15:04:05Z07:00")
@@ -39,6 +39,7 @@ func (rw *csvReportWriter) Write(summary api.Summary, config *api.BenchmarkSpec,
 		rw.writer.Write([]string{
 			timeStr,
 			id,
+			rw.writeIntValue(stats.Count()),
 			strings.Join(ctx.Labels, ","),
 			rw.writeStatNano(stats.Min),
 			rw.writeStatNano(stats.Max),
@@ -53,6 +54,10 @@ func (rw *csvReportWriter) Write(summary api.Summary, config *api.BenchmarkSpec,
 	}
 
 	return nil
+}
+
+func (rw *csvReportWriter) writeIntValue(value int) string {
+	return fmt.Sprintf("%d", value)
 }
 
 func (rw *csvReportWriter) writeStatNano(f func() (float64, error)) string {

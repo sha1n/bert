@@ -35,6 +35,7 @@ type Stats interface {
 	Percentile(percent float64) (float64, error)
 	StdDev() (float64, error)
 	ErrorRate() float64
+	Count() int
 }
 
 // Summary provides access a cpollection of identifiable statistics.

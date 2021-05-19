@@ -27,7 +27,7 @@ func TestWrite(t *testing.T) {
 	// Titles
 	assert.Equal(
 		t,
-		[]string{"Timestamp", "Scenario", "Labels", "Min", "Max", "Mean", "Median", "Percentile 90", "StdDev", "Errors"},
+		[]string{"Timestamp", "Scenario", "Samples", "Labels", "Min", "Max", "Mean", "Median", "Percentile 90", "StdDev", "Errors"},
 		allRecords[0],
 	)
 
@@ -57,14 +57,19 @@ func assertRecord(t *testing.T, scenario api.Identifiable, summary api.Summary, 
 
 	assert.Equal(t, expectedTimestamp, actualRecord[0])
 	assert.Equal(t, scenario.ID(), actualRecord[1])
-	assert.Equal(t, expectedLabels, actualRecord[2])
-	assert.Equal(t, expectedFloatFormat(stats1.Min), actualRecord[3])
-	assert.Equal(t, expectedFloatFormat(stats1.Max), actualRecord[4])
-	assert.Equal(t, expectedFloatFormat(stats1.Mean), actualRecord[5])
-	assert.Equal(t, expectedFloatFormat(stats1.Median), actualRecord[6])
-	assert.Equal(t, expectedFloatFormat(func() (float64, error) { return stats1.Percentile(90) }), actualRecord[7])
-	assert.Equal(t, expectedFloatFormat(stats1.StdDev), actualRecord[8])
-	assert.Equal(t, expectedRateFormat(stats1.ErrorRate), actualRecord[9])
+	assert.Equal(t, expectedIntFormat(func() int { return summary.Get(scenario.ID()).Count() }), actualRecord[2])
+	assert.Equal(t, expectedLabels, actualRecord[3])
+	assert.Equal(t, expectedFloatFormat(stats1.Min), actualRecord[4])
+	assert.Equal(t, expectedFloatFormat(stats1.Max), actualRecord[5])
+	assert.Equal(t, expectedFloatFormat(stats1.Mean), actualRecord[6])
+	assert.Equal(t, expectedFloatFormat(stats1.Median), actualRecord[7])
+	assert.Equal(t, expectedFloatFormat(func() (float64, error) { return stats1.Percentile(90) }), actualRecord[8])
+	assert.Equal(t, expectedFloatFormat(stats1.StdDev), actualRecord[9])
+	assert.Equal(t, expectedRateFormat(stats1.ErrorRate), actualRecord[10])
+}
+
+func expectedIntFormat(f func() int) string {
+	return fmt.Sprintf("%d", f())
 }
 
 func expectedRateFormat(f func() float64) string {
