@@ -15,11 +15,10 @@ const SingleErrScenarioID = "err"
 func TestErrorRateStat(t *testing.T) {
 
 	summary := generateExampleSummary()
-	
+
 	zeroErrStats := summary.Get(ZeroErrScenarioID)
 	assert.Equal(t, 0.0, zeroErrStats.ErrorRate())
 
-	
 	singleErrStats := summary.Get(SingleErrScenarioID)
 	assert.Equal(t, 0.1, singleErrStats.ErrorRate())
 }

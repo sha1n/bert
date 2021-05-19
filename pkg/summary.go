@@ -67,6 +67,10 @@ func (s *_stats) ErrorRate() float64 {
 	return s.errorRate
 }
 
+func (s *_stats) Count() int {
+	return len(s.float64Samples)
+}
+
 type _summary struct {
 	samples map[api.ID]api.Stats
 	time    time.Time
