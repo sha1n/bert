@@ -6,14 +6,12 @@ import (
 )
 
 // Execute executes a benchmark and returns an object that provides access to collected stats.
-func Execute(spec *api.BenchmarkSpec, ctx *api.ExecutionContext) api.Summary {
+func Execute(spec *api.BenchmarkSpec, ctx *api.ExecutionContext) {
 	if spec.Alternate {
 		executeAlternately(spec, ctx)
 	} else {
 		executeSequencially(spec, ctx)
 	}
-
-	return ctx.Tracer.Summary()
 }
 
 func executeAlternately(b *api.BenchmarkSpec, ctx *api.ExecutionContext) {

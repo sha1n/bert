@@ -105,10 +105,26 @@ func writeCsvReport(t *testing.T, summary api.Summary, includeHeaders bool) [][]
 }
 
 func aSummaryFor(i1 api.Identifiable, i2 api.Identifiable) api.Summary {
-	t := pkg.NewTracer()
+	t := pkg.NewTracer(100)
+	traces := map[api.ID][]api.Trace{}
+	s := pkg.NewStreamSubscriber(t.Stream(), func(t api.Trace) error {
+		if traces[t.ID()] == nil {
+			traces[t.ID()] = []api.Trace{}
+		}
+
+		traces[t.ID()] = append(traces[t.ID()], t)
+
+		return nil
+	})
+
+	unsub := s.Subscribe()
+
 	t.Start(i1)(nil)
 	t.Start(i2)(nil)
-	return t.Summary()
+
+	unsub()
+
+	return pkg.NewSummary(traces)
 }
 
 type scenario struct {

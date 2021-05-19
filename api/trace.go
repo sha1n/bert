@@ -8,6 +8,9 @@ type End = func(error)
 // ID ...
 type ID = string
 
+// TraceStream ...
+type TraceStream = chan Trace
+
 // Identifiable an abstraction for identifiable objects
 type Identifiable interface {
 	ID() ID
@@ -16,7 +19,7 @@ type Identifiable interface {
 // Tracer a global tracing handler that accumulates trace data and provides access to it.
 type Tracer interface {
 	Start(i Identifiable) End
-	Summary() Summary
+	Stream() TraceStream
 }
 
 // Trace a single time trace

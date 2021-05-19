@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/sha1n/benchy/api"
-	"github.com/sha1n/benchy/internal/report"
+	internal "github.com/sha1n/benchy/internal/report"
 	"github.com/sha1n/benchy/pkg"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -43,7 +43,7 @@ func init() {
 // Run parses CLI arguments and runs the benchmark process
 func Run(cmd *cobra.Command, args []string) {
 	var err error
-	var outputFile *os.File
+	var outFile *os.File
 	var spec *api.BenchmarkSpec
 
 	log.Info("Starting benchy...")
@@ -52,19 +52,19 @@ func Run(cmd *cobra.Command, args []string) {
 		log.StandardLogger().SetLevel(log.DebugLevel)
 	}
 
-	if outputFile, err = resolveOutputFile(cmd); err == nil {
+	if outFile, err = resolveOutputFile(cmd); err == nil {
 		specFilePath, _ := cmd.Flags().GetString(ArgNameConfig)
 
 		if spec, err = pkg.LoadSpec(specFilePath); err == nil {
-			ctx := resolveExecutionContext(cmd)
-
-			summary := pkg.Execute(spec, ctx)
-
-			writeReportFn := resolveReportWriter(cmd, outputFile)
+			execCtx := resolveExecutionContext(cmd, spec)
 			reportCtx := resolveReportContext(cmd)
 
-			writeReportFn(summary, spec, reportCtx)
+			reportHandler := resolveReportHandler(cmd, spec, reportCtx, outFile)
+			reportHandler.Subscribe(execCtx.Tracer.Stream())
 
+			pkg.Execute(spec, execCtx)
+
+			err = reportHandler.Finalize()
 		}
 	}
 
@@ -78,6 +78,13 @@ func checkFatal(err error) {
 	}
 }
 
+func resolveReportHandler(cmd *cobra.Command, spec *api.BenchmarkSpec, reportCtx *api.ReportContext, outFile *os.File) api.ReportHandler {
+	writer := bufio.NewWriter(outFile)
+	writeReportFn := resolveReportWriter(cmd, writer)
+
+	return pkg.NewSummaryReportHandler(spec, reportCtx, writeReportFn)
+}
+
 func resolveReportContext(cmd *cobra.Command) *api.ReportContext {
 	labels, _ := cmd.Flags().GetStringSlice(ArgNameLabel)
 	includeHeaders, _ := cmd.Flags().GetBool(ArgNameHeaders)
@@ -88,19 +95,18 @@ func resolveReportContext(cmd *cobra.Command) *api.ReportContext {
 	}
 }
 
-func resolveExecutionContext(cmd *cobra.Command) *api.ExecutionContext {
+func resolveExecutionContext(cmd *cobra.Command, spec *api.BenchmarkSpec) *api.ExecutionContext {
 	pipeStdOut, _ := cmd.Flags().GetBool(ArgNamePipeStdout)
 	pipeStdErr, _ := cmd.Flags().GetBool(ArgNamePipeStderr)
 
 	return api.NewExecutionContext(
-		pkg.NewTracer(),
+		pkg.NewTracer(spec.Executions*len(spec.Scenarios)),
 		pkg.NewCommandExecutor(pipeStdOut, pipeStdErr),
 	)
 }
 
-func resolveReportWriter(cmd *cobra.Command, outputFile *os.File) api.WriteReportFn {
+func resolveReportWriter(cmd *cobra.Command, writer *bufio.Writer) api.WriteReportFn {
 	resolvedWriterFn := func() api.WriteReportFn {
-		writer := bufio.NewWriter(outputFile)
 		if reportFormat, _ := cmd.Flags().GetString(ArgNameFormat); reportFormat == "csv" {
 			return internal.NewCsvReportWriter(writer)
 		}

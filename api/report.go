@@ -8,3 +8,9 @@ type ReportContext struct {
 
 // WriteReportFn a benchmark report handler
 type WriteReportFn = func(Summary, *BenchmarkSpec, *ReportContext) error
+
+// ReportHandler an async handler
+type ReportHandler interface {
+	Subscribe(TraceStream)
+	Finalize() error
+}

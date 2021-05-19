@@ -6,7 +6,7 @@ import (
 )
 
 type tracer struct {
-	traces map[api.ID][]api.Trace
+	stream chan api.Trace
 }
 
 type trace struct {
@@ -41,24 +41,27 @@ func newTrace(id string) *trace {
 }
 
 // NewTracer creates a new tracer
-func NewTracer() api.Tracer {
+func NewTracer(bufferSize int) api.Tracer {
 	return &tracer{
-		traces: make(map[api.ID][]api.Trace),
+		stream: make(chan api.Trace, bufferSize),
 	}
 }
 
 func (tr *tracer) Start(i api.Identifiable) api.End {
 	t := newTrace(i.ID())
 
-	if tr.traces[i.ID()] == nil {
-		tr.traces[i.ID()] = []api.Trace{}
-	}
-
-	tr.traces[i.ID()] = append(tr.traces[i.ID()], t)
-
-	return t.end
+	return tr.endFn(t)
 }
 
-func (tr *tracer) Summary() api.Summary {
-	return NewSummary(tr.traces)
+func (tr *tracer) endFn(t *trace) api.End {
+	return func(exitError error) {
+		t.elapsed = time.Since(t.start)
+		t.error = exitError
+
+		tr.stream <- t
+	}
+}
+
+func (tr *tracer) Stream() chan api.Trace {
+	return tr.stream
 }
