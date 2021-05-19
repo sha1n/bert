@@ -27,7 +27,7 @@ func NewSummary(tracesByID map[api.ID][]api.Trace) api.Summary {
 
 		summary.samples[id] = &_stats{
 			float64Samples: float64Samples,
-			errorRate:      float64(errorCount / len(traces)),
+			errorRate:      float64(errorCount) / float64(len(traces)),
 		}
 	}
 
