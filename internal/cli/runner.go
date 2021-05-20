@@ -2,6 +2,7 @@ package cli
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -27,6 +28,8 @@ const (
 	ArgNamePipeStderr = "pipe-stderr"
 	// ArgNameDebug : program arg name
 	ArgNameDebug = "debug"
+	// ArgNameSilent : program arg name
+	ArgNameSilent = "silent"
 	// ArgNameLabel : program arg name
 	ArgNameLabel = "label"
 	// ArgNameHeaders : program arg name
@@ -51,9 +54,10 @@ func init() {
 // Run parses CLI arguments and runs the benchmark process
 func Run(cmd *cobra.Command, args []string) {
 	var err error
+	configureLogger(cmd)
+
 	log.Info("Starting benchy...")
 
-	configureLogger(cmd)
 	spec := loadSpec(cmd)
 	if reportHandler, err := resolveReportHandler(cmd, spec); err == nil {
 		tracer := pkg.NewTracer(spec.Executions * len(spec.Scenarios))
@@ -75,7 +79,16 @@ func checkFatal(err error) {
 }
 
 func configureLogger(cmd *cobra.Command) {
-	if debug, _ := cmd.Flags().GetBool(ArgNameDebug); debug {
+	silent, _ := cmd.Flags().GetBool(ArgNameSilent)
+	debug, _ := cmd.Flags().GetBool(ArgNameDebug)
+
+	if silent && debug {
+		checkFatal(errors.New("'--%s' and '--%s' are mutually exclusive"))
+	}
+	if silent {
+		log.StandardLogger().SetLevel(log.PanicLevel)
+	}
+	if debug {
 		log.StandardLogger().SetLevel(log.DebugLevel)
 	}
 }
