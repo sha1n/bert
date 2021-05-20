@@ -51,17 +51,15 @@ func init() {
 // Run parses CLI arguments and runs the benchmark process
 func Run(cmd *cobra.Command, args []string) {
 	var err error
-
 	log.Info("Starting benchy...")
 
-	handleDebug(cmd)
-
+	configureLogger(cmd)
 	spec := loadSpec(cmd)
-	execCtx := resolveExecutionContext(cmd, spec)
 	if reportHandler, err := resolveReportHandler(cmd, spec); err == nil {
-		reportHandler.Subscribe(execCtx.Tracer.Stream())
+		tracer := pkg.NewTracer(spec.Executions * len(spec.Scenarios))
+		reportHandler.Subscribe(tracer.Stream())
 
-		pkg.Execute(spec, execCtx)
+		pkg.Execute(spec, resolveExecutionContext(cmd, tracer))
 
 		err = reportHandler.Finalize()
 	}
@@ -76,7 +74,7 @@ func checkFatal(err error) {
 	}
 }
 
-func handleDebug(cmd *cobra.Command) {
+func configureLogger(cmd *cobra.Command) {
 	if debug, _ := cmd.Flags().GetBool(ArgNameDebug); debug {
 		log.StandardLogger().SetLevel(log.DebugLevel)
 	}
@@ -128,14 +126,11 @@ func resolveReportContext(cmd *cobra.Command) *api.ReportContext {
 	}
 }
 
-func resolveExecutionContext(cmd *cobra.Command, spec *api.BenchmarkSpec) *api.ExecutionContext {
+func resolveExecutionContext(cmd *cobra.Command, tracer api.Tracer) *api.ExecutionContext {
 	pipeStdOut, _ := cmd.Flags().GetBool(ArgNamePipeStdout)
 	pipeStdErr, _ := cmd.Flags().GetBool(ArgNamePipeStderr)
 
-	return api.NewExecutionContext(
-		pkg.NewTracer(spec.Executions*len(spec.Scenarios)),
-		pkg.NewCommandExecutor(pipeStdOut, pipeStdErr),
-	)
+	return api.NewExecutionContext(tracer, pkg.NewCommandExecutor(pipeStdOut, pipeStdErr))
 }
 
 func resolveOutputFile(cmd *cobra.Command) *os.File {
