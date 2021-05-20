@@ -67,9 +67,9 @@ The following elements share the same structure: `beforeAll`, `afterAll`, `befor
 
 **Command structure:**
 ```yaml
-  command:                # required. the benchmarked command of this scenario - the one stats are collected for
-    workingDir: "~/path"  # optional working directory for this command. 
-    cmd:                  # required command line arguments.
+  command:                # container for commands
+    workingDir: "~/path"  # optional working directory for this command
+    cmd:                  # required. the actual command line arguments to run
     - ls
     - -l
 ```

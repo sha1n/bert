@@ -24,7 +24,7 @@
 - Set optional before/after commands for each run
 - Set optional setup/teardown commands per scenario
 - Choose between alternate executions and sequencial execution of the same command
-- Choose between `txt` and `csv` output formats
+- Choose between `txt`, `csv` and `csv/raw` output formats
 
 ## Installing 
 ### Download a prebuilt binary
@@ -32,23 +32,23 @@ Download the appropriate binary and put it in your `PATH`.
 
 ```bash
 # macOS Example (assuming that '$HOME/.local/bin' is in your PATH):
-$ curl -sL https://github.com/sha1n/benchy/releases/latest/download/benchy-darwin-amd64 -o "$HOME/.local/bin/benchy"
+curl -sSL https://github.com/sha1n/benchy/releases/latest/download/benchy-darwin-amd64 -o "$HOME/.local/bin/benchy"
 ```
 
 ### Build your own binary
 ```bash
 # macOS Example (assuming that '$HOME/.local/bin' is in your PATH):
-$ git clone git@github.com:sha1n/benchy.git
-$ cd benchy
-$ make 
-$ cp ./bin/benchy-darwin-amd64 ~/.local/bin/benchy
+git clone git@github.com:sha1n/benchy.git
+cd benchy
+make 
+cp ./bin/benchy-darwin-amd64 ~/.local/bin/benchy
 ```
 
 ## Usage
 ```bash
-$ benchy --config test/data/spec_test_load.yaml
+benchy --config test/data/spec_test_load.yaml
 
-$ benchy --help   # for full options list
+benchy --help   # for full options list
 ```
 
 ## Config File
@@ -150,7 +150,10 @@ scenarios:
 ```
 
 ## Report Formats
-There are two supported report formats; `txt` and `csv`. `txt` is the default format and is primarily designed to be used in a terminal. `csv` is especially useful when you want to accumulate stats from multiple benchmarks in a CSV file. In which case you can combine the `csv` format with `-o` and possibly `--header=false`. Use `benchy --help` for more details.
+There are three supported report formats; `txt`, `csv` and `csv/raw`. `txt` is the default format and is primarily designed to be used in a terminal. `csv` is especially useful when you want to accumulate stats from multiple benchmarks in a CSV file. In which case you can combine the `csv` format with `-o` and possibly `--header=false`. 
+`csv/raw` is streaming raw trace events as CSV records and is useful if you want to load that data into a spreadsheet or other tools for further analysis.
+
+Run `benchy --help` for more details.
 
 **TXT Example:**
 ```bash
@@ -193,4 +196,30 @@ There are two supported report formats; `txt` and `csv`. `txt` is the default fo
 Timestamp,Scenario,Labels,Min,Max,Mean,Median,Percentile 90,StdDev,Errors
 2021-05-18T23:38:49+03:00,scenario A,example-label,1003508458.000,1009577781.000,1006281483.700,1006164208.500,1008256954.000,2122427.909,0
 2021-05-18T23:38:49+03:00,scenario B,example-label,2953009.000,4218971.000,3818925.400,3854585.000,4048263.000,317884.931,0
+```
+
+**Raw CSV Example:***
+```csv
+Timestamp,Scenario,Labels,Duration,Error
+2021-05-21T00:58:37+03:00,scenario A,example-label,1008861268,false
+2021-05-21T00:58:37+03:00,scenario B,example-label,4021420,false
+2021-05-21T00:58:38+03:00,scenario A,example-label,1006453206,false
+2021-05-21T00:58:38+03:00,scenario B,example-label,3753389,false
+2021-05-21T00:58:39+03:00,scenario A,example-label,1004680188,false
+2021-05-21T00:58:39+03:00,scenario B,example-label,3780530,false
+2021-05-21T00:58:40+03:00,scenario A,example-label,1005864471,false
+2021-05-21T00:58:40+03:00,scenario B,example-label,3812982,false
+2021-05-21T00:58:41+03:00,scenario A,example-label,1006431680,false
+2021-05-21T00:58:41+03:00,scenario B,example-label,5208588,false
+2021-05-21T00:58:42+03:00,scenario A,example-label,1005159913,false
+2021-05-21T00:58:42+03:00,scenario B,example-label,3708653,false
+2021-05-21T00:58:43+03:00,scenario A,example-label,1006895996,false
+2021-05-21T00:58:43+03:00,scenario B,example-label,3261679,false
+2021-05-21T00:58:44+03:00,scenario A,example-label,1008155810,false
+2021-05-21T00:58:44+03:00,scenario B,example-label,3846961,false
+2021-05-21T00:58:45+03:00,scenario A,example-label,1007275165,false
+2021-05-21T00:58:45+03:00,scenario B,example-label,4039325,false
+2021-05-21T00:58:46+03:00,scenario A,example-label,1003687652,false
+2021-05-21T00:58:46+03:00,scenario B,example-label,3981022,false
+
 ```
