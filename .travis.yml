@@ -1,4 +1,6 @@
-language: go
+anguage: go
 go:
   - "1.16.x"
-
+os:
+  - linux
+script: make ci-checks
