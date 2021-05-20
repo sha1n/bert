@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"context"
+	"reflect"
 	"sync"
 
 	"github.com/sha1n/benchy/api"
@@ -16,26 +17,38 @@ type HandleFn = func(api.Trace) error
 
 // StreamSubscriber FIXME
 type StreamSubscriber struct {
-	stream   chan api.Trace
-	handleFn HandleFn
+	stream         chan api.Trace
+	handleFn       HandleFn
+	mx             *sync.RWMutex
+	drainWaitGroup *sync.WaitGroup
 }
 
-// NewStreamSubscriber FIXME
+// NewStreamSubscriber returns a new subscriber for the specified TraceStream. Does not subscribe immediately.
 func NewStreamSubscriber(stream api.TraceStream, handleFn HandleFn) *StreamSubscriber {
 	return &StreamSubscriber{
 		stream:   stream,
 		handleFn: handleFn,
+		mx:       &sync.RWMutex{},
 	}
 }
 
-// Subscribe FIXME
+// Subscribe subscribes to the TraceStream and starts handling events.
+// Returns an Unsubscribe handler that drains the underlaying channel and stops consuming events.
+// This method can only be called once before Unsubscribe is called.
 func (s *StreamSubscriber) Subscribe() Unsubscribe {
+	s.mx.Lock()
+	defer s.mx.Unlock()
+
+	if s.drainWaitGroup != nil {
+		log.Panicf("Programmer error: %s can only subscribe one.", reflect.TypeOf(s))
+	}
+
 	context, cancel := context.WithCancel(context.Background())
 	startWaitGroup := &sync.WaitGroup{}
 	startWaitGroup.Add(1)
 
-	drainWaitGroup := &sync.WaitGroup{}
-	drainWaitGroup.Add(1)
+	s.drainWaitGroup = &sync.WaitGroup{}
+	s.drainWaitGroup.Add(1)
 
 	go func() {
 		startWaitGroup.Done()
@@ -44,7 +57,7 @@ func (s *StreamSubscriber) Subscribe() Unsubscribe {
 			select {
 			case <-context.Done():
 				s.drain()
-				drainWaitGroup.Done()
+				s.drainWaitGroup.Done()
 
 				return
 
@@ -54,11 +67,16 @@ func (s *StreamSubscriber) Subscribe() Unsubscribe {
 		}
 	}()
 
+	// we don't return before the subscription routine starts.
 	startWaitGroup.Wait()
 
 	return func() {
+		s.mx.Lock()
+		defer s.mx.Unlock()
+
 		cancel()
-		drainWaitGroup.Wait()
+		s.drainWaitGroup.Wait()
+		s.drainWaitGroup = nil
 	}
 }
 
