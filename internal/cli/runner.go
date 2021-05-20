@@ -65,9 +65,16 @@ func Run(cmd *cobra.Command, args []string) {
 
 			writeReportFn(summary, spec, reportCtx)
 
-		} else {
-			log.Errorf("Failed to execute benchark. Error: %s", err.Error())
 		}
+	}
+
+	checkFatal(err)
+}
+
+func checkFatal(err error) {
+	if err != nil {
+		log.Errorf("Failed to execute benchark. Error: %s", err.Error())
+		log.Exit(1)
 	}
 }
 
