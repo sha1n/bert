@@ -32,6 +32,8 @@ MAKEFLAGS += --silent
 
 default: clean install lint format test compile
 
+ci-checks: lint format test
+
 install: go-get
 
 format: go-format
