@@ -25,6 +25,22 @@ func TestSubscribe(t *testing.T) {
 	assert.Equal(t, eventCount, len(received))
 }
 
+func TestCanOnlySubscribeOnce(t *testing.T) {
+	expectPanic := func() {
+		v := recover()
+		assert.NotNil(t, v)
+	}
+	defer expectPanic()
+
+	stream := make(chan api.Trace)
+	subscriber := NewStreamSubscriber(stream, func(t api.Trace) error { return nil })
+
+	unsubscribe := subscriber.Subscribe()
+	defer unsubscribe()
+
+	subscriber.Subscribe() // => expecting panic
+}
+
 func createTracerWithNBufferedEvents(n int) api.Tracer {
 	tracer := NewTracer(n)
 	spec := exampleSpec()
