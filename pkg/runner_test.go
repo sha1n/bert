@@ -143,7 +143,7 @@ func assertStatValue(t *testing.T, get func() (float64, error)) {
 	assert.GreaterOrEqual(t, value, 0.0)
 }
 
-func failingWriteSummaryFn(t *testing.T) api.WriteReportFn {
+func failingWriteSummaryFn(t *testing.T) api.WriteSummaryReportFn {
 	return func(summary api.Summary, config *api.BenchmarkSpec, ctx *api.ReportContext) error {
 		t.Fail()
 		return nil

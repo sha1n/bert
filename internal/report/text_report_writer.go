@@ -23,7 +23,7 @@ type textReportWriter struct {
 }
 
 // NewTextReportWriter returns a text report write handler.
-func NewTextReportWriter(writer *bufio.Writer, colorsOn bool) api.WriteReportFn {
+func NewTextReportWriter(writer *bufio.Writer, colorsOn bool) api.WriteSummaryReportFn {
 	var fmtRed, fmtGreen, fmtYellow, fmtBold format
 
 	if colorsOn {

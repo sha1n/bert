@@ -6,8 +6,8 @@ type ReportContext struct {
 	IncludeHeaders bool
 }
 
-// WriteReportFn a benchmark report handler
-type WriteReportFn = func(Summary, *BenchmarkSpec, *ReportContext) error
+// WriteSummaryReportFn a benchmark report handler
+type WriteSummaryReportFn = func(Summary, *BenchmarkSpec, *ReportContext) error
 
 // ReportHandler an async handler
 type ReportHandler interface {

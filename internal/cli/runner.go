@@ -2,6 +2,7 @@ package cli
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -30,6 +31,13 @@ const (
 	ArgNameLabel = "label"
 	// ArgNameHeaders : program arg name
 	ArgNameHeaders = "headers"
+
+	// ArgValueReportFormatTxt : Plain text report format arg value
+	ArgValueReportFormatTxt = "txt"
+	// ArgValueReportFormatCsv : CSV report format arg value
+	ArgValueReportFormatCsv = "csv"
+	// ArgValueReportFormatCsvRaw : CSV raw data report format value
+	ArgValueReportFormatCsvRaw = "csv/raw"
 )
 
 func init() {
@@ -43,29 +51,19 @@ func init() {
 // Run parses CLI arguments and runs the benchmark process
 func Run(cmd *cobra.Command, args []string) {
 	var err error
-	var outFile *os.File
-	var spec *api.BenchmarkSpec
 
 	log.Info("Starting benchy...")
 
-	if debug, _ := cmd.Flags().GetBool(ArgNameDebug); debug {
-		log.StandardLogger().SetLevel(log.DebugLevel)
-	}
+	handleDebug(cmd)
 
-	if outFile, err = resolveOutputFile(cmd); err == nil {
-		specFilePath, _ := cmd.Flags().GetString(ArgNameConfig)
+	spec := loadSpec(cmd)
+	execCtx := resolveExecutionContext(cmd, spec)
+	if reportHandler, err := resolveReportHandler(cmd, spec); err == nil {
+		reportHandler.Subscribe(execCtx.Tracer.Stream())
 
-		if spec, err = pkg.LoadSpec(specFilePath); err == nil {
-			execCtx := resolveExecutionContext(cmd, spec)
-			reportCtx := resolveReportContext(cmd)
+		pkg.Execute(spec, execCtx)
 
-			reportHandler := resolveReportHandler(cmd, spec, reportCtx, outFile)
-			reportHandler.Subscribe(execCtx.Tracer.Stream())
-
-			pkg.Execute(spec, execCtx)
-
-			err = reportHandler.Finalize()
-		}
+		err = reportHandler.Finalize()
 	}
 
 	checkFatal(err)
@@ -78,11 +76,46 @@ func checkFatal(err error) {
 	}
 }
 
-func resolveReportHandler(cmd *cobra.Command, spec *api.BenchmarkSpec, reportCtx *api.ReportContext, outFile *os.File) api.ReportHandler {
-	writer := bufio.NewWriter(outFile)
-	writeReportFn := resolveReportWriter(cmd, writer)
+func handleDebug(cmd *cobra.Command) {
+	if debug, _ := cmd.Flags().GetBool(ArgNameDebug); debug {
+		log.StandardLogger().SetLevel(log.DebugLevel)
+	}
+}
 
-	return pkg.NewSummaryReportHandler(spec, reportCtx, writeReportFn)
+func loadSpec(cmd *cobra.Command) *api.BenchmarkSpec {
+	specFilePath, _ := cmd.Flags().GetString(ArgNameConfig)
+	spec, err := pkg.LoadSpec(specFilePath)
+	checkFatal(err)
+
+	return spec
+}
+
+func resolveReportHandler(cmd *cobra.Command, spec *api.BenchmarkSpec) (handler api.ReportHandler, err error) {
+	reportCtx := resolveReportContext(cmd)
+	outFile := resolveOutputFile(cmd)
+	writer := bufio.NewWriter(outFile)
+
+	switch reportFormat, _ := cmd.Flags().GetString(ArgNameFormat); reportFormat {
+	case ArgValueReportFormatCsvRaw:
+		streamReportWriter := internal.NewCsvStreamReportWriter(writer, reportCtx)
+		handler = pkg.NewStreamReportHandler(spec, reportCtx, streamReportWriter.Handle)
+
+	case ArgValueReportFormatCsv:
+		handler = pkg.NewSummaryReportHandler(spec, reportCtx, internal.NewCsvReportWriter(writer))
+
+	case ArgValueReportFormatTxt:
+		var colorsOn = false
+		if file, _ := cmd.Flags().GetString(ArgNameOutputFile); file == "" {
+			colorsOn = true
+		}
+
+		handler = pkg.NewSummaryReportHandler(spec, reportCtx, internal.NewTextReportWriter(writer, colorsOn))
+
+	default:
+		err = fmt.Errorf("Invalid report format '%s'", reportFormat)
+	}
+
+	return handler, err
 }
 
 func resolveReportContext(cmd *cobra.Command) *api.ReportContext {
@@ -105,31 +138,17 @@ func resolveExecutionContext(cmd *cobra.Command, spec *api.BenchmarkSpec) *api.E
 	)
 }
 
-func resolveReportWriter(cmd *cobra.Command, writer *bufio.Writer) api.WriteReportFn {
-	resolvedWriterFn := func() api.WriteReportFn {
-		if reportFormat, _ := cmd.Flags().GetString(ArgNameFormat); reportFormat == "csv" {
-			return internal.NewCsvReportWriter(writer)
-		}
+func resolveOutputFile(cmd *cobra.Command) *os.File {
+	var outputFile = os.Stdout
+	var err error = nil
 
-		var colorsOn = false
-		if file, _ := cmd.Flags().GetString(ArgNameOutputFile); file == "" {
-			colorsOn = true
-		}
-
-		return internal.NewTextReportWriter(writer, colorsOn)
-	}()
-
-	return internal.WriteReportFnFor(resolvedWriterFn)
-}
-
-func resolveOutputFile(cmd *cobra.Command) (outputFile *os.File, err error) {
-	outputFile = os.Stdout
 	if outputFilePath, _ := cmd.Flags().GetString(ArgNameOutputFile); outputFilePath != "" {
 		resolvedfilePath := expandPath(outputFilePath)
-		return os.OpenFile(resolvedfilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		outputFile, err = os.OpenFile(resolvedfilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	}
+	checkFatal(err)
 
-	return outputFile, nil
+	return outputFile
 }
 
 // FIXME this has been copied from pgk/command_exec.go. Maybe share or use an existing implementation if exists.

@@ -16,7 +16,7 @@ type csvReportWriter struct {
 }
 
 // NewCsvReportWriter returns a CSV report write handler.
-func NewCsvReportWriter(writer *bufio.Writer) api.WriteReportFn {
+func NewCsvReportWriter(writer *bufio.Writer) api.WriteSummaryReportFn {
 	w := &csvReportWriter{
 		writer: csv.NewWriter(writer),
 	}
