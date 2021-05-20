@@ -27,19 +27,26 @@ Build label: %s`, Version, Build),
 	}
 
 	rootCmd.Flags().StringP(cli.ArgNameConfig, "c", "", `config file path. '~' will be expanded.`)
+
+	// Reporting
 	rootCmd.Flags().StringP(cli.ArgNameOutputFile, "o", "", `output file path. Optional. Writes to stdout by default.`)
 	rootCmd.Flags().StringP(cli.ArgNameFormat, "f", "txt", `summary format. One of: 'txt', 'csv', 'csv/raw'
 txt 		- plain text. designed to be used in your terminal
 csv 		- CSV in which each row represents a scenario and contians calculated stats for that scenario
 csv/raw	- CSV in which each row represents a raw trace event. useful if you want to import to a spreadsheet for further analysis`,
 	)
-	rootCmd.Flags().BoolP(cli.ArgNamePipeStdout, "", true, `redirects external commands standard out to benchy's standard out`)
-	rootCmd.Flags().BoolP(cli.ArgNamePipeStderr, "", true, `redirects external commands standard error to benchy's standard error`)
-	rootCmd.Flags().BoolP(cli.ArgNameDebug, "d", false, `logs extra debug information`)
 	rootCmd.Flags().StringSliceP(cli.ArgNameLabel, "l", []string{}, `labels to attach to be included in the benchmark report`)
 	rootCmd.Flags().BoolP(cli.ArgNameHeaders, "", true, `in tabular formats, whether to include headers in the report`)
 
-	cobra.MarkFlagRequired(rootCmd.Flags(), "config")
+	// Stdout
+	rootCmd.Flags().BoolP(cli.ArgNamePipeStdout, "", true, `redirects external commands standard out to benchy's standard out`)
+	rootCmd.Flags().BoolP(cli.ArgNamePipeStderr, "", true, `redirects external commands standard error to benchy's standard error`)
+	rootCmd.Flags().BoolP(cli.ArgNameDebug, "d", false, `logs extra debug information`)
+	rootCmd.Flags().BoolP(cli.ArgNameSilent, "s", false, `logs only fatal errors`)
+
+	cobra.MarkFlagRequired(rootCmd.Flags(), cli.ArgNameConfig)
+	cobra.MarkFlagFilename(rootCmd.Flags(), cli.ArgNameConfig)
+	cobra.MarkFlagFilename(rootCmd.Flags(), cli.ArgNameOutputFile)
 
 	rootCmd.SetVersionTemplate(`{{printf "%s" .Version}}`)
 
