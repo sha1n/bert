@@ -14,29 +14,29 @@ func Execute(spec *api.BenchmarkSpec, ctx *api.ExecutionContext) {
 	}
 }
 
-func executeAlternately(b *api.BenchmarkSpec, ctx *api.ExecutionContext) {
-	for i := 1; i <= b.Executions; i++ {
-		for si := range b.Scenarios {
-			scenario := b.Scenarios[si]
+func executeAlternately(spec *api.BenchmarkSpec, ctx *api.ExecutionContext) {
+	for i := 1; i <= spec.Executions; i++ {
+		for si := range spec.Scenarios {
+			scenario := spec.Scenarios[si]
 
 			if i == 1 {
 				executeScenarioSetup(scenario, ctx)
 			}
-			executeScenarioCommand(scenario, i, b.Executions, ctx)
-			if i == b.Executions {
+			executeScenarioCommand(scenario, i, spec.Executions, ctx)
+			if i == spec.Executions {
 				executeScenarioTeardown(scenario, ctx)
 			}
 		}
 	}
 }
 
-func executeSequencially(b *api.BenchmarkSpec, ctx *api.ExecutionContext) {
-	for si := range b.Scenarios {
-		scenario := b.Scenarios[si]
+func executeSequencially(spec *api.BenchmarkSpec, ctx *api.ExecutionContext) {
+	for si := range spec.Scenarios {
+		scenario := spec.Scenarios[si]
 
 		executeScenarioSetup(scenario, ctx)
-		for i := 1; i <= b.Executions; i++ {
-			executeScenarioCommand(scenario, i, b.Executions, ctx)
+		for i := 1; i <= spec.Executions; i++ {
+			executeScenarioCommand(scenario, i, spec.Executions, ctx)
 		}
 		executeScenarioTeardown(scenario, ctx)
 	}
