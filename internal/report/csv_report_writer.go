@@ -10,7 +10,7 @@ import (
 	"github.com/sha1n/benchy/api"
 )
 
-// textReportWriter a simple human readable test report writer
+// csvReportWriter a simple human readable test report writer
 type csvReportWriter struct {
 	writer *csv.Writer
 }

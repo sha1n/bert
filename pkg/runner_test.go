@@ -64,7 +64,7 @@ func TestExecuteBenchmarkWithSetupAndTeardownSpecs(t *testing.T) {
 func executeWith(spec *api.BenchmarkSpec) *CmdRecordingExecutor {
 	recordingCtx := recordingExecutionContext()
 
-	_ = Execute(spec, recordingCtx)
+	Execute(spec, recordingCtx)
 
 	return recordingCtx.Executor.(*CmdRecordingExecutor)
 }
@@ -79,7 +79,7 @@ func assertRecordedCommandWith(t *testing.T, scenario *api.ScenarioSpec) func(ex
 
 func recordingExecutionContext() *api.ExecutionContext {
 	return api.NewExecutionContext(
-		NewTracer(),
+		NewTracer(100),
 		&CmdRecordingExecutor{},
 	)
 }
