@@ -6,7 +6,7 @@ import (
 )
 
 // WriteReportFnFor returns a wrapper function for the specified api.WriteReportFn
-func WriteReportFnFor(write api.WriteReportFn) api.WriteReportFn {
+func WriteReportFnFor(write api.WriteSummaryReportFn) api.WriteSummaryReportFn {
 	w := func(ts api.Summary, config *api.BenchmarkSpec, ctx *api.ReportContext) (err error) {
 		log.Info("Writing report...")
 		defer log.Info("Done!")

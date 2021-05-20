@@ -27,15 +27,17 @@ Build label: %s`, Version, Build),
 	}
 
 	rootCmd.Flags().StringP(cli.ArgNameConfig, "c", "", `config file path. '~' will be expanded.`)
-	// Console output options
-	rootCmd.Flags().BoolP(cli.ArgNamePipeStdout, "", true, `redirects external commands standard out to benchy's standard out (default: true)`)
-	rootCmd.Flags().BoolP(cli.ArgNamePipeStderr, "", true, `redirects external commands standard error to benchy's standard error (default: true)`)
-	rootCmd.Flags().BoolP(cli.ArgNameDebug, "d", false, `logs extra debug information`)
-	// Reporting options
 	rootCmd.Flags().StringP(cli.ArgNameOutputFile, "o", "", `output file path. Optional. Writes to stdout by default.`)
-	rootCmd.Flags().StringP(cli.ArgNameFormat, "f", "txt", `summary format. One of: 'txt', 'csv' (default: txt)`)
-	rootCmd.Flags().StringSliceP(cli.ArgNameLabel, "l", []string{}, `labels to attach to be included in the benchmark report.`)
-	rootCmd.Flags().BoolP(cli.ArgNameHeaders, "", true, `in supported formats, whether to include headers in the report (default: true).`)
+	rootCmd.Flags().StringP(cli.ArgNameFormat, "f", "txt", `summary format. One of: 'txt', 'csv', 'csv/raw'
+txt 		- plain text. designed to be used in your terminal
+csv 		- CSV in which each row represents a scenario and contians calculated stats for that scenario
+csv/raw	- CSV in which each row represents a raw trace event. useful if you want to import to a spreadsheet for further analysis`,
+	)
+	rootCmd.Flags().BoolP(cli.ArgNamePipeStdout, "", true, `redirects external commands standard out to benchy's standard out`)
+	rootCmd.Flags().BoolP(cli.ArgNamePipeStderr, "", true, `redirects external commands standard error to benchy's standard error`)
+	rootCmd.Flags().BoolP(cli.ArgNameDebug, "d", false, `logs extra debug information`)
+	rootCmd.Flags().StringSliceP(cli.ArgNameLabel, "l", []string{}, `labels to attach to be included in the benchmark report`)
+	rootCmd.Flags().BoolP(cli.ArgNameHeaders, "", true, `in tabular formats, whether to include headers in the report`)
 
 	cobra.MarkFlagRequired(rootCmd.Flags(), "config")
 
