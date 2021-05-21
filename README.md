@@ -24,7 +24,7 @@
 - Set optional before/after commands for each run
 - Set optional setup/teardown commands per scenario
 - Choose between alternate executions and sequencial execution of the same command
-- Choose between `txt`, `csv` and `csv/raw` output formats
+- Choose between `txt`, `csv`, `csv/raw`, `md` and `md/raw` output formats
 
 ## Installing 
 ### Download a prebuilt binary
