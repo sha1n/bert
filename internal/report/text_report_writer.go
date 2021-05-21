@@ -9,6 +9,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/sha1n/benchy/api"
+	log "github.com/sirupsen/logrus"
 )
 
 type format = func(string, ...interface{}) string
@@ -80,11 +81,11 @@ func (trw *textReportWriter) Write(summary api.Summary, config *api.BenchmarkSpe
 }
 
 func (trw *textReportWriter) writeNewLine() {
-	trw.writer.WriteString("\r\n")
+	trw.writeString("\r\n")
 }
 
 func (trw *textReportWriter) println(s string) {
-	trw.writer.WriteString(fmt.Sprintf("%s\r\n", s))
+	trw.writeString(fmt.Sprintf("%s\r\n", s))
 }
 
 func (trw *textReportWriter) writeTitle(title string) {
@@ -96,36 +97,26 @@ func (trw *textReportWriter) writeTitle(title string) {
 
 func (trw *textReportWriter) writeLabels(labels []string) {
 	trw.writeStatTitle("labels")
-	trw.writer.WriteString(fmt.Sprintf("%s\r\n", strings.Join(labels, ",")))
+	trw.writeString(fmt.Sprintf("%s\r\n", strings.Join(labels, ",")))
 }
 
 func (trw *textReportWriter) writeDate(time time.Time) {
 	trw.writeStatTitle("date")
 	timeStr := time.Format("Jan 02 2006")
-	trw.writer.WriteString(fmt.Sprintf("%s\r\n", timeStr))
+	trw.writeString(fmt.Sprintf("%s\r\n", timeStr))
 }
 
 func (trw *textReportWriter) writeTime(time time.Time) {
 	trw.writeStatTitle("time")
 	timeStr := time.Format("15:04:05Z07:00")
-	trw.writer.WriteString(fmt.Sprintf("%s\r\n", timeStr))
+	trw.writeString(fmt.Sprintf("%s\r\n", timeStr))
 }
 
 func (trw *textReportWriter) writeStatNano2Sec(name string, f func() (float64, error)) {
 	value, err := f()
 	if err == nil {
 		trw.writeStatTitle(name)
-		trw.writer.WriteString(fmt.Sprintf("%.3fs\r\n", value/math.Pow(10, 9)))
-	} else {
-		trw.writeStatError(name)
-	}
-}
-
-func (trw *textReportWriter) writeNumericStat(name string, f func() (float64, error)) {
-	value, err := f()
-	if err == nil {
-		trw.writeStatTitle(name)
-		trw.writer.WriteString(fmt.Sprintf("%.3f\r\n", value))
+		trw.writeString(fmt.Sprintf("%.3fs\r\n", value/math.Pow(10, 9)))
 	} else {
 		trw.writeStatError(name)
 	}
@@ -137,9 +128,9 @@ func (trw *textReportWriter) writeErrorRateStat(name string, f func() float64) {
 	value := f()
 	errorRate := int(value * 100)
 	if errorRate > 0 {
-		trw.writer.WriteString(trw.fmtYellow("%d%%\r\n", errorRate))
+		trw.writeString(trw.fmtYellow("%d%%\r\n", errorRate))
 	} else {
-		trw.writer.WriteString(fmt.Sprintf("%d%%\r\n", errorRate))
+		trw.writeString(fmt.Sprintf("%d%%\r\n", errorRate))
 	}
 }
 
@@ -147,7 +138,7 @@ func (trw *textReportWriter) writeInt64Stat(name string, f func() (int64, error)
 	value, err := f()
 	if err == nil {
 		trw.writeStatTitle(name)
-		trw.writer.WriteString(fmt.Sprintf("%d\r\n", value))
+		trw.writeString(fmt.Sprintf("%d\r\n", value))
 	} else {
 		trw.writeStatError(name)
 	}
@@ -155,14 +146,21 @@ func (trw *textReportWriter) writeInt64Stat(name string, f func() (int64, error)
 
 func (trw *textReportWriter) writeBoolProperty(name string, value bool) {
 	trw.writeStatTitle(name)
-	trw.writer.WriteString(fmt.Sprintf("%v\r\n", value))
+	trw.writeString(fmt.Sprintf("%v\r\n", value))
 }
 
 func (trw *textReportWriter) writeStatTitle(name string) {
-	trw.writer.WriteString(trw.fmtBold("%11s: ", name))
+	trw.writeString(trw.fmtBold("%11s: ", name))
 }
 
 func (trw *textReportWriter) writeStatError(name string) {
-	trw.writer.WriteString(trw.fmtBold("%11s: ", name))
-	trw.writer.WriteString(trw.fmtRed("%s\r\n", "ERROR"))
+	trw.writeString(trw.fmtBold("%11s: ", name))
+	trw.writeString(trw.fmtRed("%s\r\n", "ERROR"))
+}
+
+func (trw *textReportWriter) writeString(str string) {
+	_, err := trw.writer.WriteString(str)
+	if err != nil {
+		log.Error(err)
+	}
 }

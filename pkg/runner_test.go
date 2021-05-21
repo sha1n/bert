@@ -126,26 +126,3 @@ func aSpecWithSetupAndTeardownCommands(executions int) *api.BenchmarkSpec {
 		},
 	}
 }
-
-func assertFullScenarioStats(t *testing.T, stats api.Stats) {
-	assert.NotNil(t, stats)
-	assert.Equal(t, 0.0, stats.ErrorRate())
-	assertStatValue(t, stats.Min)
-	assertStatValue(t, stats.Max)
-	assertStatValue(t, stats.Mean)
-	assertStatValue(t, stats.Median)
-}
-
-func assertStatValue(t *testing.T, get func() (float64, error)) {
-	value, err := get()
-
-	assert.NoError(t, err)
-	assert.GreaterOrEqual(t, value, 0.0)
-}
-
-func failingWriteSummaryFn(t *testing.T) api.WriteSummaryReportFn {
-	return func(summary api.Summary, config *api.BenchmarkSpec, ctx *api.ReportContext) error {
-		t.Fail()
-		return nil
-	}
-}

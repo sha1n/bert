@@ -25,8 +25,12 @@ func NewCsvReportWriter(writer *bufio.Writer) api.WriteSummaryReportFn {
 }
 
 func (rw *csvReportWriter) Write(summary api.Summary, config *api.BenchmarkSpec, ctx *api.ReportContext) (err error) {
+	defer rw.writer.Flush()
+
 	if ctx.IncludeHeaders {
-		rw.writer.Write(SummaryReportHeaders)
+		if err = rw.writer.Write(SummaryReportHeaders); err != nil {
+			return err
+		}
 	}
 
 	timeStr := summary.Time().Format("2006-01-02T15:04:05Z07:00")
@@ -36,7 +40,7 @@ func (rw *csvReportWriter) Write(summary api.Summary, config *api.BenchmarkSpec,
 		id := sortedIds[i]
 		stats := summary.Get(id)
 
-		rw.writer.Write([]string{
+		if err = rw.writer.Write([]string{
 			timeStr,
 			id,
 			fmt.Sprintf("%d", stats.Count()),
@@ -48,10 +52,10 @@ func (rw *csvReportWriter) Write(summary api.Summary, config *api.BenchmarkSpec,
 			FormatFloat3(func() (float64, error) { return stats.Percentile(90) }),
 			FormatFloat3(stats.StdDev),
 			FormatFloatAsRate(stats.ErrorRate),
-		})
-
-		rw.writer.Flush()
+		}); err != nil {
+			return err
+		}
 	}
 
-	return nil
+	return err
 }

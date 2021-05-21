@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"encoding/csv"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/sha1n/benchy/api"
 )
@@ -24,28 +25,33 @@ func NewCsvStreamReportWriter(writer *bufio.Writer, ctx *api.ReportContext) *Csv
 		ctx:    ctx,
 	}
 
-	w.writeHeaders()
+	if err := w.writeHeaders(); err != nil {
+		log.Error(err)
+	}
 
 	return w
 }
 
-func (rw *CsvStreamReportWriter) writeHeaders() {
+func (rw *CsvStreamReportWriter) writeHeaders() (err error) {
 	if rw.ctx.IncludeHeaders {
-		rw.writer.Write([]string{"Timestamp", "Scenario", "Labels", "Duration", "Error"})
+		err = rw.writer.Write([]string{"Timestamp", "Scenario", "Labels", "Duration", "Error"})
 	}
+
+	return err
 }
 
 // Handle handles a real time trace event
 func (rw *CsvStreamReportWriter) Handle(trace api.Trace) (err error) {
+	defer rw.writer.Flush()
+
 	timeStr := time.Now().Format("2006-01-02T15:04:05Z07:00")
-	rw.writer.Write([]string{
+	err = rw.writer.Write([]string{
 		timeStr,
 		trace.ID(),
 		strings.Join(rw.ctx.Labels, ","),
 		fmt.Sprintf("%d", trace.Elapsed()),
 		fmt.Sprintf("%v", trace.Error() != nil),
 	})
-	rw.writer.Flush()
 
-	return nil
+	return err
 }

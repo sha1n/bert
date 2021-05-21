@@ -16,11 +16,6 @@ type trace struct {
 	error   error
 }
 
-func (t *trace) end(exitError error) {
-	t.elapsed = time.Since(t.start)
-	t.error = exitError
-}
-
 func (t *trace) ID() string {
 	return t.id
 }
