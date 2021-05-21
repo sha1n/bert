@@ -150,8 +150,9 @@ scenarios:
 ```
 
 ## Report Formats
-There are three supported report formats; `txt`, `csv` and `csv/raw`. `txt` is the default format and is primarily designed to be used in a terminal. `csv` is especially useful when you want to accumulate stats from multiple benchmarks in a CSV file. In which case you can combine the `csv` format with `-o` and possibly `--header=false`. 
+There are three supported report formats; `txt`, `csv`, `csv/raw`, `md` and `md/raw`. `txt` is the default format and is primarily designed to be used in a terminal. `csv` is especially useful when you want to accumulate stats from multiple benchmarks in a CSV file. In which case you can combine the `csv` format with `-o` and possibly `--header=false`. 
 `csv/raw` is streaming raw trace events as CSV records and is useful if you want to load that data into a spreadsheet or other tools for further analysis.
+`md` and `md/raw` and similar to `csv` and `csv/raw` respectively, but write in Markdown table format.
 
 Run `benchy --help` for more details.
 
@@ -197,6 +198,14 @@ Timestamp,Scenario,Labels,Min,Max,Mean,Median,Percentile 90,StdDev,Errors
 2021-05-18T23:38:49+03:00,scenario A,example-label,1003508458.000,1009577781.000,1006281483.700,1006164208.500,1008256954.000,2122427.909,0
 2021-05-18T23:38:49+03:00,scenario B,example-label,2953009.000,4218971.000,3818925.400,3854585.000,4048263.000,317884.931,0
 ```
+
+**Equivalent Markdown Example:**
+
+|Timestamp|Scenario|Samples|Labels|Min|Max|Mean|Median|Percentile 90|StdDev|Errors|
+|----|----|----|----|----|----|----|----|----|----|----|
+|2021-05-21T16:21:13+03:00|scenario A|10|example-label|1.004s|1.010s|1.007s|1.008s|1.008s|0.002s|0%|
+|2021-05-21T16:21:13+03:00|scenario B|10|example-label|0.001s|0.005s|0.004s|0.004s|0.004s|0.001s|0%|
+
 
 **Raw CSV Example:***
 ```csv
