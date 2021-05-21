@@ -41,6 +41,10 @@ const (
 	ArgValueReportFormatCsv = "csv"
 	// ArgValueReportFormatCsvRaw : CSV raw data report format value
 	ArgValueReportFormatCsvRaw = "csv/raw"
+	// ArgValueReportFormatMarkdown : Markdown report format arg value
+	ArgValueReportFormatMarkdown = "md"
+	// ArgValueReportFormatMarkdownRaw : Markdown report format arg value
+	ArgValueReportFormatMarkdownRaw = "md/raw"
 )
 
 func init() {
@@ -59,7 +63,8 @@ func Run(cmd *cobra.Command, args []string) {
 	log.Info("Starting benchy...")
 
 	spec := loadSpec(cmd)
-	if reportHandler, err := resolveReportHandler(cmd, spec); err == nil {
+	var reportHandler api.ReportHandler
+	if reportHandler, err = resolveReportHandler(cmd, spec); err == nil {
 		tracer := pkg.NewTracer(spec.Executions * len(spec.Scenarios))
 		reportHandler.Subscribe(tracer.Stream())
 
@@ -107,9 +112,16 @@ func resolveReportHandler(cmd *cobra.Command, spec *api.BenchmarkSpec) (handler 
 	writer := bufio.NewWriter(outFile)
 
 	switch reportFormat, _ := cmd.Flags().GetString(ArgNameFormat); reportFormat {
+	case ArgValueReportFormatMarkdownRaw:
+		streamReportWriter := internal.NewMarkdownStreamReportWriter(writer, reportCtx)
+		handler = pkg.NewStreamReportHandler(spec, reportCtx, streamReportWriter.Handle)
+
 	case ArgValueReportFormatCsvRaw:
 		streamReportWriter := internal.NewCsvStreamReportWriter(writer, reportCtx)
 		handler = pkg.NewStreamReportHandler(spec, reportCtx, streamReportWriter.Handle)
+
+	case ArgValueReportFormatMarkdown:
+		handler = pkg.NewSummaryReportHandler(spec, reportCtx, internal.NewMarkdownSummaryReportWriter(writer))
 
 	case ArgValueReportFormatCsv:
 		handler = pkg.NewSummaryReportHandler(spec, reportCtx, internal.NewCsvReportWriter(writer))
