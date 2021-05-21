@@ -207,7 +207,7 @@ Timestamp,Scenario,Labels,Min,Max,Mean,Median,Percentile 90,StdDev,Errors
 |2021-05-21T16:21:13+03:00|scenario B|10|example-label|0.001s|0.005s|0.004s|0.004s|0.004s|0.001s|0%|
 
 
-**Raw CSV Example:***
+**Raw CSV Example:**
 ```csv
 Timestamp,Scenario,Labels,Duration,Error
 2021-05-21T00:58:37+03:00,scenario A,example-label,1008861268,false
