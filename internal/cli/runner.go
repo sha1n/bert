@@ -39,6 +39,8 @@ const (
 	ArgValueReportFormatTxt = "txt"
 	// ArgValueReportFormatCsv : CSV report format arg value
 	ArgValueReportFormatCsv = "csv"
+	// ArgValueReportFormatMarkdown : Markdown report format arg value
+	ArgValueReportFormatMarkdown = "md"
 	// ArgValueReportFormatCsvRaw : CSV raw data report format value
 	ArgValueReportFormatCsvRaw = "csv/raw"
 )
@@ -110,6 +112,9 @@ func resolveReportHandler(cmd *cobra.Command, spec *api.BenchmarkSpec) (handler 
 	case ArgValueReportFormatCsvRaw:
 		streamReportWriter := internal.NewCsvStreamReportWriter(writer, reportCtx)
 		handler = pkg.NewStreamReportHandler(spec, reportCtx, streamReportWriter.Handle)
+
+	case ArgValueReportFormatMarkdown:
+		handler = pkg.NewSummaryReportHandler(spec, reportCtx, internal.NewMarkdownSummaryReportWriter(writer))
 
 	case ArgValueReportFormatCsv:
 		handler = pkg.NewSummaryReportHandler(spec, reportCtx, internal.NewCsvReportWriter(writer))

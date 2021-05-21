@@ -30,8 +30,9 @@ Build label: %s`, Version, Build),
 
 	// Reporting
 	rootCmd.Flags().StringP(cli.ArgNameOutputFile, "o", "", `output file path. Optional. Writes to stdout by default.`)
-	rootCmd.Flags().StringP(cli.ArgNameFormat, "f", "txt", `summary format. One of: 'txt', 'csv', 'csv/raw'
+	rootCmd.Flags().StringP(cli.ArgNameFormat, "f", "txt", `summary format. One of: 'txt', 'md', 'csv', 'csv/raw'
 txt 		- plain text. designed to be used in your terminal
+md 			- markdown. similar to CSV but writes in markdown table format
 csv 		- CSV in which each row represents a scenario and contians calculated stats for that scenario
 csv/raw	- CSV in which each row represents a raw trace event. useful if you want to import to a spreadsheet for further analysis`,
 	)

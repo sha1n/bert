@@ -3,10 +3,36 @@ package internal
 import (
 	"bufio"
 	"fmt"
+	"strings"
 )
 
 type MarkdownTable struct {
 	data [][]string
+}
+
+type MarkdownTableWriter struct {
+	writer *bufio.Writer
+}
+
+func NewMarkdownTableWriter(writer *bufio.Writer) *MarkdownTableWriter {
+	return &MarkdownTableWriter{
+		writer: writer,
+	}
+}
+
+func (tw *MarkdownTableWriter) WriteHeaders(headers []string) (err error) {
+	if err = tw.WriteRow(headers); err == nil {
+		_, err = tw.writer.WriteString(fmt.Sprintf("%s|\r\n", strings.Repeat("|----", len(headers))))
+	}
+	tw.writer.Flush()
+	return err
+}
+
+func (tw *MarkdownTableWriter) WriteRow(row []string) (err error) {
+	// TODO theoretically we need to escape '|' chars
+	_, err = tw.writer.WriteString(fmt.Sprintf("|%s|\r\n", strings.Join(row, "|")))
+	tw.writer.Flush()
+	return err
 }
 
 func NewMarkdownTable(rows, cols int) *MarkdownTable {

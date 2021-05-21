@@ -7,14 +7,14 @@ import (
 	"fmt"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/sha1n/benchy/api"
 	"github.com/sha1n/benchy/pkg"
+	"github.com/sha1n/benchy/test"
 	"github.com/stretchr/testify/assert"
 )
 
-var randomLabels = []string{time.Now().String()}
+var randomLabels = test.RandomLabels()
 
 func TestWrite(t *testing.T) {
 	var scenario1, scenario2 = scenario{id: "1-id"}, scenario{id: "2-id"}
@@ -75,7 +75,7 @@ func expectedIntFormat(f func() int) string {
 func expectedRateFormat(f func() float64) string {
 	errorRate := int(f() * 100)
 
-	return fmt.Sprintf("%d", errorRate)
+	return fmt.Sprintf("%d%%", errorRate)
 
 }
 
