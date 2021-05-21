@@ -200,12 +200,12 @@ Timestamp,Scenario,Labels,Min,Max,Mean,Median,Percentile 90,StdDev,Errors
 ```
 
 **Equivalent Markdown Example:**
-
+```
 |Timestamp|Scenario|Samples|Labels|Min|Max|Mean|Median|Percentile 90|StdDev|Errors|
 |----|----|----|----|----|----|----|----|----|----|----|
 |2021-05-21T16:21:13+03:00|scenario A|10|example-label|1.004s|1.010s|1.007s|1.008s|1.008s|0.002s|0%|
 |2021-05-21T16:21:13+03:00|scenario B|10|example-label|0.001s|0.005s|0.004s|0.004s|0.004s|0.001s|0%|
-
+```
 
 **Raw CSV Example:**
 ```csv
