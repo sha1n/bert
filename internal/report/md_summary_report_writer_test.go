@@ -90,38 +90,3 @@ func aTwoScenarioSpec() *api.BenchmarkSpec {
 		},
 	}
 }
-
-// func createTestMarkdownTableFrom(includeHeaders bool) ([]api.ID, *MarkdownTable, error) {
-// 	spec := aTwoScenarioSpec()
-// 	t1 := test.NewFakeTrace(spec.Scenarios[0].ID(), 1, nil)
-// 	t2 := test.NewFakeTrace(spec.Scenarios[1].ID(), 2, errors.New("err2"))
-
-// 	summary := test.NewFakeSummary(t1, t2)
-// 	ctx := &api.ReportContext{
-// 		Labels:         randomLabels,
-// 		IncludeHeaders: includeHeaders,
-// 	}
-// 	sortedIDs := GetSortedScenarioIds(summary)
-// 	table, err := createMarkdownTableFrom(summary, aTwoScenarioSpec(), ctx)
-// 	return sortedIDs, table
-// }
-
-// func aTwoScenarioSpec() *api.BenchmarkSpec {
-// 	return &api.BenchmarkSpec{
-// 		Executions: 1,
-// 		Scenarios: []*api.ScenarioSpec{
-// 			{
-// 				Name: "a",
-// 				Command: &api.CommandSpec{
-// 					Cmd: []string{"cmd", "a"},
-// 				},
-// 			},
-// 			{
-// 				Name: "b",
-// 				Command: &api.CommandSpec{
-// 					Cmd: []string{"cmd", "b"},
-// 				},
-// 			},
-// 		},
-// 	}
-// }

@@ -8,6 +8,7 @@ import (
 	"github.com/sha1n/benchy/api"
 )
 
+var RawDataReportHeaders = []string{"Timestamp", "Scenario", "Labels", "Duration", "Error"}
 var SummaryReportHeaders = []string{
 	"Timestamp",
 	"Scenario",

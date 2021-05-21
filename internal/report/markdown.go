@@ -21,17 +21,17 @@ func NewMarkdownTableWriter(writer *bufio.Writer) *MarkdownTableWriter {
 }
 
 func (tw *MarkdownTableWriter) WriteHeaders(headers []string) (err error) {
+	defer tw.writer.Flush()
 	if err = tw.WriteRow(headers); err == nil {
 		_, err = tw.writer.WriteString(fmt.Sprintf("%s|\r\n", strings.Repeat("|----", len(headers))))
 	}
-	tw.writer.Flush()
 	return err
 }
 
 func (tw *MarkdownTableWriter) WriteRow(row []string) (err error) {
+	defer tw.writer.Flush()
 	// TODO theoretically we need to escape '|' chars
 	_, err = tw.writer.WriteString(fmt.Sprintf("|%s|\r\n", strings.Join(row, "|")))
-	tw.writer.Flush()
 	return err
 }
 
