@@ -30,8 +30,7 @@ func (rw *mdReportWriter) Write(summary api.Summary, spec *api.BenchmarkSpec, ct
 	if err == nil {
 		timeStr := summary.Time().Format("2006-01-02T15:04:05Z07:00")
 		sortedIds := GetSortedScenarioIds(summary)
-		for i := range sortedIds {
-			id := sortedIds[i]
+		for _, id := range sortedIds {
 			stats := summary.Get(id)
 
 			err = rw.tableWriter.WriteRow([]string{

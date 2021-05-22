@@ -36,7 +36,7 @@ Build label: %s`, Version, Build),
 txt     - plain text. designed to be used in your terminal
 md      - markdown table. similar to CSV but writes in markdown table format
 md/raw  - markdown table in which each row represents a raw trace event.
-csv     - CSV in which each row represents a scenario and contians calculated stats for that scenario
+csv     - CSV in which each row represents a scenario and contains calculated stats for that scenario
 csv/raw - CSV in which each row represents a raw trace event. useful if you want to import to a spreadsheet for further analysis`,
 	)
 	rootCmd.Flags().StringSliceP(cli.ArgNameLabel, "l", []string{}, `labels to attach to be included in the benchmark report`)
