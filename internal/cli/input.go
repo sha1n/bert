@@ -46,7 +46,7 @@ func QuestionYN(prompt string) bool {
 	for {
 		displayPrompt()
 		str, _ = reader.ReadString('\n')
-		str = strings.TrimSpace(str)
+		str = strings.TrimSpace(strings.ToLower(str))
 		if str == "y" {
 			return true
 		} else if str == "n" || str == "" {
@@ -67,7 +67,7 @@ func RequestExistingDirectory(prompt string, required bool) string {
 			if path == "" {
 				return true
 			}
-			_, err := os.Stat(path)
+			_, err := os.Stat(expandPath(path))
 			exists := !os.IsNotExist(err)
 			if !exists {
 				_, _ = printfRed("the directory '%s' does not exist\r\n", path)
