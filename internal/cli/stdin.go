@@ -17,9 +17,9 @@ func RequestInput(prompt string, required bool, isValidFn IsValidFn) string {
 
 	displayPrompt := func() {
 		if required {
-			printfBold("%s %s: ", prompt, sprintRed("*"))
+			_, _ = printfBold("%s %s: ", prompt, sprintRed("*"))
 		} else {
-			printfBold("%s %s: ", prompt, sprintGreen("?"))
+			_, _ = printfBold("%s %s: ", prompt, sprintGreen("?"))
 		}
 	}
 
@@ -40,7 +40,7 @@ func QuestionYN(prompt string) bool {
 	reader := bufio.NewReader(os.Stdin)
 
 	displayPrompt := func() {
-		printfBold("%s (y/n): ", prompt)
+		_, _ = printfBold("%s (y/n): ", prompt)
 	}
 
 	for {
@@ -68,7 +68,12 @@ func RequestExistingDirectory(prompt string, required bool) string {
 				return true
 			}
 			_, err := os.Stat(path)
-			return !os.IsNotExist(err)
+			exists := !os.IsNotExist(err)
+			if !exists {
+				_, _ = printfRed("the directory '%s' does not exist\r\n", path)
+			}
+
+			return exists
 		},
 	)
 }
@@ -82,6 +87,8 @@ func RequestUint(prompt string, required bool) uint {
 		}
 		if v, err := strconv.ParseUint(str, 10, 32); err == nil {
 			return uint(v)
+		} else {
+			_, _ = printRed("please enter an unsigned integer value\r\n")
 		}
 	}
 }
@@ -95,6 +102,8 @@ func RequestBool(prompt string, required bool) bool {
 		}
 		if v, err := strconv.ParseBool(str); err == nil {
 			return v
+		} else {
+			_, _ = printRed("please enter 'true', 'false', '1' or '0'\r\n")
 		}
 	}
 }
