@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/sha1n/benchy/cmd/config"
 	"github.com/sha1n/benchy/internal/cli"
 	"github.com/spf13/cobra"
 )
@@ -52,6 +53,9 @@ csv/raw - CSV in which each row represents a raw trace event. useful if you want
 	_ = rootCmd.MarkFlagFilename(cli.ArgNameOutputFile, "txt", "csv", "md")
 
 	rootCmd.SetVersionTemplate(`{{printf "%s" .Version}}`)
+
+	// Subcommands
+	rootCmd.AddCommand(config.CreateConfigCommand())
 
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)

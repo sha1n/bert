@@ -2,19 +2,19 @@ package api
 
 // CommandSpec benchmark command execution specs
 type CommandSpec struct {
-	WorkingDirectory string   `json:"workingDir" yaml:"workingDir"`
+	WorkingDirectory string   `json:"workingDir,omitempty" yaml:"workingDir,omitempty"`
 	Cmd              []string `json:"cmd" yaml:"cmd" validate:"required"`
 }
 
 // ScenarioSpec benchmark scenario specs
 type ScenarioSpec struct {
 	Name             string `json:"name" yaml:"name" validate:"required"`
-	WorkingDirectory string `json:"workingDir" yaml:"workingDir"`
+	WorkingDirectory string `json:"workingDir,omitempty" yaml:"workingDir,omitempty"`
 	Env              map[string]string
-	BeforeAll        *CommandSpec `json:"beforeAll" yaml:"beforeAll"`
-	AfterAll         *CommandSpec `json:"afterAll" yaml:"afterAll"`
-	BeforeEach       *CommandSpec `json:"beforeEach" yaml:"beforeEach"`
-	AfterEach        *CommandSpec `json:"afterEach" yaml:"afterEach"`
+	BeforeAll        *CommandSpec `json:"beforeAll,omitempty" yaml:"beforeAll,omitempty"`
+	AfterAll         *CommandSpec `json:"afterAll,omitempty" yaml:"afterAll,omitempty"`
+	BeforeEach       *CommandSpec `json:"beforeEach,omitempty" yaml:"beforeEach,omitempty"`
+	AfterEach        *CommandSpec `json:"afterEach,omitempty" yaml:"afterEach,omitempty"`
 	Command          *CommandSpec `validate:"required,dive"`
 }
 
@@ -22,7 +22,7 @@ type ScenarioSpec struct {
 type BenchmarkSpec struct {
 	Scenarios  []*ScenarioSpec `json:"scenarios" yaml:"scenarios" validate:"required,min=1,dive"`
 	Executions int             `validate:"required,gte=1"`
-	Alternate  bool
+	Alternate  bool            `json:"alternate,omitempty" yaml:"alternate,omitempty"`
 }
 
 // ID returns a unique identifier

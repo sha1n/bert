@@ -3,10 +3,10 @@ package pkg
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/sha1n/benchy/api"
-	"io/ioutil"
 	"os"
 	"strings"
+
+	"github.com/sha1n/benchy/api"
 
 	log "github.com/sirupsen/logrus"
 
@@ -34,19 +34,31 @@ func LoadSpec(path string) (*api.BenchmarkSpec, error) {
 	return load(path, unmarshalFn)
 }
 
+func SaveSpec(spec *api.BenchmarkSpec, path string) (err error) {
+	if err = validate(spec); err != nil {
+		return err
+	}
+
+	return save(spec, path)
+}
+
+func save(spec *api.BenchmarkSpec, path string) (err error) {
+	var data []byte
+	if data, err = yaml.Marshal(spec); err == nil {
+		err = os.WriteFile(path, data, 0644)
+	}
+
+	return err
+}
+
 func load(path string, unmarshal func([]byte, interface{}) error) (spec *api.BenchmarkSpec, err error) {
-	var jsonFile *os.File
-	if jsonFile, err = os.Open(path); err == nil {
-		defer jsonFile.Close()
+	var bytes []byte
+	if bytes, err = os.ReadFile(path); err == nil {
+		err = unmarshal(bytes, &spec)
+	}
 
-		var bytes []byte
-		if bytes, err = ioutil.ReadAll(jsonFile); err == nil {
-			err = unmarshal(bytes, &spec)
-		}
-
-		if err == nil {
-			err = validate(spec)
-		}
+	if err == nil {
+		err = validate(spec)
 	}
 
 	return spec, err

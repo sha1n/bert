@@ -5,7 +5,8 @@
 [![Release Drafter](https://github.com/sha1n/benchy/actions/workflows/release-drafter.yml/badge.svg)](https://github.com/sha1n/benchy/actions/workflows/release-drafter.yml)
 
 # benchy
-`benchy` is a simple CLI benchmarking tool that allows you to easily compare key performance metrics of different CLI commands. It was developed very quickly for a very specific use-case I had, but it is already very useful and can easily evolve into something even better.
+`benchy` is a CLI benchmarking tool that allows you to easily compare performance metrics of different CLI commands. I developed this tool to benchmark and compare development tools and configurations on different environment setups and machine over time. It is designed to support complex scenarios that require high level of control and consistency.
+
 
 - [benchy](#benchy)
   - [Main Features](#main-features)
@@ -13,7 +14,7 @@
     - [Download a prebuilt binary](#download-a-prebuilt-binary)
     - [Build your own binary](#build-your-own-binary)
   - [Usage](#usage)
-  - [Config File](#config-file)
+  - [Configurartion](#configurartion)
   - [Report Formats](#report-formats)
 
 ## Main Features
@@ -51,102 +52,48 @@ benchy --config test/data/spec_test_load.yaml
 benchy --help   # for full options list
 ```
 
-## Config File
-The config file can be either in JSON format or YAML. `benchy` assumes a file with the `yml` or `yaml` extension to be YAML, otherwise JSON is assumed. More about configuration [here](docs/configuration.md).
+## Configurartion
+`benchy` reads benchmark specifications from a config file. The config file can be either in YAML or JSON. `benchy` assumes a file with the `yml` or `yaml` extension to be YAML, otherwise JSON is assumed. You may create a configuratio file manually or use the `config` command to interactively generate your configuration.
 
-**YAML Example:**
-```yaml
----
-alternate: true
-executions: 10
-scenarios:
-- name: scenario A
-  workingDir: "/tmp"
-  env:
-    KEY: value
-  beforeAll:
-    cmd:
-    - echo
-    - setupA
-  afterAll:
-    cmd:
-    - echo
-    - teardownA
-  beforeEach:
-    workingDir: "~/tmp"
-    cmd:
-    - echo
-    - beforeA
-  afterEach:
-    cmd:
-    - echo
-    - afterA
-  command:
-    cmd:
-    - sleep
-    - '1'
-- name: scenario B
-  command:
-    cmd:
-    - sleep
-    - '0'
-```
+More about configuration [here](docs/configuration.md).
 
-**Equivalent JSON Example:**
-```json
-{
-  "alternate": true,
-  "executions": 10,
-  "scenarios": [
-    {
-      "name": "scenario A",
-      "workingDir": "/tmp",
-      "env": {
-        "KEY": "value"
-      },
-      "beforeAll": {
-        "cmd": [
-          "echo",
-          "setupA"
-        ]
-      },
-      "afterAll": {
-        "cmd": [
-          "echo",
-          "teardownA"
-        ]
-      },
-      "beforeEach": {
-        "workingDir": "~/tmp",
-        "cmd": [
-          "echo",
-          "beforeA"
-        ]
-      },
-      "afterEach": {
-        "cmd": [
-          "echo",
-          "afterA"
-        ]
-      },
-      "command": {
-        "cmd": [
-          "sleep",
-          "1"
-        ]
-      }
-    },
-    {
-      "name": "scenario B",
-      "command": {
-        "cmd": [
-          "sleep",
-          "0"
-        ]
-      }
-    }
-  ]
-}
+**Benchy Config Utility Sample** 
+```bash
+benchy config -o benchmark.yaml
+
+--------------------------------
+ BENCHMARK CONFIGURATION HELPER
+--------------------------------
+
+This tool is going to help you go through a benchmark configuration definition.
+
+* annotates required input
+? annotates optional input
+
+more here: https://github.com/sha1n/benchy/blob/master/docs/configuration.md
+
+--------------------------------
+
+number of executions *: 30
+alternate executions ?: true
+scenario name *: sleepy scenario
+working directory ?:
+define custom env vars? (y/n):
+add setup command? (y/n): y
+working directory ?:
+command line *: echo 'preparing bedroom'
+add teardown command? (y/n): n
+add before each command? (y/n): y
+working directory ?:
+command line *: echo 'going to sleep'
+add after each command? (y/n):
+benchmarked command:
+working directory ?:
+command line *: sleep 1
+add another scenario? (y/n):
+
+
+Writing your configuration...
 ```
 
 ## Report Formats
