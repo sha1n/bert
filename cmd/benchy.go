@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/sha1n/benchy/internal/cli"
 	"github.com/spf13/cobra"
@@ -46,11 +47,13 @@ csv/raw - CSV in which each row represents a raw trace event. useful if you want
 	rootCmd.Flags().BoolP(cli.ArgNameDebug, "d", false, `logs extra debug information`)
 	rootCmd.Flags().BoolP(cli.ArgNameSilent, "s", false, `logs only fatal errors`)
 
-	cobra.MarkFlagRequired(rootCmd.Flags(), cli.ArgNameConfig)
-	cobra.MarkFlagFilename(rootCmd.Flags(), cli.ArgNameConfig)
-	cobra.MarkFlagFilename(rootCmd.Flags(), cli.ArgNameOutputFile)
+	_ = rootCmd.MarkFlagRequired(cli.ArgNameConfig)
+	_ = rootCmd.MarkFlagFilename(cli.ArgNameConfig, "yml", "yaml", "json")
+	_ = rootCmd.MarkFlagFilename(cli.ArgNameOutputFile, "txt", "csv", "md")
 
 	rootCmd.SetVersionTemplate(`{{printf "%s" .Version}}`)
 
-	_ = rootCmd.Execute()
+	if err := rootCmd.Execute(); err != nil {
+		os.Exit(1)
+	}
 }
