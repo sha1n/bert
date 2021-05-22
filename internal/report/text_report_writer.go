@@ -60,8 +60,7 @@ func (trw *textReportWriter) Write(summary api.Summary, config *api.BenchmarkSpe
 
 	sortedIds := GetSortedScenarioIds(summary)
 
-	for i := range sortedIds {
-		id := sortedIds[i]
+	for _, id := range sortedIds {
 		stats := summary.Get(id)
 
 		title := fmt.Sprintf("SCENARIO: '%s'", id)
