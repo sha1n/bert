@@ -46,7 +46,7 @@ func QuestionYN(prompt string) bool {
 	for {
 		displayPrompt()
 		str, _ = reader.ReadString('\n')
-		str = strings.TrimSpace(str)
+		str = strings.TrimSpace(strings.ToLower(str))
 		if str == "y" {
 			return true
 		} else if str == "n" || str == "" {
