@@ -1,8 +1,8 @@
 package test
 
 import (
-	"math/rand"
 	"fmt"
+	"math/rand"
 	"time"
 )
 
@@ -15,7 +15,7 @@ func RandomString() string {
 }
 
 func RandomBool() bool {
-	return time.Now().Nanosecond() % 2 == 0
+	return time.Now().Nanosecond()%2 == 0
 }
 
 func RandomUint() uint {
