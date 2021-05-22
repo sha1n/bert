@@ -106,14 +106,3 @@ func givenStdInWith(t *testing.T, content string) func() {
 
 	}
 }
-
-func invalidOnceFn() IsValidFn {
-	count := 0
-	return func(s string) bool {
-		if count == 0 {
-			count++
-			return false
-		}
-		return true
-	}
-}

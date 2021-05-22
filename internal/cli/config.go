@@ -54,7 +54,7 @@ func RequestCommand(description string, required bool) *api.CommandSpec {
 	}
 
 	if required {
-		printfBold("%s:\r\n", description)
+		_, _ = printfBold("%s:\r\n", description)
 		return requestCommand()
 	}
 	if QuestionYN(fmt.Sprintf("%s?", description)) {
