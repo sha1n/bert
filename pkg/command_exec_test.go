@@ -20,7 +20,7 @@ func TestConfigureCommandWithEmptyWorkingDir(t *testing.T) {
 	execCmd := configureCommand(aCommandSpec(cmd, ""), defaultWorkingDir, env)
 
 	assert.Equal(t, defaultWorkingDir, execCmd.Dir)
-	assert.Equal(t, []string(nil), execCmd.Env)
+	assert.Equal(t, os.Environ(), execCmd.Env)
 	assert.Equal(t, cmd, execCmd.Args)
 }
 
@@ -32,7 +32,7 @@ func TestConfigureCommandWithTildeDefaultWorkingDir(t *testing.T) {
 	execCmd := configureCommand(aCommandSpec(cmd, ""), defaultWorkingDir, env)
 
 	assert.Equal(t, userHomeDir(), execCmd.Dir)
-	assert.Equal(t, []string(nil), execCmd.Env)
+	assert.Equal(t, os.Environ(), execCmd.Env)
 	assert.Equal(t, cmd, execCmd.Args)
 }
 
@@ -44,7 +44,7 @@ func TestConfigureCommandWithTildeLocalWorkingDir(t *testing.T) {
 	execCmd := configureCommand(aCommandSpec(cmd, "~"), defaultWorkingDir, env)
 
 	assert.Equal(t, userHomeDir(), execCmd.Dir)
-	assert.Equal(t, []string(nil), execCmd.Env)
+	assert.Equal(t, os.Environ(), execCmd.Env)
 	assert.Equal(t, cmd, execCmd.Args)
 }
 
@@ -78,7 +78,7 @@ func aCustomEnv() map[string]string {
 }
 
 func expectedEnvFor(e map[string]string) []string {
-	return toEnvVarsArray(e)
+	return append(toEnvVarsArray(e), os.Environ()...) // user vars are expected to be first
 }
 
 func userHomeDir() string {
