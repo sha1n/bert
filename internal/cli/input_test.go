@@ -23,7 +23,7 @@ func TestRequestInputWithInvalidInput(t *testing.T) {
 	expected := test.RandomString()
 	stdin := fmt.Sprintf(`rejected
 %s`, expected)
-	
+
 	cleanup := givenStdInWith(t, stdin)
 	defer cleanup()
 
