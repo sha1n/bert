@@ -7,37 +7,36 @@ import (
 	"github.com/sha1n/benchy/pkg"
 )
 
-type fake_trace struct {
+type fakeTrace struct {
 	id      string
 	elapsed time.Duration
 	error   error
 }
 
 func NewFakeTrace(id string, elapsed time.Duration, err error) api.Trace {
-	return &fake_trace{
+	return &fakeTrace{
 		id:      id,
 		elapsed: elapsed,
 		error:   err,
 	}
 }
 
-func (t *fake_trace) ID() string {
+func (t *fakeTrace) ID() string {
 	return t.id
 }
 
-func (t *fake_trace) Elapsed() time.Duration {
+func (t *fakeTrace) Elapsed() time.Duration {
 	return t.elapsed
 }
 
-func (t *fake_trace) Error() error {
+func (t *fakeTrace) Error() error {
 	return t.error
 }
 
 func NewFakeSummary(traces ...api.Trace) api.Summary {
 	traceByID := map[string][]api.Trace{}
 
-	for i := range traces {
-		trace := traces[i]
+	for _, trace := range traces {
 		traces := traceByID[trace.ID()]
 		if traces == nil {
 			traces = []api.Trace{}
