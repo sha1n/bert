@@ -59,6 +59,7 @@ func (ce *commandExecutor) configureCommand(cmd *api.CommandSpec, execCmd *exec.
 		cmdEnv := toEnvVarsArray(env)
 		log.Debugf("Populating command environment variables '%v'", cmdEnv)
 		execCmd.Env = append(execCmd.Env, cmdEnv...)
+		execCmd.Env = append(execCmd.Env, os.Environ()...)
 	}
 
 	if ce.pipeStdout {
