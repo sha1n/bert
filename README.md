@@ -57,9 +57,10 @@ benchy --help   # for full options list
 
 More about configuration [here](docs/configuration.md).
 
-**Benchy Config Utility Sample** 
+**Benchy Config Utility Example** 
 ```bash
-benchy config -o benchmark.yaml
+# add '-o filename.yaml' to save generated config to a file.
+$ benchy config
 
 --------------------------------
  BENCHMARK CONFIGURATION HELPER
@@ -75,25 +76,42 @@ more here: https://github.com/sha1n/benchy/blob/master/docs/configuration.md
 --------------------------------
 
 number of executions *: 30
-alternate executions ?: true
+alternate executions (default: false, enter to skip) ?: 1
 scenario name *: sleepy scenario
-working directory ?:
-define custom env vars? (y/n):
-add setup command? (y/n): y
-working directory ?:
+working directory (default: inherits benchy's, enter to skip) ?:
+define custom env vars? (y/n|enter):
+add setup command? (y/n|enter): y
+working directory (default: inherits scenario, enter to skip) ?:
 command line *: echo 'preparing bedroom'
-add teardown command? (y/n): n
-add before each command? (y/n): y
-working directory ?:
+add teardown command? (y/n|enter):
+add before each command? (y/n|enter): y
+working directory (default: inherits scenario, enter to skip) ?:
 command line *: echo 'going to sleep'
-add after each command? (y/n):
+add after each command? (y/n|enter):
 benchmarked command:
-working directory ?:
+working directory (default: inherits scenario, enter to skip) ?:
 command line *: sleep 1
-add another scenario? (y/n):
+add another scenario? (y/n|enter):
 
 
 Writing your configuration...
+
+scenarios:
+- name: sleepy scenario
+  beforeAll:
+    cmd:
+    - echo
+    - preparing bedroom
+  beforeEach:
+    cmd:
+    - echo
+    - going to sleep
+  command:
+    cmd:
+    - sleep
+    - "1"
+executions: 30
+alternate: true
 ```
 
 ## Report Formats
