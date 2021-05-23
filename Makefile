@@ -56,10 +56,7 @@ clean:
 
 go-lint:
 	@echo "  >  Linting source files..."
-	go vet -mod=readonly -c=10 $(GOBASE)/cmd/...
-	go vet -mod=readonly -c=10 $(GOBASE)/internal/...
-	go vet -mod=readonly -c=10 $(GOBASE)/pkg/...
-	go vet -mod=readonly -c=10 $(GOBASE)/api/...
+	go vet -mod=readonly -c=10 `go list -mod=readonly ./...`
 
 go-format:
 	@echo "  >  Formating source files..."
@@ -68,7 +65,7 @@ go-format:
 go-build: go-get go-build-linux-amd64 go-build-linux-arm64 go-build-darwin-amd64 go-build-windows-amd64 go-build-windows-arm
 
 go-test:
-	go test -mod=readonly -v `go list -mod=readonly ./...`
+	go test -mod=readonly -coverprofile=$(GOBUILD)/.coverage `go list -mod=readonly ./...`
 
 go-build-linux-amd64:
 	@echo "  >  Building linux amd64 binaries..."
