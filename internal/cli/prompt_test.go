@@ -46,7 +46,7 @@ func TestRequestBool(t *testing.T) {
 	cleanup := givenStdInWith(t, fmt.Sprint(expected))
 	defer cleanup()
 
-	actual := RequestBool("", false)
+	actual := RequestOptionalBool("", false)
 	assert.Equal(t, expected, actual)
 }
 
