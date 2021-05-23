@@ -120,5 +120,5 @@ func RequestCommandLine(prompt string, required bool) []string {
 }
 
 func formatOptionalPrompt(prompt string, defaultVal interface{}) string {
-	return fmt.Sprintf("%s (default: %v, enter to skip)", prompt, defaultVal)
+	return fmt.Sprintf("%s (%v)", prompt, defaultVal)
 }

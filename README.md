@@ -76,20 +76,20 @@ more here: https://github.com/sha1n/benchy/blob/master/docs/configuration.md
 --------------------------------
 
 number of executions *: 30
-alternate executions (default: false, enter to skip) ?: 1
+alternate executions (false) ?: 1
 scenario name *: sleepy scenario
-working directory (default: inherits benchy's, enter to skip) ?:
+working directory (inherits benchy's) ?:
 define custom env vars? (y/n|enter):
 add setup command? (y/n|enter): y
-working directory (default: inherits scenario, enter to skip) ?:
+working directory (inherits scenario) ?:
 command line *: echo 'preparing bedroom'
 add teardown command? (y/n|enter):
 add before each command? (y/n|enter): y
-working directory (default: inherits scenario, enter to skip) ?:
+working directory (inherits scenario) ?:
 command line *: echo 'going to sleep'
 add after each command? (y/n|enter):
 benchmarked command:
-working directory (default: inherits scenario, enter to skip) ?:
+working directory (inherits scenario) ?:
 command line *: sleep 1
 add another scenario? (y/n|enter):
 
