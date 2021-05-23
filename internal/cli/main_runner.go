@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/sha1n/benchy/api"
-	internal "github.com/sha1n/benchy/internal/report"
+	"github.com/sha1n/benchy/internal/report"
 	"github.com/sha1n/benchy/pkg"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -72,18 +72,18 @@ func resolveReportHandler(cmd *cobra.Command, spec *api.BenchmarkSpec) (handler 
 
 	switch reportFormat := GetString(cmd, ArgNameFormat); reportFormat {
 	case ArgValueReportFormatMarkdownRaw:
-		streamReportWriter := internal.NewMarkdownStreamReportWriter(writer, reportCtx)
+		streamReportWriter := report.NewMarkdownStreamReportWriter(writer, reportCtx)
 		handler = pkg.NewStreamReportHandler(spec, reportCtx, streamReportWriter.Handle)
 
 	case ArgValueReportFormatCsvRaw:
-		streamReportWriter := internal.NewCsvStreamReportWriter(writer, reportCtx)
+		streamReportWriter := report.NewCsvStreamReportWriter(writer, reportCtx)
 		handler = pkg.NewStreamReportHandler(spec, reportCtx, streamReportWriter.Handle)
 
 	case ArgValueReportFormatMarkdown:
-		handler = pkg.NewSummaryReportHandler(spec, reportCtx, internal.NewMarkdownSummaryReportWriter(writer))
+		handler = pkg.NewSummaryReportHandler(spec, reportCtx, report.NewMarkdownSummaryReportWriter(writer))
 
 	case ArgValueReportFormatCsv:
-		handler = pkg.NewSummaryReportHandler(spec, reportCtx, internal.NewCsvReportWriter(writer))
+		handler = pkg.NewSummaryReportHandler(spec, reportCtx, report.NewCsvReportWriter(writer))
 
 	case ArgValueReportFormatTxt:
 		var colorsOn = false
@@ -91,7 +91,7 @@ func resolveReportHandler(cmd *cobra.Command, spec *api.BenchmarkSpec) (handler 
 			colorsOn = true
 		}
 
-		handler = pkg.NewSummaryReportHandler(spec, reportCtx, internal.NewTextReportWriter(writer, colorsOn))
+		handler = pkg.NewSummaryReportHandler(spec, reportCtx, report.NewTextReportWriter(writer, colorsOn))
 
 	default:
 		err = fmt.Errorf("Invalid report format '%s'", reportFormat)
