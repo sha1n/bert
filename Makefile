@@ -65,7 +65,7 @@ go-format:
 go-build: go-get go-build-linux-amd64 go-build-linux-arm64 go-build-darwin-amd64 go-build-windows-amd64 go-build-windows-arm
 
 go-test:
-	go test -mod=readonly -coverprofile=$(GOBUILD)/.coverage `go list -mod=readonly ./...`
+	go test -mod=readonly `go list -mod=readonly ./...`
 
 go-build-linux-amd64:
 	@echo "  >  Building linux amd64 binaries..."
