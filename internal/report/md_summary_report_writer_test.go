@@ -65,6 +65,7 @@ func generateTestMdReport(t *testing.T, includeHeaders bool) ([]string, api.Summ
 	reportWriter := NewMarkdownSummaryReportWriter(writer)
 
 	assert.NoError(t, reportWriter(summary, spec, ctx))
+
 	actualMarkdown := buf.String()
 	lines := strings.Split(actualMarkdown, "\r\n")
 

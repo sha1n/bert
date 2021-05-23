@@ -74,7 +74,7 @@ func TestQuestionYNWithEmptyResponse(t *testing.T) {
 	assert.False(t, actual) // empty == no
 }
 
-func TestRequestUnint(t *testing.T) {
+func TestRequestUint(t *testing.T) {
 	expected := test.RandomUint()
 	cleanup := givenStdInWith(t, fmt.Sprint(expected))
 	defer cleanup()
