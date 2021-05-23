@@ -1,4 +1,4 @@
-package config
+package subcmd
 
 import (
 	"github.com/sha1n/benchy/internal/cli"
@@ -10,7 +10,7 @@ func CreateConfigCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "config",
 		Long:  `Interactively walks through a benchmark configuration creation process`,
-		Short: `interactively creates a benchmark config`,
+		Short: `Interactively creates a benchmark config`,
 		Run:   cli.CreateConfig,
 	}
 
