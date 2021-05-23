@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"path/filepath"
 
 	"github.com/sha1n/benchy/api"
 	"github.com/sha1n/benchy/internal/report"
@@ -48,9 +49,13 @@ func configureLogger(cmd *cobra.Command) {
 	}
 }
 
-func loadSpec(cmd *cobra.Command) *api.BenchmarkSpec {
-	specFilePath := GetString(cmd, ArgNameConfig)
-	spec, err := pkg.LoadSpec(specFilePath)
+func loadSpec(cmd *cobra.Command) (spec *api.BenchmarkSpec) {
+	var filePath string
+	var err error
+	filePath = GetString(cmd, ArgNameConfig)
+	if filePath, err = filepath.Abs(filePath); err == nil {
+		spec, err = pkg.LoadSpec(filePath)
+	}
 	CheckBenchmarkInitFatal(err)
 
 	return spec
