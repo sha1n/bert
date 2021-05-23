@@ -24,7 +24,7 @@ func init() {
 }
 
 func TestBasic(t *testing.T) {
-	output, err := runBenchmarkCommand("go", "run", "../../cmd/main.go", "-s", "--config=../data/integration.yaml")
+	output, err := runBenchmarkCommandWith("../../cmd/main.go", "-s", "--config=../data/integration.yaml")
 
 	assert.NoError(t, err)
 	assert.Contains(t, output, "NAME")
@@ -32,14 +32,14 @@ func TestBasic(t *testing.T) {
 }
 
 func TestBasicMd(t *testing.T) {
-	output, err := runBenchmarkCommand("go", "run", "../../cmd/main.go", "-s", "--config=../data/integration.yaml", "--format=md")
+	output, err := runBenchmarkCommandWith("../../cmd/main.go", "-s", "--config=../data/integration.yaml", "--format=md")
 
 	assert.NoError(t, err)
 	assert.Contains(t, output, "|NAME|")
 	assert.Contains(t, output, expectedGoVersionOutput)
 }
 func TestBasicCsv(t *testing.T) {
-	output, err := runBenchmarkCommand("go", "run", "../../cmd/main.go", "-s", "--config=../data/integration.yaml", "--format=csv")
+	output, err := runBenchmarkCommandWith("../../cmd/main.go", "-s", "--config=../data/integration.yaml", "--format=csv")
 
 	assert.NoError(t, err)
 	assert.Contains(t, output, ",NAME,")
@@ -52,7 +52,13 @@ func TestExit1WhenRequiredArgsAreMissing(t *testing.T) {
 	assert.Error(t, cmd.Run())
 }
 
-func runBenchmarkCommand(cmd ...string) (string, error) {
+func runBenchmarkCommandWith(args ...string) (string, error) {
+	cmd := append([]string{
+		"go",
+		"run",
+		"-mod=readonly",
+	}, args...)
+
 	buf := new(bytes.Buffer)
 	writer := bufio.NewWriter(buf)
 
