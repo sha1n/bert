@@ -52,28 +52,28 @@ func ResolveOutputFileArg(cmd *cobra.Command, name string) *os.File {
 		resolvedfilePath := expandPath(outputFilePath)
 		outputFile, err = os.OpenFile(resolvedfilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	}
-	CheckInitFatal(err)
+	CheckBenchmarkInitFatal(err)
 
 	return outputFile
 }
 
 func GetString(cmd *cobra.Command, name string) string {
 	v, err := cmd.Flags().GetString(name)
-	CheckArgFatal(err)
+	CheckUserArgFatal(err)
 
 	return v
 }
 
 func GetBool(cmd *cobra.Command, name string) bool {
 	v, err := cmd.Flags().GetBool(name)
-	CheckArgFatal(err)
+	CheckUserArgFatal(err)
 
 	return v
 }
 
 func GetStringSlice(cmd *cobra.Command, name string) []string {
 	v, err := cmd.Flags().GetStringSlice(ArgNameLabel)
-	CheckArgFatal(err)
+	CheckUserArgFatal(err)
 
 	return v
 }

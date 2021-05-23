@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"os"
 
 	"github.com/sha1n/benchy/api"
 	"github.com/sha1n/benchy/internal/report"
@@ -12,14 +11,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
-
-func init() {
-	log.SetFormatter(&log.TextFormatter{
-		DisableTimestamp: true,
-	})
-	log.SetOutput(os.Stdout)
-	log.SetLevel(log.InfoLevel)
-}
 
 // Run parses CLI arguments and runs the benchmark process
 func Run(cmd *cobra.Command, args []string) {
@@ -39,7 +30,7 @@ func Run(cmd *cobra.Command, args []string) {
 		err = reportHandler.Finalize()
 	}
 
-	CheckInitFatal(err)
+	CheckBenchmarkInitFatal(err)
 }
 
 func configureLogger(cmd *cobra.Command) {
@@ -47,7 +38,7 @@ func configureLogger(cmd *cobra.Command) {
 	debug := GetBool(cmd, ArgNameDebug)
 
 	if silent && debug {
-		CheckInitFatal(errors.New("'--%s' and '--%s' are mutually exclusive"))
+		CheckBenchmarkInitFatal(errors.New("'--%s' and '--%s' are mutually exclusive"))
 	}
 	if silent {
 		log.StandardLogger().SetLevel(log.PanicLevel)
@@ -60,7 +51,7 @@ func configureLogger(cmd *cobra.Command) {
 func loadSpec(cmd *cobra.Command) *api.BenchmarkSpec {
 	specFilePath := GetString(cmd, ArgNameConfig)
 	spec, err := pkg.LoadSpec(specFilePath)
-	CheckInitFatal(err)
+	CheckBenchmarkInitFatal(err)
 
 	return spec
 }

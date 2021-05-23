@@ -4,10 +4,19 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/sha1n/benchy/cmd/config"
+	"github.com/sha1n/benchy/cmd/subcmd"
 	"github.com/sha1n/benchy/internal/cli"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
+
+func init() {
+	log.SetFormatter(&log.TextFormatter{
+		DisableTimestamp: true,
+	})
+	log.SetOutput(os.Stdout)
+	log.SetLevel(log.InfoLevel)
+}
 
 var (
 	// ProgramName : passed from build environment
@@ -55,7 +64,8 @@ csv/raw - CSV in which each row represents a raw trace event. useful if you want
 	rootCmd.SetVersionTemplate(`{{printf "%s" .Version}}`)
 
 	// Subcommands
-	rootCmd.AddCommand(config.CreateConfigCommand())
+	rootCmd.AddCommand(subcmd.CreateConfigCommand())
+	rootCmd.AddCommand(subcmd.CreateUpdateCommand(Version, ProgramName))
 
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)

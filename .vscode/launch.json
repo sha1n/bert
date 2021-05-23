@@ -9,7 +9,7 @@
       "type": "go",
       "request": "launch",
       "mode": "auto",
-      "program": "${workspaceFolder}/cmd/benchy.go",
+      "program": "${workspaceFolder}/cmd/main.go",
       "args": [
         "-c",
         "${workspaceFolder}/test/data/spec_test_load.yaml"
@@ -20,7 +20,7 @@
       "type": "go",
       "request": "launch",
       "mode": "auto",
-      "program": "${workspaceFolder}/cmd/benchy.go",
+      "program": "${workspaceFolder}/cmd/main.go",
       "args": [
         "-c",
         "${workspaceFolder}/test/data/spec_test_load.yaml",
@@ -34,7 +34,7 @@
       "type": "go",
       "request": "launch",
       "mode": "auto",
-      "program": "${workspaceFolder}/cmd/benchy.go",
+      "program": "${workspaceFolder}/cmd/main.go",
       "args": [
         "-c",
         "${workspaceFolder}/test/data/spec_test_load.yaml",
@@ -44,6 +44,17 @@
         "md",
         "--label=vscode"
       ]
+    },
+    {
+      "name": "Benchy update",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}/cmd/main.go",
+      "args": [
+        "update"
+      ]
     }
+
   ]
 }
