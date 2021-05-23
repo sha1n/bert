@@ -16,7 +16,7 @@ func CreateConfig(cmd *cobra.Command, args []string) {
 
 	spec := &api.BenchmarkSpec{
 		Executions: int(RequestUint("number of executions", true)),
-		Alternate:  RequestBool("alternate executions", false),
+		Alternate:  RequestOptionalBool("alternate executions", false),
 		Scenarios:  RequestScenarios(),
 	}
 
@@ -48,13 +48,13 @@ func RequestScenarios() []*api.ScenarioSpec {
 func RequestCommand(description string, required bool) *api.CommandSpec {
 	requestCommand := func() *api.CommandSpec {
 		return &api.CommandSpec{
-			WorkingDirectory: RequestExistingDirectory("working directory", false),
+			WorkingDirectory: RequestOptionalExistingDirectory("working directory", "inherits scenario"),
 			Cmd:              RequestCommandLine("command line", true),
 		}
 	}
 
 	if required {
-		_, _ = printfBold("%s:\r\n", description)
+		_, _ = fmt.Printf("%s:\r\n", description)
 		return requestCommand()
 	}
 	if QuestionYN(fmt.Sprintf("%s?", description)) {
@@ -86,7 +86,7 @@ func RequestEnvVars() map[string]string {
 func RequestScenario() *api.ScenarioSpec {
 	return &api.ScenarioSpec{
 		Name:             RequestString("scenario name", true),
-		WorkingDirectory: RequestExistingDirectory("working directory", false),
+		WorkingDirectory: RequestOptionalExistingDirectory("working directory", "inherits benchy's"),
 		Env:              RequestEnvVars(),
 		BeforeAll:        RequestCommand("add setup command", false),
 		AfterAll:         RequestCommand("add teardown command", false),
