@@ -8,14 +8,14 @@ type CommandSpec struct {
 
 // ScenarioSpec benchmark scenario specs
 type ScenarioSpec struct {
-	Name             string `json:"name" yaml:"name" validate:"required"`
-	WorkingDirectory string `json:"workingDir,omitempty" yaml:"workingDir,omitempty"`
-	Env              map[string]string
-	BeforeAll        *CommandSpec `json:"beforeAll,omitempty" yaml:"beforeAll,omitempty"`
-	AfterAll         *CommandSpec `json:"afterAll,omitempty" yaml:"afterAll,omitempty"`
-	BeforeEach       *CommandSpec `json:"beforeEach,omitempty" yaml:"beforeEach,omitempty"`
-	AfterEach        *CommandSpec `json:"afterEach,omitempty" yaml:"afterEach,omitempty"`
-	Command          *CommandSpec `validate:"required,dive"`
+	Name             string            `json:"name" yaml:"name" validate:"required"`
+	WorkingDirectory string            `json:"workingDir,omitempty" yaml:"workingDir,omitempty"`
+	Env              map[string]string `json:"env,omitempty" yaml:"env,omitempty"`
+	BeforeAll        *CommandSpec      `json:"beforeAll,omitempty" yaml:"beforeAll,omitempty"`
+	AfterAll         *CommandSpec      `json:"afterAll,omitempty" yaml:"afterAll,omitempty"`
+	BeforeEach       *CommandSpec      `json:"beforeEach,omitempty" yaml:"beforeEach,omitempty"`
+	AfterEach        *CommandSpec      `json:"afterEach,omitempty" yaml:"afterEach,omitempty"`
+	Command          *CommandSpec      `validate:"required,dive"`
 }
 
 // BenchmarkSpec benchmark specs top level structure
