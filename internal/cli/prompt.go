@@ -2,6 +2,7 @@ package cli
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -17,9 +18,9 @@ func RequestInput(prompt string, required bool, isValidFn IsValidFn) string {
 
 	displayPrompt := func() {
 		if required {
-			_, _ = printfBold("%s %s: ", prompt, sprintRed("*"))
+			_, _ = fmt.Printf("%s %s: ", prompt, sprintRed("*"))
 		} else {
-			_, _ = printfBold("%s %s: ", prompt, sprintGreen("?"))
+			_, _ = fmt.Printf("%s %s: ", prompt, sprintGreen("?"))
 		}
 	}
 
@@ -40,7 +41,7 @@ func QuestionYN(prompt string) bool {
 	reader := bufio.NewReader(os.Stdin)
 
 	displayPrompt := func() {
-		_, _ = printfBold("%s (y/n): ", prompt)
+		_, _ = fmt.Printf("%s (y/n|enter): ", prompt)
 	}
 
 	for {
@@ -59,10 +60,10 @@ func RequestString(prompt string, required bool) string {
 	return RequestInput(prompt, required, defaultIsValidFn)
 }
 
-func RequestExistingDirectory(prompt string, required bool) string {
+func RequestOptionalExistingDirectory(prompt string, defaultVal string) string {
 	return RequestInput(
-		prompt,
-		required,
+		formatOptionalPrompt(prompt, defaultVal),
+		false,
 		func(path string) bool {
 			if path == "" {
 				return true
@@ -93,10 +94,10 @@ func RequestUint(prompt string, required bool) uint {
 	}
 }
 
-func RequestBool(prompt string, required bool) bool {
+func RequestOptionalBool(prompt string, defaultVal bool) bool {
 	var str string
 	for {
-		str = RequestInput(prompt, required, defaultIsValidFn)
+		str = RequestInput(formatOptionalPrompt(prompt, defaultVal), false, defaultIsValidFn)
 		if str == "" {
 			return false
 		}
@@ -116,4 +117,8 @@ func RequestCommandLine(prompt string, required bool) []string {
 	}
 
 	return final
+}
+
+func formatOptionalPrompt(prompt string, defaultVal interface{}) string {
+	return fmt.Sprintf("%s (default: %v, enter to skip)", prompt, defaultVal)
 }
