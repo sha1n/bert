@@ -2,6 +2,7 @@ package test
 
 import (
 	"fmt"
+	"github.com/google/uuid"
 	"math/rand"
 	"time"
 )
@@ -11,7 +12,8 @@ func RandomLabels() []string {
 }
 
 func RandomString() string {
-	return fmt.Sprintf("label-%d", time.Now().Nanosecond())
+	uid, _ := uuid.NewRandom()
+	return fmt.Sprintf("label-%s", uid.String())
 }
 
 func RandomBool() bool {
