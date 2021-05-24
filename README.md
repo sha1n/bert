@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.com/sha1n/benchy.svg?branch=master)](https://travis-ci.com/sha1n/benchy) 
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/sha1n/benchy)
 [![Go Report Card](https://goreportcard.com/badge/sha1n/benchy)](https://goreportcard.com/report/sha1n/benchy) 
-[![Coverage Status](https://coveralls.io/repos/github/sha1n/benchy/badge.svg?branch=master&&service=github)](https://coveralls.io/github/sha1n/benchy?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/sha1n/benchy/badge.svg?branch=master&service=github)](https://coveralls.io/github/sha1n/benchy?branch=master)
 [![Release](https://img.shields.io/github/release/sha1n/benchy.svg?style=flat-square)](https://github.com/sha1n/benchy/releases)
 [![Release Drafter](https://github.com/sha1n/benchy/actions/workflows/release-drafter.yml/badge.svg)](https://github.com/sha1n/benchy/actions/workflows/release-drafter.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -13,11 +13,11 @@
 
 - [benchy](#benchy)
   - [Main Features](#main-features)
-  - [Installing](#installing)
-    - [Download a prebuilt binary](#download-a-prebuilt-binary)
+  - [Installation](#installation)
+    - [Download the Latest Release](#download-the-latest-release)
     - [Build your own binary](#build-your-own-binary)
   - [Usage](#usage)
-  - [Configurartion](#configurartion)
+  - [Configuration](#configuration)
   - [Report Formats](#report-formats)
 
 ## Main Features
@@ -27,16 +27,19 @@
 - Set optional custom environment variables per scenario
 - Set optional before/after commands for each run
 - Set optional setup/teardown commands per scenario
-- Choose between alternate executions and sequencial execution of the same command
+- Choose between alternate executions and sequential execution of the same command
 - Choose between `txt`, `csv`, `csv/raw`, `md` and `md/raw` output formats
 
-## Installing 
-### Download a prebuilt binary
+## Installation
+### Download the Latest Release
 Download the appropriate binary and put it in your `PATH`.
 
 ```bash
 # macOS Example (assuming that '$HOME/.local/bin' is in your PATH):
 curl -sSL https://github.com/sha1n/benchy/releases/latest/download/benchy-darwin-amd64 -o "$HOME/.local/bin/benchy"
+
+# once you have it, you can update using the update command
+benchy update
 ```
 
 ### Build your own binary
@@ -55,8 +58,8 @@ benchy --config test/data/spec_test_load.yaml
 benchy --help   # for full options list
 ```
 
-## Configurartion
-`benchy` reads benchmark specifications from a config file. The config file can be either in YAML or JSON. `benchy` assumes a file with the `yml` or `yaml` extension to be YAML, otherwise JSON is assumed. You may create a configuratio file manually or use the `config` command to interactively generate your configuration.
+## Configuration
+`benchy` reads benchmark specifications from a config file. The config file can be either in YAML or JSON. `benchy` assumes a file with the `yml` or `yaml` extension to be YAML, otherwise JSON is assumed. You may create a configuration file manually or use the `config` command to interactively generate your configuration.
 
 More about configuration [here](docs/configuration.md).
 
