@@ -3,6 +3,7 @@ package pkg
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 
@@ -34,18 +35,22 @@ func LoadSpec(path string) (*api.BenchmarkSpec, error) {
 	return load(path, unmarshalFn)
 }
 
-func SaveSpec(spec *api.BenchmarkSpec, path string) (err error) {
+func SaveSpec(spec *api.BenchmarkSpec, wc io.WriteCloser) (err error) {
 	if err = validate(spec); err != nil {
 		return err
 	}
 
-	return save(spec, path)
+	return save(spec, wc)
 }
 
-func save(spec *api.BenchmarkSpec, path string) (err error) {
+func save(spec *api.BenchmarkSpec, wc io.WriteCloser) (err error) {
 	var data []byte
 	if data, err = yaml.Marshal(spec); err == nil {
-		err = os.WriteFile(path, data, 0644)
+		_, err = wc.Write(data)
+	}
+
+	if closeErr := wc.Close(); closeErr != nil {
+		log.Error(closeErr)
 	}
 
 	return err

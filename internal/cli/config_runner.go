@@ -12,7 +12,8 @@ import (
 
 func CreateConfig(cmd *cobra.Command, args []string) {
 	printHints()
-	outFile := ResolveOutputFileArg(cmd, ArgNameOutputFile)
+	writeCloser := ResolveOutputArg(cmd, ArgNameOutputFile)
+	defer writeCloser.Close()
 
 	spec := &api.BenchmarkSpec{
 		Executions: int(RequestUint("number of executions", true)),
@@ -26,7 +27,7 @@ Writing your configuration...
 
 `)
 
-	if err := pkg.SaveSpec(spec, outFile.Name()); err != nil {
+	if err := pkg.SaveSpec(spec, writeCloser); err != nil {
 		log.Error(err)
 		log.Exit(1)
 	}

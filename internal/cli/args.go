@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -42,10 +43,10 @@ const (
 	ArgValueReportFormatMarkdownRaw = "md/raw"
 )
 
-// ResolveOutputFileArg resolves an output file argument based on user input.
+// ResolveOutputArg resolves an output file argument based on user input.
 // If the specified argument is empty, stdout is returned.
-func ResolveOutputFileArg(cmd *cobra.Command, name string) *os.File {
-	var outputFile = os.Stdout
+func ResolveOutputArg(cmd *cobra.Command, name string) io.WriteCloser {
+	var outputFile io.WriteCloser = stdOutNonClosingWriteCloser{}
 	var err error = nil
 
 	if outputFilePath := GetString(cmd, name); outputFilePath != "" {
@@ -88,4 +89,17 @@ func expandPath(path string) string {
 	}
 
 	return path
+}
+
+// stdOutNonClosingWriteCloser a wrapper around os.Stdout that implements the io.WriteCloser interface but never closes the file
+type stdOutNonClosingWriteCloser struct{}
+
+// Write forwards the call to standard output
+func (wc stdOutNonClosingWriteCloser) Write(b []byte) (int, error) {
+	return os.Stdout.Write(b)
+}
+
+// Close NOOP
+func (wc stdOutNonClosingWriteCloser) Close() error {
+	return nil
 }

@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"io"
 	"path/filepath"
 
 	"github.com/sha1n/benchy/api"
@@ -16,13 +17,17 @@ import (
 // Run parses CLI arguments and runs the benchmark process
 func Run(cmd *cobra.Command, args []string) {
 	var err error
+	var closer io.Closer
 	configureLogger(cmd)
 
 	log.Info("Starting benchy...")
 
 	spec := loadSpec(cmd)
 	var reportHandler api.ReportHandler
-	if reportHandler, err = resolveReportHandler(cmd, spec); err == nil {
+	reportHandler, closer, err = resolveReportHandler(cmd, spec)
+	defer closer.Close()
+
+	if err == nil {
 		tracer := pkg.NewTracer(spec.Executions * len(spec.Scenarios))
 		reportHandler.Subscribe(tracer.Stream())
 
@@ -61,10 +66,10 @@ func loadSpec(cmd *cobra.Command) (spec *api.BenchmarkSpec) {
 	return spec
 }
 
-func resolveReportHandler(cmd *cobra.Command, spec *api.BenchmarkSpec) (handler api.ReportHandler, err error) {
+func resolveReportHandler(cmd *cobra.Command, spec *api.BenchmarkSpec) (handler api.ReportHandler, closer io.Closer, err error) {
 	reportCtx := resolveReportContext(cmd)
-	outFile := ResolveOutputFileArg(cmd, ArgNameOutputFile)
-	writer := bufio.NewWriter(outFile)
+	writeCloser := ResolveOutputArg(cmd, ArgNameOutputFile)
+	writer := bufio.NewWriter(writeCloser)
 
 	switch reportFormat := GetString(cmd, ArgNameFormat); reportFormat {
 	case ArgValueReportFormatMarkdownRaw:
@@ -93,7 +98,7 @@ func resolveReportHandler(cmd *cobra.Command, spec *api.BenchmarkSpec) (handler 
 		err = fmt.Errorf("Invalid report format '%s'", reportFormat)
 	}
 
-	return handler, err
+	return handler, writeCloser, err
 }
 
 func resolveReportContext(cmd *cobra.Command) *api.ReportContext {
