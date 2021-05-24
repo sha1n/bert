@@ -26,10 +26,10 @@ func LoadSpec(path string) (*api.BenchmarkSpec, error) {
 
 	log.Infof("Loading benchmark specs from '%s'...", path)
 
-	if strings.HasSuffix(path, ".yaml") || strings.HasSuffix(path, ".yml") {
-		unmarshalFn = yaml.Unmarshal
-	} else {
+	if strings.HasSuffix(path, ".json") {
 		unmarshalFn = json.Unmarshal
+	} else {
+		unmarshalFn = yaml.Unmarshal
 	}
 
 	return load(path, unmarshalFn)

@@ -1,10 +1,71 @@
 # Benchmark Configuration 
 
 - [Benchmark Configuration](#benchmark-configuration)
+  - [Interactive Configuration Utility](#interactive-configuration-utility)
   - [Minimal Example](#minimal-example)
   - [Full Example](#full-example)
   - [Command Configuration](#command-configuration)
   - [Alternate Execution](#alternate-execution)
+
+## Interactive Configuration Utility
+An easy way to start playing with `benchy` configuration is to simply copy an [example configuration](#full-example), start modifying things and see what happens. But if you are not a YAML type of person and prefer to do it interactively, you might find the `config` utility useful. In any case, it is recommended that you go over the examples below and familiarize yourself with the different properties, so that you can get the most out of this utility.
+
+**Benchy Config Utility Example** 
+```bash
+# add '-o filename.yaml' to save generated config to a file.
+$ benchy config
+
+--------------------------------
+ BENCHMARK CONFIGURATION HELPER
+--------------------------------
+
+This tool is going to help you go through a benchmark configuration definition.
+
+* annotates required input
+? annotates optional input
+
+more here: https://github.com/sha1n/benchy/blob/master/docs/configuration.md
+
+--------------------------------
+
+number of executions *: 30
+alternate executions (false) ?: 1
+scenario name *: sleepy scenario
+working directory (inherits benchy's) ?:
+define custom env vars? (y/n|enter):
+add setup command? (y/n|enter): y
+working directory (inherits scenario) ?:
+command line *: echo 'preparing bedroom'
+add teardown command? (y/n|enter):
+add before each command? (y/n|enter): y
+working directory (inherits scenario) ?:
+command line *: echo 'going to sleep'
+add after each command? (y/n|enter):
+benchmarked command:
+working directory (inherits scenario) ?:
+command line *: sleep 1
+add another scenario? (y/n|enter):
+
+
+Writing your configuration...
+
+scenarios:
+- name: sleepy scenario
+  beforeAll:
+    cmd:
+    - echo
+    - preparing bedroom
+  beforeEach:
+    cmd:
+    - echo
+    - going to sleep
+  command:
+    cmd:
+    - sleep
+    - "1"
+executions: 30
+alternate: true
+```
 
 ## Minimal Example
 ```yaml
@@ -63,7 +124,7 @@ scenarios:                # list of scenarios
 ## Command Configuration
 The following elements share the same structure: `beforeAll`, `afterAll`, `beforeEach`, `afterEach`, `command`. 
 
-`workingDir` - the `workingDir` property can be set globally for a scenario and optionally be overriden per command. If no working directory is set the default is the directory `benchy` is executed from. `~` prefix willl be expanded to the current user home directory.
+`workingDir` - the `workingDir` property can be set globally for a scenario and optionally be overridden per command. If no working directory is set the default is the directory `benchy` is executed from. `~` prefix will be expanded to the current user home directory.
 
 **Command structure:**
 ```yaml
@@ -78,4 +139,4 @@ The following elements share the same structure: `beforeAll`, `afterAll`, `befor
 By default `benchy` executes scenarios in sequence and according to the number of `executions` set for your benchmark. Set the `alternate` property to `true` if you want spread the different scenarios more evenly over the time line. 
 Alternate execution can be helpful when:
 - your benchmark runs for a very long time and external resources tend to behave differently over time
-- you want some quiet time between executions of the same scenario to allow an extenral resource to cool down
+- you want some quiet time between executions of the same scenario to allow an external resource to cool down
