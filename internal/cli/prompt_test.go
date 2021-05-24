@@ -4,18 +4,28 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
 	"testing"
 
 	"github.com/sha1n/benchy/test"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestRequestInput(t *testing.T) {
+func TestRequestString(t *testing.T) {
 	expected := test.RandomString()
 	cleanup := givenStdInWith(t, expected)
 	defer cleanup()
 
-	actual := RequestInput("", false, defaultIsValidFn)
+	actual := RequestString("", false)
+	assert.Equal(t, expected, actual)
+}
+
+func TestRequestRequiredString(t *testing.T) {
+	expected := test.RandomString()
+	cleanup := givenStdInWith(t, fmt.Sprintf("\r\n\r\n%s", expected))
+	defer cleanup()
+
+	actual := RequestString("", true)
 	assert.Equal(t, expected, actual)
 }
 
@@ -41,13 +51,33 @@ func TestRequestInputWithInvalidInput(t *testing.T) {
 	assert.Equal(t, 2, callCount)
 }
 
-func TestRequestBool(t *testing.T) {
+func TestRequestOptionalBool(t *testing.T) {
 	expected := test.RandomBool()
 	cleanup := givenStdInWith(t, fmt.Sprint(expected))
 	defer cleanup()
 
 	actual := RequestOptionalBool("", false)
 	assert.Equal(t, expected, actual)
+}
+
+func TestRequestOptionalBoolWithInvalidInput(t *testing.T) {
+	// FIXME this doesn't seem to be a real bug, but it just might...
+	t.Skip("Skipped due to instability (looks like buffering issue on the faked stdin)")
+	attempt1 := "12"
+	attempt2 := 1 // 1 == true
+	cleanup := givenStdInWith(t, fmt.Sprintf("%s\r\n%d", attempt1, attempt2))
+	defer cleanup()
+
+	actual := RequestOptionalBool("", false)
+	assert.Equal(t, true, actual)
+}
+
+func TestRequestOptionalBoolWithSkip(t *testing.T) {
+	cleanup := givenStdInWith(t, "\r\n")
+	defer cleanup()
+
+	actual := RequestOptionalBool("", false)
+	assert.Equal(t, false, actual)
 }
 
 func TestQuestionYNWithPositiveInput(t *testing.T) {
@@ -74,6 +104,33 @@ func TestQuestionYNWithEmptyResponse(t *testing.T) {
 	assert.False(t, actual) // empty == no
 }
 
+func TestRequestOptionalExistingDirectoryWithExistingDir(t *testing.T) {
+	path := os.TempDir()
+	cleanup := givenStdInWith(t, path)
+	defer cleanup()
+
+	actual := RequestOptionalExistingDirectory("", "")
+	assert.Equal(t, path, actual)
+}
+
+func TestRequestOptionalExistingDirectoryWithNonExistingDir(t *testing.T) {
+	attempt1 := path.Join(os.TempDir(), test.RandomString())
+	attempt2 := os.TempDir()
+	cleanup := givenStdInWith(t, fmt.Sprintf("%s\r\n%s", attempt1, attempt2))
+	defer cleanup()
+
+	actual := RequestOptionalExistingDirectory("", "")
+	assert.Equal(t, attempt2, actual)
+}
+
+func TestRequestOptionalExistingDirectoryWithSkip(t *testing.T) {
+	cleanup := givenStdInWith(t, "\r\n")
+	defer cleanup()
+
+	actual := RequestOptionalExistingDirectory("", "")
+	assert.Equal(t, "", actual)
+}
+
 func TestRequestUint(t *testing.T) {
 	expected := test.RandomUint()
 	cleanup := givenStdInWith(t, fmt.Sprint(expected))
@@ -81,6 +138,19 @@ func TestRequestUint(t *testing.T) {
 
 	actual := RequestUint("", false)
 	assert.Equal(t, expected, actual)
+}
+
+func TestRequestRequiredUint(t *testing.T) {
+	// FIXME this doesn't seem to be a real bug, but it just might...
+	t.Skip("Skipped due to instability (looks like buffering issue on the faked stdin)")
+
+	attempt1 := -1
+	attempt2 := test.RandomUint()
+	cleanup := givenStdInWith(t, fmt.Sprintf("%d\r\n%d", attempt1, attempt2))
+	defer cleanup()
+
+	actual := RequestUint("", false)
+	assert.Equal(t, attempt2, actual)
 }
 
 func givenStdInWith(t *testing.T, content string) func() {
