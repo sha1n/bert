@@ -50,6 +50,8 @@ compile:
 
 test: go-test
 
+cover: go-cover
+
 clean:
 	@-rm $(GOBIN)/$(PROGRAMNAME)* 2> /dev/null
 	@-$(MAKE) go-clean
@@ -66,6 +68,11 @@ go-build: go-get go-build-linux-amd64 go-build-linux-arm64 go-build-darwin-amd64
 
 go-test:
 	go test -mod=readonly `go list -mod=readonly ./...`
+
+go-cover:
+	go test -mod=readonly -coverprofile=$(GOBUILD)/.coverprof `go list -mod=readonly ./...`
+	go tool cover -html=$(GOBUILD)/.coverprof -o $(GOBUILD)/coverage.html
+	@open $(GOBUILD)/coverage.html
 
 go-build-linux-amd64:
 	@echo "  >  Building linux amd64 binaries..."
