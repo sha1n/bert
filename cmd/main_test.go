@@ -8,11 +8,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+var runMainCommand = []string{
+	"go",
+	"run",
+	"-mod=readonly",
+	"main.go",
+}
+
 func TestExitCodeWhenRequiredConfigArgIsMissing(t *testing.T) {
 	expectedExitCode := 1
 	buf := new(bytes.Buffer)
 
-	cmd := exec.Command("go", "run", "main.go")
+	cmd := exec.Command(runMainCommand[0], runMainCommand[1:]...)
 
 	cmd.Stdout = buf
 	cmd.Stderr = buf
