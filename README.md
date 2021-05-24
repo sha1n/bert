@@ -59,66 +59,10 @@ benchy --help   # for full options list
 ```
 
 ## Configuration
-`benchy` reads benchmark specifications from a config file. The config file can be either in YAML or JSON. `benchy` assumes a file with the `yml` or `yaml` extension to be YAML, otherwise JSON is assumed. You may create a configuration file manually or use the `config` command to interactively generate your configuration.
+`benchy` reads benchmark specifications from a config file. The config file can be either in YAML or JSON format. `benchy` treats files with the `.json` extension as JSON, otherwise it assumes YAML. You may create a configuration file manually or use the `config` command to interactively generate your configuration.
 
 More about configuration [here](docs/configuration.md).
 
-**Benchy Config Utility Example** 
-```bash
-# add '-o filename.yaml' to save generated config to a file.
-$ benchy config
-
---------------------------------
- BENCHMARK CONFIGURATION HELPER
---------------------------------
-
-This tool is going to help you go through a benchmark configuration definition.
-
-* annotates required input
-? annotates optional input
-
-more here: https://github.com/sha1n/benchy/blob/master/docs/configuration.md
-
---------------------------------
-
-number of executions *: 30
-alternate executions (false) ?: 1
-scenario name *: sleepy scenario
-working directory (inherits benchy's) ?:
-define custom env vars? (y/n|enter):
-add setup command? (y/n|enter): y
-working directory (inherits scenario) ?:
-command line *: echo 'preparing bedroom'
-add teardown command? (y/n|enter):
-add before each command? (y/n|enter): y
-working directory (inherits scenario) ?:
-command line *: echo 'going to sleep'
-add after each command? (y/n|enter):
-benchmarked command:
-working directory (inherits scenario) ?:
-command line *: sleep 1
-add another scenario? (y/n|enter):
-
-
-Writing your configuration...
-
-scenarios:
-- name: sleepy scenario
-  beforeAll:
-    cmd:
-    - echo
-    - preparing bedroom
-  beforeEach:
-    cmd:
-    - echo
-    - going to sleep
-  command:
-    cmd:
-    - sleep
-    - "1"
-executions: 30
-alternate: true
-```
 
 ## Report Formats
 There are three supported report formats; `txt`, `csv`, `csv/raw`, `md` and `md/raw`. `txt` is the default format and is primarily designed to be used in a terminal. `csv` is especially useful when you want to accumulate stats from multiple benchmarks in a CSV file. In which case you can combine the `csv` format with `-o` and possibly `--header=false`. 
