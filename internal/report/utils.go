@@ -8,6 +8,7 @@ import (
 	"github.com/sha1n/benchy/api"
 )
 
+var TabularReportDateFormat = "2006-01-02T15:04:05Z07:00"
 var RawDataReportHeaders = []string{"Timestamp", "Scenario", "Labels", "Duration", "Error"}
 var SummaryReportHeaders = []string{
 	"Timestamp",

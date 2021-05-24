@@ -19,7 +19,7 @@ type CsvStreamReportWriter struct {
 }
 
 // NewCsvStreamReportWriter returns a streaming CSV report writer.
-func NewCsvStreamReportWriter(writer *bufio.Writer, ctx *api.ReportContext) *CsvStreamReportWriter {
+func NewCsvStreamReportWriter(writer *bufio.Writer, ctx *api.ReportContext) RawDataHandler {
 	w := &CsvStreamReportWriter{
 		writer: csv.NewWriter(writer),
 		ctx:    ctx,
@@ -34,7 +34,7 @@ func NewCsvStreamReportWriter(writer *bufio.Writer, ctx *api.ReportContext) *Csv
 
 func (rw *CsvStreamReportWriter) writeHeaders() (err error) {
 	if rw.ctx.IncludeHeaders {
-		err = rw.writer.Write([]string{"Timestamp", "Scenario", "Labels", "Duration", "Error"})
+		err = rw.writer.Write(RawDataReportHeaders)
 	}
 
 	return err
@@ -44,7 +44,7 @@ func (rw *CsvStreamReportWriter) writeHeaders() (err error) {
 func (rw *CsvStreamReportWriter) Handle(trace api.Trace) (err error) {
 	defer rw.writer.Flush()
 
-	timeStr := time.Now().Format("2006-01-02T15:04:05Z07:00")
+	timeStr := time.Now().Format(TabularReportDateFormat)
 	err = rw.writer.Write([]string{
 		timeStr,
 		trace.ID(),

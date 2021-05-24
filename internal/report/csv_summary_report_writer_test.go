@@ -10,11 +10,8 @@ import (
 
 	"github.com/sha1n/benchy/api"
 	"github.com/sha1n/benchy/pkg"
-	"github.com/sha1n/benchy/test"
 	"github.com/stretchr/testify/assert"
 )
-
-var randomLabels = test.RandomLabels()
 
 func TestWrite(t *testing.T) {
 	var scenario1, scenario2 = scenario{id: "1-id"}, scenario{id: "2-id"}
