@@ -10,9 +10,26 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// CreateConfigCommand creates the 'config' sub command
+func CreateConfigCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "config",
+		Long:  `Interactively walks through a benchmark configuration creation process`,
+		Short: `Interactively creates a benchmark config`,
+		Run:   CreateConfig,
+	}
+
+	cmd.Flags().StringP(ArgNameOutputFile, "o", "", `output file path. Optional. Writes to stdout by default.`)
+
+	_ = cmd.MarkFlagFilename(ArgNameOutputFile, "yml", "yaml")
+
+	return cmd
+}
+
 func CreateConfig(cmd *cobra.Command, args []string) {
 	printHints()
-	outFile := ResolveOutputFileArg(cmd, ArgNameOutputFile)
+	writeCloser := ResolveOutputArg(cmd, ArgNameOutputFile)
+	defer writeCloser.Close()
 
 	spec := &api.BenchmarkSpec{
 		Executions: int(RequestUint("number of executions", true)),
@@ -26,7 +43,7 @@ Writing your configuration...
 
 `)
 
-	if err := pkg.SaveSpec(spec, outFile.Name()); err != nil {
+	if err := pkg.SaveSpec(spec, writeCloser); err != nil {
 		log.Error(err)
 		log.Exit(1)
 	}

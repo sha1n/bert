@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"io"
+	"os"
 	"path/filepath"
 
 	"github.com/sha1n/benchy/api"
@@ -13,16 +15,62 @@ import (
 	"github.com/spf13/cobra"
 )
 
+func NewRootCommand(programName, version, build string) *cobra.Command {
+	var rootCmd = &cobra.Command{
+		Use: programName,
+		Version: fmt.Sprintf(`Version: %s
+Build label: %s`, version, build),
+		Example:      fmt.Sprintf("%s --%s <config file path>", programName, ArgNameConfig),
+		SilenceUsage: false,
+		Run:          Run,
+	}
+
+	rootCmd.Flags().StringP(ArgNameConfig, "c", "", `config file path. '~' will be expanded.`)
+
+	// Reporting
+	rootCmd.Flags().StringP(ArgNameOutputFile, "o", "", `output file path. Optional. Writes to stdout by default.`)
+	rootCmd.Flags().StringP(ArgNameFormat, "f", "txt", `summary format. One of: 'txt', 'md', 'md/raw', 'csv', 'csv/raw'
+txt     - plain text. designed to be used in your terminal
+md      - markdown table. similar to CSV but writes in markdown table format
+md/raw  - markdown table in which each row represents a raw trace event.
+csv     - CSV in which each row represents a scenario and contains calculated stats for that scenario
+csv/raw - CSV in which each row represents a raw trace event. useful if you want to import to a spreadsheet for further analysis`,
+	)
+	rootCmd.Flags().StringSliceP(ArgNameLabel, "l", []string{}, `labels to attach to be included in the benchmark report`)
+	rootCmd.Flags().BoolP(ArgNameHeaders, "", true, `in tabular formats, whether to include headers in the report`)
+
+	// Stdout
+	rootCmd.Flags().BoolP(ArgNamePipeStdout, "", true, `redirects external commands standard out to benchy's standard out`)
+	rootCmd.Flags().BoolP(ArgNamePipeStderr, "", true, `redirects external commands standard error to benchy's standard error`)
+	rootCmd.Flags().BoolP(ArgNameDebug, "d", false, `logs extra debug information`)
+	rootCmd.Flags().BoolP(ArgNameSilent, "s", false, `logs only fatal errors`)
+
+	_ = rootCmd.MarkFlagRequired(ArgNameConfig)
+	_ = rootCmd.MarkFlagFilename(ArgNameConfig, "yml", "yaml", "json")
+	_ = rootCmd.MarkFlagFilename(ArgNameOutputFile, "txt", "csv", "md")
+
+	rootCmd.SetVersionTemplate(`{{printf "%s" .Version}}`)
+
+	return rootCmd
+}
+
 // Run parses CLI arguments and runs the benchmark process
 func Run(cmd *cobra.Command, args []string) {
 	var err error
+	var closer io.Closer
 	configureLogger(cmd)
 
 	log.Info("Starting benchy...")
 
-	spec := loadSpec(cmd)
+	var spec *api.BenchmarkSpec
+	spec, err = loadSpec(cmd)
+	CheckBenchmarkInitFatal(err)
+
 	var reportHandler api.ReportHandler
-	if reportHandler, err = resolveReportHandler(cmd, spec); err == nil {
+	reportHandler, closer, err = resolveReportHandler(cmd, spec)
+	defer closer.Close()
+
+	if err == nil {
 		tracer := pkg.NewTracer(spec.Executions * len(spec.Scenarios))
 		reportHandler.Subscribe(tracer.Stream())
 
@@ -31,7 +79,7 @@ func Run(cmd *cobra.Command, args []string) {
 		err = reportHandler.Finalize()
 	}
 
-	CheckBenchmarkInitFatal(err)
+	CheckFatal(err)
 }
 
 func configureLogger(cmd *cobra.Command) {
@@ -39,7 +87,7 @@ func configureLogger(cmd *cobra.Command) {
 	debug := GetBool(cmd, ArgNameDebug)
 
 	if silent && debug {
-		CheckBenchmarkInitFatal(errors.New("'--%s' and '--%s' are mutually exclusive"))
+		CheckUserArgFatal(errors.New("'--%s' and '--%s' are mutually exclusive"))
 	}
 	if silent {
 		log.StandardLogger().SetLevel(log.PanicLevel)
@@ -49,22 +97,29 @@ func configureLogger(cmd *cobra.Command) {
 	}
 }
 
-func loadSpec(cmd *cobra.Command) (spec *api.BenchmarkSpec) {
+func loadSpec(cmd *cobra.Command) (spec *api.BenchmarkSpec, err error) {
 	var filePath string
-	var err error
 	filePath = GetString(cmd, ArgNameConfig)
-	if filePath, err = filepath.Abs(filePath); err == nil {
-		spec, err = pkg.LoadSpec(filePath)
-	}
-	CheckBenchmarkInitFatal(err)
+	filePath, err = filepath.Abs(expandPath(filePath))
 
-	return spec
+	if err == nil {
+		_, err = os.Stat(expandPath(filePath))
+		exists := !os.IsNotExist(err)
+
+		if err == nil && exists {
+			return pkg.LoadSpec(filePath)
+		}
+
+		err = fmt.Errorf("The file '%s' does not exist, or is not accessible.", filePath)
+	}
+
+	return spec, err
 }
 
-func resolveReportHandler(cmd *cobra.Command, spec *api.BenchmarkSpec) (handler api.ReportHandler, err error) {
+func resolveReportHandler(cmd *cobra.Command, spec *api.BenchmarkSpec) (handler api.ReportHandler, closer io.Closer, err error) {
 	reportCtx := resolveReportContext(cmd)
-	outFile := ResolveOutputFileArg(cmd, ArgNameOutputFile)
-	writer := bufio.NewWriter(outFile)
+	writeCloser := ResolveOutputArg(cmd, ArgNameOutputFile)
+	writer := bufio.NewWriter(writeCloser)
 
 	switch reportFormat := GetString(cmd, ArgNameFormat); reportFormat {
 	case ArgValueReportFormatMarkdownRaw:
@@ -93,7 +148,7 @@ func resolveReportHandler(cmd *cobra.Command, spec *api.BenchmarkSpec) (handler 
 		err = fmt.Errorf("Invalid report format '%s'", reportFormat)
 	}
 
-	return handler, err
+	return handler, writeCloser, err
 }
 
 func resolveReportContext(cmd *cobra.Command) *api.ReportContext {
