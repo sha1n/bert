@@ -1,10 +1,13 @@
 package pkg
 
 import (
+	"os"
+	"path"
 	"testing"
 
 	"github.com/sha1n/benchy/api"
 	"github.com/stretchr/testify/assert"
+	"gopkg.in/yaml.v3"
 )
 
 func TestLoadJson(t *testing.T) {
@@ -13,6 +16,31 @@ func TestLoadJson(t *testing.T) {
 
 func TestLoadYaml(t *testing.T) {
 	testLoad(t, "../test/data/spec_test_load.yaml")
+}
+
+func TestSaveYaml(t *testing.T) {
+	filePath := path.Join(os.TempDir(), "TestSaveYaml.yml")
+	f, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY, 0644)
+	assert.NoError(t, err)
+
+	expectedSpec := expectedBenchmarkSpec()
+
+	assert.NoError(t, SaveSpec(expectedSpec, f))
+
+	actualSpec, err := loadYaml(t, filePath)
+	assert.NoError(t, err)
+	assert.Equal(t, expectedSpec, actualSpec)
+}
+
+func TestSaveYamlClosesFile(t *testing.T) {
+	filePath := path.Join(os.TempDir(), "TestSaveYamlClosesFile.yml")
+	f, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY, 0644)
+	assert.NoError(t, err)
+
+	assert.NoError(t, SaveSpec(expectedBenchmarkSpec(), f))
+	err = f.Close()
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "already closed")
 }
 
 func TestLoadYamlWithMissingRequiredCommand(t *testing.T) {
@@ -71,4 +99,14 @@ func expectedBenchmarkSpec() *api.BenchmarkSpec {
 		},
 	}
 
+}
+
+func loadYaml(t *testing.T, filePath string) (spec *api.BenchmarkSpec, err error) {
+	var bytes []byte
+	bytes, err = os.ReadFile(filePath)
+	assert.NoError(t, err)
+
+	err = yaml.Unmarshal(bytes, &spec)
+
+	return spec, err
 }
