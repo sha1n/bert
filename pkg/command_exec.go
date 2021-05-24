@@ -63,10 +63,10 @@ func (ce *commandExecutor) configureCommand(cmd *api.CommandSpec, execCmd *exec.
 	}
 
 	if ce.pipeStdout {
-		execCmd.Stdout = os.Stdout
+		execCmd.Stdout = log.StandardLogger().Out
 	}
 	if ce.pipeStdout {
-		execCmd.Stderr = os.Stderr
+		execCmd.Stderr = log.StandardLogger().Out
 	}
 }
 
