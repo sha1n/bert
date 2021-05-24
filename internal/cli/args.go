@@ -96,7 +96,10 @@ type stdOutNonClosingWriteCloser struct{}
 
 // Write forwards the call to standard output
 func (wc stdOutNonClosingWriteCloser) Write(b []byte) (int, error) {
-	return os.Stdout.Write(b)
+	logger := log.StandardLogger()
+	// logger.Writer().Write(b)
+	return logger.Out.Write(b)
+	// return os.Stdout.Write(b) //log.StandardLogger().Writer().Write(b)
 }
 
 // Close NOOP

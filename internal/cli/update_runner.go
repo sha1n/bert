@@ -14,6 +14,18 @@ import (
 type GetLatestReleaseFn = func() (github.Release, error)
 type ResolveBinaryPathFn = func() (string, error)
 
+// CreateConfigCommand creates the 'config' sub command
+func CreateUpdateCommand(version, binaryName string) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "update",
+		Long:  `Checks for a newer release on GitHub and updates if one is found (https://github.com/sha1n/benchy/releases)`,
+		Short: `Checks for a newer release on GitHub and updates if one is found`,
+		Run:   RunSelfUpdateFor(version, binaryName),
+	}
+
+	return cmd
+}
+
 func RunSelfUpdateFor(version, binaryName string) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
 		CheckFatal(runSelfUpdateWith(version, binaryName, os.Executable, github.GetLatestRelease))
