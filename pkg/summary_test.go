@@ -13,8 +13,7 @@ const ZeroErrScenarioID = "noErr"
 const SingleErrScenarioID = "err"
 
 func TestErrorRateStat(t *testing.T) {
-
-	summary := generateExampleSummary()
+	summary, _ := generateExampleSummary()
 
 	zeroErrStats := summary.Get(ZeroErrScenarioID)
 	assert.Equal(t, 0.0, zeroErrStats.ErrorRate())
@@ -23,10 +22,21 @@ func TestErrorRateStat(t *testing.T) {
 	assert.Equal(t, 0.1, singleErrStats.ErrorRate())
 }
 
-func generateExampleSummary() api.Summary {
+func TestCount(t *testing.T) {
+	summary, size := generateExampleSummary()
+
+	zeroErrStats := summary.Get(ZeroErrScenarioID)
+	assert.Equal(t, size, zeroErrStats.Count())
+
+	singleErrStats := summary.Get(SingleErrScenarioID)
+	assert.Equal(t, size, singleErrStats.Count())
+}
+
+func generateExampleSummary() (api.Summary, int) {
+	size := 10
 	traces := make(map[api.ID][]api.Trace)
 
-	for i := 1; i <= 10; i++ {
+	for i := 1; i <= size; i++ {
 		traces[ZeroErrScenarioID] = append(traces[ZeroErrScenarioID], aTraceWith(ZeroErrScenarioID, i, nil))
 		if i <= 9 {
 			traces[SingleErrScenarioID] = append(traces[SingleErrScenarioID], aTraceWith(SingleErrScenarioID, i, nil))
@@ -35,7 +45,7 @@ func generateExampleSummary() api.Summary {
 
 	traces[SingleErrScenarioID] = append(traces[SingleErrScenarioID], aTraceWith(SingleErrScenarioID, 10, errors.New("test")))
 
-	return NewSummary(traces)
+	return NewSummary(traces), size
 }
 
 func aTraceWith(id string, dur int, err error) api.Trace {

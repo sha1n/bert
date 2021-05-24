@@ -10,7 +10,7 @@ func Execute(spec *api.BenchmarkSpec, ctx *api.ExecutionContext) {
 	if spec.Alternate {
 		executeAlternately(spec, ctx)
 	} else {
-		executeSequencially(spec, ctx)
+		executeSequentially(spec, ctx)
 	}
 }
 
@@ -30,7 +30,7 @@ func executeAlternately(spec *api.BenchmarkSpec, ctx *api.ExecutionContext) {
 	}
 }
 
-func executeSequencially(spec *api.BenchmarkSpec, ctx *api.ExecutionContext) {
+func executeSequentially(spec *api.BenchmarkSpec, ctx *api.ExecutionContext) {
 	for si := range spec.Scenarios {
 		scenario := spec.Scenarios[si]
 

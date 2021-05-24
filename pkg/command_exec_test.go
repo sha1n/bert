@@ -12,10 +12,21 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestExecuteReturnsErrorOnCommandFailure(t *testing.T) {
+	defaultWorkingDir := "default/dir"
+	env := map[string]string{}
+	exec := NewCommandExecutor(true, true)
+	cmdSpec := aCommandSpec(aNonExistingCommand(), "")
+
+	err := exec.Execute(cmdSpec, defaultWorkingDir, env)
+
+	assert.Error(t, err)
+}
+
 func TestConfigureCommandWithEmptyWorkingDir(t *testing.T) {
 	defaultWorkingDir := ""
 	env := map[string]string{}
-	cmd := aCommand()
+	cmd := aNonExistingCommand()
 
 	execCmd := configureCommand(aCommandSpec(cmd, ""), defaultWorkingDir, env)
 
@@ -27,7 +38,7 @@ func TestConfigureCommandWithEmptyWorkingDir(t *testing.T) {
 func TestConfigureCommandWithTildeDefaultWorkingDir(t *testing.T) {
 	defaultWorkingDir := "~"
 	env := map[string]string{}
-	cmd := aCommand()
+	cmd := aNonExistingCommand()
 
 	execCmd := configureCommand(aCommandSpec(cmd, ""), defaultWorkingDir, env)
 
@@ -39,7 +50,7 @@ func TestConfigureCommandWithTildeDefaultWorkingDir(t *testing.T) {
 func TestConfigureCommandWithTildeLocalWorkingDir(t *testing.T) {
 	defaultWorkingDir := ""
 	env := map[string]string{}
-	cmd := aCommand()
+	cmd := aNonExistingCommand()
 
 	execCmd := configureCommand(aCommandSpec(cmd, "~"), defaultWorkingDir, env)
 
@@ -51,7 +62,7 @@ func TestConfigureCommandWithTildeLocalWorkingDir(t *testing.T) {
 func TestConfigureCommandWithCustomEnv(t *testing.T) {
 	defaultWorkingDir := ""
 	env := aCustomEnv()
-	cmd := aCommand()
+	cmd := aNonExistingCommand()
 
 	execCmd := configureCommand(aCommandSpec(cmd, ""), defaultWorkingDir, env)
 
@@ -69,8 +80,8 @@ func configureCommand(spec *api.CommandSpec, defaultWorkingDir string, env map[s
 	return execCmd
 }
 
-func aCommand() []string {
-	return []string{"sleep", fmt.Sprintf("%d", time.Now().Nanosecond())}
+func aNonExistingCommand() []string {
+	return []string{"dummyCmd", "-arg"}
 }
 
 func aCustomEnv() map[string]string {
