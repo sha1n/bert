@@ -6,6 +6,7 @@ import (
 	"path"
 	"testing"
 
+  "github.com/sha1n/uneedtest"
 	"github.com/sha1n/benchy/test"
 	"github.com/stretchr/testify/assert"
 )
@@ -153,7 +154,7 @@ func TestRequestRequiredUint(t *testing.T) {
 }
 
 func givenStdInWith(content string) func() {
-	StdinReader = test.NewEmulatedStdinReader(content)
+	StdinReader = uneedtest.NewEmulatedStdinReader(content)
 
 	return func() {
 		StdinReader = os.Stdin
