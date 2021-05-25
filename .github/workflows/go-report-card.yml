@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  refresh:
+  refresh_go_report_card:
     runs-on: ubuntu-latest
     steps:
     - name: Go report card
