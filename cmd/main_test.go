@@ -17,7 +17,7 @@ var runMainCommand = []string{
 
 func TestExitCodeWhenRequiredConfigArgIsMissing(t *testing.T) {
 	expectedExitCode := 1
-	buf := new(bytes.Buffer)
+	buf := new(bytes.Buffer)	
 
 	cmd := exec.Command(runMainCommand[0], runMainCommand[1:]...)
 

@@ -8,13 +8,14 @@ import (
 	"strings"
 )
 
+
 type IsValidFn = func(string) bool
 
 var defaultIsValidFn = func(s string) bool { return true }
 
 func RequestInput(prompt string, required bool, isValidFn IsValidFn) string {
 	var str string
-	reader := bufio.NewReader(os.Stdin)
+	reader := bufio.NewReader(StdinReader)
 
 	displayPrompt := func() {
 		if required {
@@ -38,7 +39,7 @@ func RequestInput(prompt string, required bool, isValidFn IsValidFn) string {
 
 func QuestionYN(prompt string) bool {
 	var str string
-	reader := bufio.NewReader(os.Stdin)
+	reader := bufio.NewReader(StdinReader)
 
 	displayPrompt := func() {
 		_, _ = fmt.Printf("%s (y/n|enter): ", prompt)
