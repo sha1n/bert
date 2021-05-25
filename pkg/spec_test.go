@@ -7,7 +7,7 @@ import (
 
 	"github.com/sha1n/benchy/api"
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/yaml.v3"
+	"gopkg.in/yaml.v2"
 )
 
 func TestLoadJson(t *testing.T) {

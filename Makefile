@@ -18,6 +18,8 @@ GOARCH_AMD64 := "amd64"
 GOARCH_ARM64 := "arm64"
 GOARCH_ARM := "arm"
 
+MODFLAGS=-mod=readonly
+
 # Use linker flags to provide version/build settings
 LDFLAGS=-ldflags "-X=main.Version=$(VERSION) -X=main.Build=$(BUILD) -X=main.ProgramName=$(PROGRAMNAME)"
 
@@ -30,7 +32,7 @@ PID := $(GOBUILD)/.$(PROJECTNAME).pid
 # Make is verbose in Linux. Make it silent.
 MAKEFLAGS += --silent
 
-default: clean install lint format test compile
+default: install lint format test compile
 
 ci-checks: lint format test
 
@@ -44,13 +46,13 @@ compile:
 	@[ -d $(GOBUILD) ] || mkdir -p $(GOBUILD)
 	@-touch $(STDERR)
 	@-rm $(STDERR)
-	@-$(MAKE) -s go-build 2> $(STDERR)
-	@cat $(STDERR) | sed -e '1s/.*/\nError:\n/'  | sed 's/make\[.*/ /' | sed "/^/s/^/     /" 1>&2
+	@-$(MAKE) -s go-build #2> $(STDERR)
+	#@cat $(STDERR) | sed -e '1s/.*/\nError:\n/'  | sed 's/make\[.*/ /' | sed "/^/s/^/     /" 1>&2
 
 
-test: go-test
+test: install go-test
 
-cover: go-cover
+cover: install go-cover
 
 clean:
 	@-rm $(GOBIN)/$(PROGRAMNAME)* 2> /dev/null
@@ -58,7 +60,7 @@ clean:
 
 go-lint:
 	@echo "  >  Linting source files..."
-	go vet -mod=readonly -c=10 `go list -mod=readonly ./...`
+	go vet $(MODFLAGS) -c=10 `go list $(MODFLAGS) ./...`
 
 go-format:
 	@echo "  >  Formating source files..."
@@ -67,32 +69,32 @@ go-format:
 go-build: go-get go-build-linux-amd64 go-build-linux-arm64 go-build-darwin-amd64 go-build-windows-amd64 go-build-windows-arm
 
 go-test:
-	go test -mod=readonly `go list -mod=readonly ./...`
+	go test $(MODFLAGS) `go list $(MODFLAGS) ./...`
 
 go-cover:
-	go test -mod=readonly -coverprofile=$(GOBUILD)/.coverprof `go list -mod=readonly ./...`
+	go test $(MODFLAGS) -coverprofile=$(GOBUILD)/.coverprof `go list $(MODFLAGS) ./...`
 	go tool cover -html=$(GOBUILD)/.coverprof -o $(GOBUILD)/coverage.html
 	@open $(GOBUILD)/coverage.html
 
 go-build-linux-amd64:
 	@echo "  >  Building linux amd64 binaries..."
-	@GOPATH=$(GOPATH) GOOS=$(GOOS_LINUX) GOARCH=$(GOARCH_AMD64) GOBIN=$(GOBIN) go build -mod=readonly $(LDFLAGS) -o $(GOBIN)/$(PROGRAMNAME)-$(GOOS_LINUX)-$(GOARCH_AMD64) $(GOBASE)/cmd
+	@GOPATH=$(GOPATH) GOOS=$(GOOS_LINUX) GOARCH=$(GOARCH_AMD64) GOBIN=$(GOBIN) go build $(MODFLAGS) $(LDFLAGS) -o $(GOBIN)/$(PROGRAMNAME)-$(GOOS_LINUX)-$(GOARCH_AMD64) $(GOBASE)/cmd
 
 go-build-linux-arm64:
 	@echo "  >  Building linux arm64 binaries..."
-	@GOPATH=$(GOPATH) GOOS=$(GOOS_LINUX) GOARCH=$(GOARCH_ARM64) GOBIN=$(GOBIN) go build -mod=readonly $(LDFLAGS) -o $(GOBIN)/$(PROGRAMNAME)-$(GOOS_LINUX)-$(GOARCH_ARM64) $(GOBASE)/cmd
+	@GOPATH=$(GOPATH) GOOS=$(GOOS_LINUX) GOARCH=$(GOARCH_ARM64) GOBIN=$(GOBIN) go build $(MODFLAGS) $(LDFLAGS) -o $(GOBIN)/$(PROGRAMNAME)-$(GOOS_LINUX)-$(GOARCH_ARM64) $(GOBASE)/cmd
 
 go-build-darwin-amd64:
 	@echo "  >  Building darwin binaries..."
-	@GOPATH=$(GOPATH) GOOS=$(GOOS_DARWIN) GOARCH=$(GOARCH_AMD64) GOBIN=$(GOBIN) go build -mod=readonly $(LDFLAGS) -o $(GOBIN)/$(PROGRAMNAME)-$(GOOS_DARWIN)-$(GOARCH_AMD64) $(GOBASE)/cmd
+	@GOPATH=$(GOPATH) GOOS=$(GOOS_DARWIN) GOARCH=$(GOARCH_AMD64) GOBIN=$(GOBIN) go build $(MODFLAGS) $(LDFLAGS) -o $(GOBIN)/$(PROGRAMNAME)-$(GOOS_DARWIN)-$(GOARCH_AMD64) $(GOBASE)/cmd
 
 go-build-windows-amd64:
 	@echo "  >  Building windows amd64 binaries..."
-	@GOPATH=$(GOPATH) GOOS=$(GOOS_WINDOWS) GOARCH=$(GOARCH_AMD64) GOBIN=$(GOBIN) go build -mod=readonly $(LDFLAGS) -o $(GOBIN)/$(PROGRAMNAME)-$(GOOS_WINDOWS)-$(GOARCH_AMD64).exe $(GOBASE)/cmd
+	@GOPATH=$(GOPATH) GOOS=$(GOOS_WINDOWS) GOARCH=$(GOARCH_AMD64) GOBIN=$(GOBIN) go build $(MODFLAGS) $(LDFLAGS) -o $(GOBIN)/$(PROGRAMNAME)-$(GOOS_WINDOWS)-$(GOARCH_AMD64).exe $(GOBASE)/cmd
 
 go-build-windows-arm:
 	@echo "  >  Building windows arm binaries..."
-	@GOPATH=$(GOPATH) GOOS=$(GOOS_WINDOWS) GOARCH=$(GOARCH_ARM) GOBIN=$(GOBIN) go build -mod=readonly $(LDFLAGS) -o $(GOBIN)/$(PROGRAMNAME)-$(GOOS_WINDOWS)-$(GOARCH_ARM).exe $(GOBASE)/cmd
+	@GOPATH=$(GOPATH) GOOS=$(GOOS_WINDOWS) GOARCH=$(GOARCH_ARM) GOBIN=$(GOBIN) go build $(MODFLAGS) $(LDFLAGS) -o $(GOBIN)/$(PROGRAMNAME)-$(GOOS_WINDOWS)-$(GOARCH_ARM).exe $(GOBASE)/cmd
 
 go-generate:
 	@echo "  >  Generating dependency files..."
@@ -107,7 +109,9 @@ go-install:
 
 go-clean:
 	@echo "  >  Cleaning build cache"
-	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go clean -mod=readonly $(GOBASE)/cmd
+	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go clean $(MODFLAGS) $(GOBASE)/cmd
+	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go clean -modcache
+
 
 
 .PHONY: help
