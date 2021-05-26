@@ -38,13 +38,13 @@ func (rw *mdReportWriter) Write(summary api.Summary, spec *api.BenchmarkSpec, ct
 				id,
 				fmt.Sprint(stats.Count()),
 				strings.Join(ctx.Labels, ","),
-				FormatNanosAsSec3(stats.Min),
-				FormatNanosAsSec3(stats.Max),
-				FormatNanosAsSec3(stats.Mean),
-				FormatNanosAsSec3(stats.Median),
-				FormatNanosAsSec3(func() (float64, error) { return stats.Percentile(90) }),
-				FormatNanosAsSec3(stats.StdDev),
-				FormatFloatAsRate(stats.ErrorRate),
+				FormatReportNanosAsSec3(stats.Min),
+				FormatReportNanosAsSec3(stats.Max),
+				FormatReportNanosAsSec3(stats.Mean),
+				FormatReportNanosAsSec3(stats.Median),
+				FormatReportNanosAsSec3(func() (float64, error) { return stats.Percentile(90) }),
+				FormatReportNanosAsSec3(stats.StdDev),
+				FormatReportFloatAsRate(stats.ErrorRate),
 			})
 		}
 

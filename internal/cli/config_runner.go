@@ -26,15 +26,16 @@ func CreateConfigCommand() *cobra.Command {
 	return cmd
 }
 
+// CreateConfig runs the config tool
 func CreateConfig(cmd *cobra.Command, args []string) {
 	printHints()
 	writeCloser := ResolveOutputArg(cmd, ArgNameOutputFile)
 	defer writeCloser.Close()
 
 	spec := &api.BenchmarkSpec{
-		Executions: int(RequestUint("number of executions", true)),
-		Alternate:  RequestOptionalBool("alternate executions", false),
-		Scenarios:  RequestScenarios(),
+		Executions: int(requestUint("number of executions", true)),
+		Alternate:  requestOptionalBool("alternate executions", false),
+		Scenarios:  requestScenarios(),
 	}
 
 	fmt.Print(`
@@ -49,12 +50,12 @@ Writing your configuration...
 	}
 }
 
-func RequestScenarios() []*api.ScenarioSpec {
+func requestScenarios() []*api.ScenarioSpec {
 	specs := []*api.ScenarioSpec{}
 
 	for {
-		specs = append(specs, RequestScenario())
-		if !QuestionYN("add another scenario?") {
+		specs = append(specs, requestScenario())
+		if !questionYN("add another scenario?") {
 			break
 		}
 	}
@@ -62,11 +63,11 @@ func RequestScenarios() []*api.ScenarioSpec {
 	return specs
 }
 
-func RequestCommand(description string, required bool) *api.CommandSpec {
+func requestCommand(description string, required bool) *api.CommandSpec {
 	requestCommand := func() *api.CommandSpec {
 		return &api.CommandSpec{
-			WorkingDirectory: RequestOptionalExistingDirectory("working directory", "inherits scenario"),
-			Cmd:              RequestCommandLine("command line", true),
+			WorkingDirectory: requestOptionalExistingDirectory("working directory", "inherits scenario"),
+			Cmd:              requestCommandLine("command line", true),
 		}
 	}
 
@@ -74,20 +75,20 @@ func RequestCommand(description string, required bool) *api.CommandSpec {
 		_, _ = fmt.Printf("%s:\r\n", description)
 		return requestCommand()
 	}
-	if QuestionYN(fmt.Sprintf("%s?", description)) {
+	if questionYN(fmt.Sprintf("%s?", description)) {
 		return requestCommand()
 	}
 
 	return nil
 }
 
-func RequestEnvVars() map[string]string {
+func requestEnvVars() map[string]string {
 	var envVars map[string]string
 
-	if QuestionYN("define custom env vars?") {
+	if questionYN("define custom env vars?") {
 		envVars = map[string]string{}
 		for {
-			kv := RequestString("K=v", false)
+			kv := requestString("K=v", false)
 			if kv != "" {
 				kvSlice := strings.Split(kv, "=")
 				envVars[kvSlice[0]] = kvSlice[1]
@@ -100,16 +101,16 @@ func RequestEnvVars() map[string]string {
 	return envVars
 }
 
-func RequestScenario() *api.ScenarioSpec {
+func requestScenario() *api.ScenarioSpec {
 	return &api.ScenarioSpec{
-		Name:             RequestString("scenario name", true),
-		WorkingDirectory: RequestOptionalExistingDirectory("working directory", "inherits benchy's"),
-		Env:              RequestEnvVars(),
-		BeforeAll:        RequestCommand("add setup command", false),
-		AfterAll:         RequestCommand("add teardown command", false),
-		BeforeEach:       RequestCommand("add before each command", false),
-		AfterEach:        RequestCommand("add after each command", false),
-		Command:          RequestCommand("benchmarked command", true),
+		Name:             requestString("scenario name", true),
+		WorkingDirectory: requestOptionalExistingDirectory("working directory", "inherits benchy's"),
+		Env:              requestEnvVars(),
+		BeforeAll:        requestCommand("add setup command", false),
+		AfterAll:         requestCommand("add teardown command", false),
+		BeforeEach:       requestCommand("add before each command", false),
+		AfterEach:        requestCommand("add after each command", false),
+		Command:          requestCommand("benchmarked command", true),
 	}
 }
 

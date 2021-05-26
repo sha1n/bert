@@ -58,6 +58,7 @@ func ResolveOutputArg(cmd *cobra.Command, name string) io.WriteCloser {
 	return outputFile
 }
 
+// GetString tries to get a user argument. Handles errors as fatal.
 func GetString(cmd *cobra.Command, name string) string {
 	v, err := cmd.Flags().GetString(name)
 	CheckUserArgFatal(err)
@@ -65,6 +66,7 @@ func GetString(cmd *cobra.Command, name string) string {
 	return v
 }
 
+// GetBool tries to get a user argument. Handles errors as fatal.
 func GetBool(cmd *cobra.Command, name string) bool {
 	v, err := cmd.Flags().GetBool(name)
 	CheckUserArgFatal(err)
@@ -72,6 +74,7 @@ func GetBool(cmd *cobra.Command, name string) bool {
 	return v
 }
 
+// GetStringSlice tries to get a user argument. Handles errors as fatal.
 func GetStringSlice(cmd *cobra.Command, name string) []string {
 	v, err := cmd.Flags().GetStringSlice(ArgNameLabel)
 	CheckUserArgFatal(err)

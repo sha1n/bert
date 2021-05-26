@@ -17,6 +17,7 @@ const (
 	binaryName = "benchy"
 )
 
+// Release a GitHub realease facade
 type Release interface {
 	TagName() string
 	DownloadAsset() (io.ReadCloser, error)
@@ -26,10 +27,7 @@ type rel struct {
 	delegate *github.RepositoryRelease
 }
 
-type GitHubRelease interface {
-	GetLatest() Release
-}
-
+// GetLatestRelease returns the latest github non-draft release of this program.
 func GetLatestRelease() (Release, error) {
 	ctx := context.Background()
 	client := github.NewClient(nil)
@@ -65,7 +63,7 @@ func findCompatibleAssetID(release *github.RepositoryRelease) (int64, error) {
 			return *asset.ID, nil
 		}
 	}
-	return 0, fmt.Errorf("Unable to find a compatible asset in the latest release (required=%s).", requiredAssetName)
+	return 0, fmt.Errorf("unable to find a compatible asset in the latest release (required=%s).", requiredAssetName)
 }
 
 func getRequiredAssetName() string {
