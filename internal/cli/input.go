@@ -8,12 +8,14 @@ import (
 	"strings"
 )
 
-
+// IsValidFn validates the input string and returns true if valid otherwise false.
 type IsValidFn = func(string) bool
 
 var defaultIsValidFn = func(s string) bool { return true }
 
-func RequestInput(prompt string, required bool, isValidFn IsValidFn) string {
+// requestInput prompts for input, reads, validates it and returns it.
+// If 'required' is specified, the function will keep asking for inputs until a valid input is entered.
+func requestInput(prompt string, required bool, isValidFn IsValidFn) string {
 	var str string
 	reader := bufio.NewReader(StdinReader)
 
@@ -37,7 +39,7 @@ func RequestInput(prompt string, required bool, isValidFn IsValidFn) string {
 	}
 }
 
-func QuestionYN(prompt string) bool {
+func questionYN(prompt string) bool {
 	var str string
 	reader := bufio.NewReader(StdinReader)
 
@@ -57,12 +59,12 @@ func QuestionYN(prompt string) bool {
 	}
 }
 
-func RequestString(prompt string, required bool) string {
-	return RequestInput(prompt, required, defaultIsValidFn)
+func requestString(prompt string, required bool) string {
+	return requestInput(prompt, required, defaultIsValidFn)
 }
 
-func RequestOptionalExistingDirectory(prompt string, defaultVal string) string {
-	return RequestInput(
+func requestOptionalExistingDirectory(prompt string, defaultVal string) string {
+	return requestInput(
 		formatOptionalPrompt(prompt, defaultVal),
 		false,
 		func(path string) bool {
@@ -80,39 +82,39 @@ func RequestOptionalExistingDirectory(prompt string, defaultVal string) string {
 	)
 }
 
-func RequestUint(prompt string, required bool) uint {
+func requestUint(prompt string, required bool) uint {
 	var str string
 	for {
-		str = RequestInput(prompt, required, defaultIsValidFn)
+		str = requestInput(prompt, required, defaultIsValidFn)
 		if str == "" {
 			return 0
 		}
 		if v, err := strconv.ParseUint(str, 10, 32); err == nil {
 			return uint(v)
-		} else {
-			_, _ = printRed("please enter an unsigned integer value\r\n")
 		}
+
+		_, _ = printRed("please enter an unsigned integer value\r\n")
 	}
 }
 
-func RequestOptionalBool(prompt string, defaultVal bool) bool {
+func requestOptionalBool(prompt string, defaultVal bool) bool {
 	var str string
 	for {
-		str = RequestInput(formatOptionalPrompt(prompt, defaultVal), false, defaultIsValidFn)
+		str = requestInput(formatOptionalPrompt(prompt, defaultVal), false, defaultIsValidFn)
 		if str == "" {
 			return false
 		}
 		if v, err := strconv.ParseBool(str); err == nil {
 			return v
-		} else {
-			_, _ = printRed("please enter 'true', 'false', '1' or '0'\r\n")
 		}
+
+		_, _ = printRed("please enter 'true', 'false', '1' or '0'\r\n")
 	}
 }
 
-func RequestCommandLine(prompt string, required bool) []string {
+func requestCommandLine(prompt string, required bool) []string {
 	var final []string
-	str := RequestInput(prompt, required, defaultIsValidFn)
+	str := requestInput(prompt, required, defaultIsValidFn)
 	if str != "" {
 		final = parseCommand(str)
 	}

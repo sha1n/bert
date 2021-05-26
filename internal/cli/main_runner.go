@@ -15,6 +15,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// NewRootCommand creates the main command parse
 func NewRootCommand(programName, version, build string) *cobra.Command {
 	var rootCmd = &cobra.Command{
 		Use: programName,
@@ -110,7 +111,7 @@ func loadSpec(cmd *cobra.Command) (spec *api.BenchmarkSpec, err error) {
 			return pkg.LoadSpec(filePath)
 		}
 
-		err = fmt.Errorf("The file '%s' does not exist, or is not accessible.", filePath)
+		err = fmt.Errorf("the file '%s' does not exist, or is not accessible.", filePath)
 	}
 
 	return spec, err

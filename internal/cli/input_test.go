@@ -6,8 +6,8 @@ import (
 	"path"
 	"testing"
 
-  "github.com/sha1n/uneatest"
 	"github.com/sha1n/benchy/test"
+	"github.com/sha1n/uneatest"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -16,7 +16,7 @@ func TestRequestString(t *testing.T) {
 	cleanup := givenStdInWith(expected)
 	defer cleanup()
 
-	actual := RequestString("", false)
+	actual := requestString("", false)
 	assert.Equal(t, expected, actual)
 }
 
@@ -25,7 +25,7 @@ func TestRequestRequiredString(t *testing.T) {
 	cleanup := givenStdInWith(fmt.Sprintf("\r\n\r\n%s", expected))
 	defer cleanup()
 
-	actual := RequestString("", true)
+	actual := requestString("", true)
 	assert.Equal(t, expected, actual)
 }
 
@@ -46,7 +46,7 @@ func TestRequestInputWithInvalidInput(t *testing.T) {
 		return true
 	}
 
-	actual := RequestInput("", false, isValidFn)
+	actual := requestInput("", false, isValidFn)
 	assert.Equal(t, expected, actual)
 	assert.Equal(t, 2, callCount)
 }
@@ -56,7 +56,7 @@ func TestRequestOptionalBool(t *testing.T) {
 	cleanup := givenStdInWith(fmt.Sprint(expected))
 	defer cleanup()
 
-	actual := RequestOptionalBool("", false)
+	actual := requestOptionalBool("", false)
 	assert.Equal(t, expected, actual)
 }
 
@@ -68,7 +68,7 @@ func TestRequestOptionalBoolWithInvalidInput(t *testing.T) {
 	cleanup := givenStdInWith(fmt.Sprintf("%s\r\n%d", attempt1, attempt2))
 	defer cleanup()
 
-	actual := RequestOptionalBool("", false)
+	actual := requestOptionalBool("", false)
 	assert.Equal(t, true, actual)
 }
 
@@ -76,7 +76,7 @@ func TestRequestOptionalBoolWithSkip(t *testing.T) {
 	cleanup := givenStdInWith("\r\n")
 	defer cleanup()
 
-	actual := RequestOptionalBool("", false)
+	actual := requestOptionalBool("", false)
 	assert.Equal(t, false, actual)
 }
 
@@ -84,7 +84,7 @@ func TestQuestionYNWithPositiveInput(t *testing.T) {
 	cleanup := givenStdInWith("y")
 	defer cleanup()
 
-	actual := QuestionYN("")
+	actual := questionYN("")
 	assert.True(t, actual)
 }
 
@@ -92,7 +92,7 @@ func TestQuestionYNWithNegativeInput(t *testing.T) {
 	cleanup := givenStdInWith("n")
 	defer cleanup()
 
-	actual := QuestionYN("")
+	actual := questionYN("")
 	assert.False(t, actual)
 }
 
@@ -100,7 +100,7 @@ func TestQuestionYNWithEmptyResponse(t *testing.T) {
 	cleanup := givenStdInWith("")
 	defer cleanup()
 
-	actual := QuestionYN("")
+	actual := questionYN("")
 	assert.False(t, actual) // empty == no
 }
 
@@ -109,7 +109,7 @@ func TestRequestOptionalExistingDirectoryWithExistingDir(t *testing.T) {
 	cleanup := givenStdInWith(path)
 	defer cleanup()
 
-	actual := RequestOptionalExistingDirectory("", "")
+	actual := requestOptionalExistingDirectory("", "")
 	assert.Equal(t, path, actual)
 }
 
@@ -119,7 +119,7 @@ func TestRequestOptionalExistingDirectoryWithNonExistingDir(t *testing.T) {
 	cleanup := givenStdInWith(fmt.Sprintf("%s\r\n%s", attempt1, attempt2))
 	defer cleanup()
 
-	actual := RequestOptionalExistingDirectory("", "")
+	actual := requestOptionalExistingDirectory("", "")
 	assert.Equal(t, attempt2, actual)
 }
 
@@ -127,7 +127,7 @@ func TestRequestOptionalExistingDirectoryWithSkip(t *testing.T) {
 	cleanup := givenStdInWith("\r\n")
 	defer cleanup()
 
-	actual := RequestOptionalExistingDirectory("", "")
+	actual := requestOptionalExistingDirectory("", "")
 	assert.Equal(t, "", actual)
 }
 
@@ -136,7 +136,7 @@ func TestRequestUint(t *testing.T) {
 	cleanup := givenStdInWith(fmt.Sprint(expected))
 	defer cleanup()
 
-	actual := RequestUint("", false)
+	actual := requestUint("", false)
 	assert.Equal(t, expected, actual)
 }
 
@@ -149,7 +149,7 @@ func TestRequestRequiredUint(t *testing.T) {
 	cleanup := givenStdInWith(fmt.Sprintf("%d\r\n%d", attempt1, attempt2))
 	defer cleanup()
 
-	actual := RequestUint("", false)
+	actual := requestUint("", false)
 	assert.Equal(t, attempt2, actual)
 }
 
