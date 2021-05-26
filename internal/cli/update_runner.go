@@ -11,10 +11,12 @@ import (
 	"golang.org/x/mod/semver"
 )
 
+// GetLatestReleaseFn ...
 type GetLatestReleaseFn = func() (github.Release, error)
+// ResolveBinaryPathFn ...
 type ResolveBinaryPathFn = func() (string, error)
 
-// CreateConfigCommand creates the 'config' sub command
+// CreateUpdateCommand creates the 'config' sub command
 func CreateUpdateCommand(version, binaryName string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update",
@@ -26,9 +28,11 @@ func CreateUpdateCommand(version, binaryName string) *cobra.Command {
 	return cmd
 }
 
-func RunSelfUpdateFor(version, binaryName string) func(cmd *cobra.Command, args []string) {
+// RunSelfUpdateFor runs the self update command based on the current version and binary name.
+// currentVersion is used to determine whether a newer one is available
+func RunSelfUpdateFor(currentVersion, binaryName string) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
-		CheckFatal(runSelfUpdateWith(version, binaryName, os.Executable, github.GetLatestRelease))
+		CheckFatal(runSelfUpdateWith(currentVersion, binaryName, os.Executable, github.GetLatestRelease))
 	}
 }
 

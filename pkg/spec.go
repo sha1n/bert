@@ -35,6 +35,7 @@ func LoadSpec(path string) (*api.BenchmarkSpec, error) {
 	return load(path, unmarshalFn)
 }
 
+// SaveSpec saves the specified spec to the provided writer in YAML format and closes.
 func SaveSpec(spec *api.BenchmarkSpec, wc io.WriteCloser) (err error) {
 	if err = validate(spec); err != nil {
 		return err

@@ -6,20 +6,24 @@ import (
 	"strings"
 )
 
+// MarkdownTable a markdown table data structure
 type MarkdownTable struct {
 	data [][]string
 }
 
+// MarkdownTableWriter a writer like interface for markdown table data.
 type MarkdownTableWriter struct {
 	writer *bufio.Writer
 }
 
+// NewMarkdownTableWriter creates a new markdown table writer with the specified buffered writer.
 func NewMarkdownTableWriter(writer *bufio.Writer) *MarkdownTableWriter {
 	return &MarkdownTableWriter{
 		writer: writer,
 	}
 }
 
+// WriteHeaders writes table headers line
 func (tw *MarkdownTableWriter) WriteHeaders(headers []string) (err error) {
 	if err = tw.WriteRow(headers); err == nil {
 		err = tw.writeString(fmt.Sprintf("%s|\r\n", strings.Repeat("|----", len(headers))))
@@ -28,6 +32,7 @@ func (tw *MarkdownTableWriter) WriteHeaders(headers []string) (err error) {
 	return err
 }
 
+// WriteRow writes a row line
 func (tw *MarkdownTableWriter) WriteRow(row []string) (err error) {
 	// TODO theoretically we need to escape '|' chars
 	return tw.writeString(fmt.Sprintf("|%s|\r\n", strings.Join(row, "|")))
@@ -39,6 +44,7 @@ func (tw *MarkdownTableWriter) writeString(str string) error {
 	return err
 }
 
+// NewMarkdownTable creates a new markdown table instance
 func NewMarkdownTable(rows, cols int) *MarkdownTable {
 	t := new(MarkdownTable)
 	rows = rows + 2
@@ -54,19 +60,23 @@ func NewMarkdownTable(rows, cols int) *MarkdownTable {
 	return t
 }
 
+// SetHeader ...
 func (t *MarkdownTable) SetHeader(col int, header string) *MarkdownTable {
 	t.data[0][col] = header
 	return t
 }
 
+// SetData ...
 func (t *MarkdownTable) SetData(row, col int, data interface{}) *MarkdownTable {
 	return t.setStringData(row, col, fmt.Sprintf("%v", data))
 }
 
+// SetInt ...
 func (t *MarkdownTable) SetInt(row, col int, data int) *MarkdownTable {
 	return t.setStringData(row, col, fmt.Sprintf("%d", data))
 }
 
+// SetFloat64 ...
 func (t *MarkdownTable) SetFloat64(row, col int, data float64) *MarkdownTable {
 	return t.setStringData(row, col, fmt.Sprintf("%.3f", data))
 }

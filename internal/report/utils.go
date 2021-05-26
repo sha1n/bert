@@ -8,8 +8,13 @@ import (
 	"github.com/sha1n/benchy/api"
 )
 
+// TabularReportDateFormat ...
 var TabularReportDateFormat = "2006-01-02T15:04:05Z07:00"
+
+// RawDataReportHeaders ...
 var RawDataReportHeaders = []string{"Timestamp", "Scenario", "Labels", "Duration", "Error"}
+
+// SummaryReportHeaders ...
 var SummaryReportHeaders = []string{
 	"Timestamp",
 	"Scenario",
@@ -36,7 +41,8 @@ func GetSortedScenarioIds(summary api.Summary) []api.ID {
 	return sortedIds
 }
 
-func FormatFloat3(f func() (float64, error)) string {
+// FormatReportFloat3 formats floats for report rendering with 3 digit precision
+func FormatReportFloat3(f func() (float64, error)) string {
 	value, err := f()
 	if err == nil {
 		return fmt.Sprintf("%.3f", value)
@@ -45,7 +51,8 @@ func FormatFloat3(f func() (float64, error)) string {
 	return "ERROR"
 }
 
-func FormatNanosAsSec3(f func() (float64, error)) string {
+// FormatReportNanosAsSec3 formats nano-seconds float as seconds with 3 digits precision for report rendering
+func FormatReportNanosAsSec3(f func() (float64, error)) string {
 	value, err := f()
 	if err == nil {
 		return fmt.Sprintf("%.3fs", value/math.Pow(10, 9))
@@ -54,7 +61,8 @@ func FormatNanosAsSec3(f func() (float64, error)) string {
 	return "ERROR"
 }
 
-func FormatFloatAsRate(f func() float64) string {
+// FormatReportFloatAsRate formats a float as rate with percent sign, for report rendering
+func FormatReportFloatAsRate(f func() float64) string {
 	value := f()
 	errorRate := int(value * 100)
 

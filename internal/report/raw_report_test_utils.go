@@ -16,7 +16,10 @@ import (
 
 var randomLabels = test.RandomLabels()
 
+// GetRawDataHandler a provider for a RawDataHandler instance
 type GetRawDataHandler = func(*bufio.Writer, *api.ReportContext) RawDataHandler
+
+// ParseRecords parses report records from a reader
 type ParseRecords = func(io.Reader) ([][]string, error)
 
 func assertRawTraceRecord(t *testing.T, trace api.Trace, actualRecord []string) {
