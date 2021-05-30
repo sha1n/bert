@@ -5,7 +5,6 @@ import log "github.com/sirupsen/logrus"
 // CheckFatalFn checks the specified error and treats it as fatal if not nil
 type CheckFatalFn = func(error)
 
-
 // CheckBenchmarkInitFatal checks the specified error and treats it as fatal if not nil
 func CheckBenchmarkInitFatal(err error) {
 	if err != nil {

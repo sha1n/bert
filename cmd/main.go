@@ -7,14 +7,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func init() {
-	log.SetFormatter(&log.TextFormatter{
-		DisableTimestamp: true,
-	})
-	log.SetOutput(os.Stdout)
-	log.SetLevel(log.InfoLevel)
-}
-
 var (
 	// ProgramName : passed from build environment
 	ProgramName string
