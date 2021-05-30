@@ -10,6 +10,7 @@ import (
 	"github.com/sha1n/benchy/api"
 	"github.com/sha1n/benchy/pkg"
 	"github.com/sha1n/benchy/test"
+	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -27,23 +28,33 @@ func TestBasicInteractiveFlow(t *testing.T) {
 	teardown := givenStdInWith(userInput())
 	defer teardown()
 
-	cmd := CreateConfigCommand()
+	rootCmd, configPath, teardown := configureCommand(t)
+	defer teardown()
 
-	tmpFile, err := ioutil.TempFile("", "TestBasicInteractiveFlow")
-	defer os.Remove(tmpFile.Name())
+	rootCmd.Execute()
 
-	assert.NoError(t, err)
-
-	args := []string{"--out-file", tmpFile.Name()}
-	cmd.SetArgs(args)
-	assert.NoError(t, cmd.Flags().Set("out-file", tmpFile.Name()))
-
-	CreateConfig(cmd, args)
-
-	actual, err := pkg.LoadSpec(tmpFile.Name())
+	actual, err := pkg.LoadSpec(configPath)
 
 	assert.NoError(t, err)
 	assert.Equal(t, expectedSpec(), actual)
+}
+
+func configureCommand(t *testing.T) (command *cobra.Command, configPath string, teardown func()) {
+	rootCmd := NewRootCommand(test.RandomString(), test.RandomString(), test.RandomString())
+	cmd := CreateConfigCommand()
+	rootCmd.AddCommand(cmd)
+
+	tmpFile, err := ioutil.TempFile("", "TestBasicInteractiveFlow")
+
+	assert.NoError(t, err)
+
+	args := []string{"config", "--out-file", tmpFile.Name()}
+	// cmd.SetArgs(args)
+
+	assert.NoError(t, cmd.Flags().Set("out-file", tmpFile.Name()))
+	rootCmd.SetArgs(args)
+
+	return rootCmd, tmpFile.Name(), func() { os.Remove(tmpFile.Name()) }
 }
 
 func userInput() string {

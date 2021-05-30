@@ -29,7 +29,7 @@ func init() {
 }
 
 func TestBasic(t *testing.T) {
-	output, err := runBenchmarkCommandWith(t, "-s", itConfigFileArgValue)
+	output, err := runBenchmarkCommandWith(t, itConfigFileArgValue)
 
 	assert.NoError(t, err)
 	assert.Contains(t, output, "NAME")
@@ -37,7 +37,7 @@ func TestBasic(t *testing.T) {
 }
 
 func TestBasicMd(t *testing.T) {
-	output, err := runBenchmarkCommandWith(t, "-s", itConfigFileArgValue, "--format=md")
+	output, err := runBenchmarkCommandWith(t, itConfigFileArgValue, "--format=md")
 
 	assert.NoError(t, err)
 	assert.Contains(t, output, "|NAME|")
@@ -45,7 +45,7 @@ func TestBasicMd(t *testing.T) {
 }
 
 func TestBasicMdRaw(t *testing.T) {
-	output, err := runBenchmarkCommandWith(t, "-s", itConfigFileArgValue, "--format=md/raw")
+	output, err := runBenchmarkCommandWith(t, itConfigFileArgValue, "--format=md/raw")
 
 	assert.NoError(t, err)
 	assert.Contains(t, output, "|NAME|")
@@ -53,7 +53,7 @@ func TestBasicMdRaw(t *testing.T) {
 }
 
 func TestBasicCsv(t *testing.T) {
-	output, err := runBenchmarkCommandWith(t, "-s", itConfigFileArgValue, "--format=csv")
+	output, err := runBenchmarkCommandWith(t, itConfigFileArgValue, "--format=csv")
 
 	assert.NoError(t, err)
 	assert.Contains(t, output, ",NAME,")
@@ -61,7 +61,7 @@ func TestBasicCsv(t *testing.T) {
 }
 
 func TestBasicCsvRaw(t *testing.T) {
-	output, err := runBenchmarkCommandWith(t, "-s", itConfigFileArgValue, "--format=csv/raw")
+	output, err := runBenchmarkCommandWith(t, itConfigFileArgValue, "--format=csv/raw")
 
 	assert.NoError(t, err)
 	assert.Contains(t, output, ",NAME,")
@@ -70,12 +70,12 @@ func TestBasicCsvRaw(t *testing.T) {
 
 func TestWithMissingConfigFile(t *testing.T) {
 	nonExistingConfigArg := fmt.Sprintf("-c=/tmp/%s", test.RandomString())
-	_, _ = runBenchmarkCommandExpectPanic(t, "-s", nonExistingConfigArg)
+	_, _ = runBenchmarkCommandExpectPanic(t, nonExistingConfigArg)
 }
 
 func TestWithInvalidConfigFile(t *testing.T) {
 	invalidConfig := "-c=../../test/data/invalid_config.yml"
-	_, _ = runBenchmarkCommandExpectPanic(t, "-s", invalidConfig)
+	_, _ = runBenchmarkCommandExpectPanic(t, invalidConfig)
 }
 
 func TestWithCombinedDebugAndSilent(t *testing.T) {
