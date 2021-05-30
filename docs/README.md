@@ -14,24 +14,24 @@
 - [Benchy](#benchy)
   - [Main Features](#main-features)
   - [Installation](#installation)
-    - [Download the Latest Release](#download-the-latest-release)
-    - [Build your own binary](#build-your-own-binary)
+    - [Download A Pre-Built Release](#download-a-pre-built-release)
+    - [Build From Sources](#build-from-sources)
   - [Usage](#usage)
   - [Configuration](#configuration)
   - [Report Formats](#report-formats)
 
 ## Main Features
-- Compare any number of commands
-- Set your working directory per scenario and/or command
+- Benchmark any number of commands
 - Set the number of times every scenario is executed
-- Set optional custom environment variables per scenario
-- Set optional before/after commands for each run
-- Set optional setup/teardown commands per scenario
 - Choose between alternate executions and sequential execution of the same command
 - Choose between `txt`, `csv`, `csv/raw`, `md` and `md/raw` output formats
+- Set your working directory per scenario and/or command 
+- Set optional custom environment variables per scenario
+- Set optional setup/teardown commands per scenario
+- Set optional before/after commands for each run
 
 ## Installation
-### Download the Latest Release
+### Download A Pre-Built Release
 Download the appropriate binary and put it in your `PATH`.
 
 ```bash
@@ -42,7 +42,7 @@ curl -sSL https://github.com/sha1n/benchy/releases/latest/download/benchy-darwin
 benchy update
 ```
 
-### Build your own binary
+### Build From Sources
 ```bash
 # macOS Example (assuming that '$HOME/.local/bin' is in your PATH):
 git clone git@github.com:sha1n/benchy.git
