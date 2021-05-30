@@ -1,10 +1,10 @@
 package cli
 
 import (
-	"os"
 	"testing"
 
 	"github.com/sha1n/benchy/test"
+	"github.com/sha1n/termite"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
@@ -15,7 +15,7 @@ func TestDefaultLogLevel(t *testing.T) {
 	configureOutput(cmd)
 
 	assert.Equal(t, log.InfoLevel, log.StandardLogger().Level)
-	assert.Equal(t, os.Stdout, log.StandardLogger().Out)
+	assert.Equal(t, StdoutWriter, log.StandardLogger().Out)
 }
 
 func TestDebugOn(t *testing.T) {
@@ -24,7 +24,7 @@ func TestDebugOn(t *testing.T) {
 		configureOutput(cmd)
 
 		assert.Equal(t, log.DebugLevel, log.StandardLogger().Level)
-		assert.Equal(t, os.Stdout, log.StandardLogger().Out)
+		assert.Equal(t, StdoutWriter, log.StandardLogger().Out)
 	}
 	cmd.Execute()
 }
@@ -35,9 +35,23 @@ func TestSilentOn(t *testing.T) {
 		configureOutput(cmd)
 
 		assert.Equal(t, log.PanicLevel, log.StandardLogger().Level)
-		assert.Equal(t, os.Stderr, log.StandardLogger().Out)
+		assert.Equal(t, StderrWriter, log.StandardLogger().Out)
 	}
 	cmd.Execute()
+}
+
+func TestTTYModeConfiguration(t *testing.T) {
+	cmd := aCommandWithArgs("-s")
+	origTty := termite.Tty
+	termite.Tty = true
+	defer func() {
+		termite.Tty = origTty
+	}()
+
+	cancel := configureNonInteractiveOutput(cmd)
+	assert.NotEqual(t, StdoutWriter, log.StandardLogger().Out)
+	assert.IsType(t, &alwaysRewritingWriter{}, log.StandardLogger().Out)
+	cancel()
 }
 
 func aCommandWithArgs(args ...string) *cobra.Command {

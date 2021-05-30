@@ -59,7 +59,7 @@ csv/raw - CSV in which each row represents a raw trace event. useful if you want
 func Run(cmd *cobra.Command, args []string) {
 	var err error
 	var closer io.Closer
-	configureOutput(cmd)
+	defer configureNonInteractiveOutput(cmd)()
 
 	log.Info("Starting benchy...")
 
