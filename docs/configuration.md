@@ -1,5 +1,6 @@
 # Benchmark Configuration 
 
+- [Home](README.md)
 - [Benchmark Configuration](#benchmark-configuration)
   - [Interactive Configuration Utility](#interactive-configuration-utility)
   - [Minimal Example](#minimal-example)
