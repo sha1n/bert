@@ -68,7 +68,11 @@ func GetString(cmd *cobra.Command, name string) string {
 
 // GetBool tries to get a user argument. Handles errors as fatal.
 func GetBool(cmd *cobra.Command, name string) bool {
-	v, err := cmd.Flags().GetBool(name)
+	var v bool
+	var err error
+	if v, err = cmd.Flags().GetBool(name); err != nil {
+		v, err = cmd.PersistentFlags().GetBool(name)
+	}
 	CheckUserArgFatal(err)
 
 	return v

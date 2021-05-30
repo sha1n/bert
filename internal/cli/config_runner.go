@@ -28,6 +28,8 @@ func CreateConfigCommand() *cobra.Command {
 
 // CreateConfig runs the config tool
 func CreateConfig(cmd *cobra.Command, args []string) {
+	configureOutput(cmd)
+
 	printHints()
 	writeCloser := ResolveOutputArg(cmd, ArgNameOutputFile)
 	defer writeCloser.Close()

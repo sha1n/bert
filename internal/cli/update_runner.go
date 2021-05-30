@@ -13,6 +13,7 @@ import (
 
 // GetLatestReleaseFn ...
 type GetLatestReleaseFn = func() (github.Release, error)
+
 // ResolveBinaryPathFn ...
 type ResolveBinaryPathFn = func() (string, error)
 
@@ -32,7 +33,11 @@ func CreateUpdateCommand(version, binaryName string) *cobra.Command {
 // currentVersion is used to determine whether a newer one is available
 func RunSelfUpdateFor(currentVersion, binaryName string) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
+		configureOutput(cmd)
+
 		CheckFatal(runSelfUpdateWith(currentVersion, binaryName, os.Executable, github.GetLatestRelease))
+
+		log.Info("Done!")
 	}
 }
 

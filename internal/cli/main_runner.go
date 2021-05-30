@@ -2,7 +2,6 @@ package cli
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -43,8 +42,9 @@ csv/raw - CSV in which each row represents a raw trace event. useful if you want
 	// Stdout
 	rootCmd.Flags().BoolP(ArgNamePipeStdout, "", true, `redirects external commands standard out to benchy's standard out`)
 	rootCmd.Flags().BoolP(ArgNamePipeStderr, "", true, `redirects external commands standard error to benchy's standard error`)
-	rootCmd.Flags().BoolP(ArgNameDebug, "d", false, `logs extra debug information`)
-	rootCmd.Flags().BoolP(ArgNameSilent, "s", false, `logs only fatal errors`)
+
+	rootCmd.PersistentFlags().BoolP(ArgNameDebug, "d", false, `logs extra debug information`)
+	rootCmd.PersistentFlags().BoolP(ArgNameSilent, "s", false, `logs only fatal errors`)
 
 	_ = rootCmd.MarkFlagRequired(ArgNameConfig)
 	_ = rootCmd.MarkFlagFilename(ArgNameConfig, "yml", "yaml", "json")
@@ -59,7 +59,7 @@ csv/raw - CSV in which each row represents a raw trace event. useful if you want
 func Run(cmd *cobra.Command, args []string) {
 	var err error
 	var closer io.Closer
-	configureLogger(cmd)
+	configureOutput(cmd)
 
 	log.Info("Starting benchy...")
 
@@ -83,21 +83,6 @@ func Run(cmd *cobra.Command, args []string) {
 	CheckFatal(err)
 }
 
-func configureLogger(cmd *cobra.Command) {
-	silent := GetBool(cmd, ArgNameSilent)
-	debug := GetBool(cmd, ArgNameDebug)
-
-	if silent && debug {
-		CheckUserArgFatal(errors.New("'--%s' and '--%s' are mutually exclusive"))
-	}
-	if silent {
-		log.StandardLogger().SetLevel(log.PanicLevel)
-	}
-	if debug {
-		log.StandardLogger().SetLevel(log.DebugLevel)
-	}
-}
-
 func loadSpec(cmd *cobra.Command) (spec *api.BenchmarkSpec, err error) {
 	var filePath string
 	filePath = GetString(cmd, ArgNameConfig)
@@ -111,7 +96,7 @@ func loadSpec(cmd *cobra.Command) (spec *api.BenchmarkSpec, err error) {
 			return pkg.LoadSpec(filePath)
 		}
 
-		err = fmt.Errorf("the file '%s' does not exist, or is not accessible.", filePath)
+		err = fmt.Errorf("the file '%s' does not exist, or is not accessible", filePath)
 	}
 
 	return spec, err
