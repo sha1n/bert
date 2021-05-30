@@ -40,8 +40,8 @@ csv/raw - CSV in which each row represents a raw trace event. useful if you want
 	rootCmd.Flags().BoolP(ArgNameHeaders, "", true, `in tabular formats, whether to include headers in the report`)
 
 	// Stdout
-	rootCmd.Flags().BoolP(ArgNamePipeStdout, "", true, `redirects external commands standard out to benchy's standard out`)
-	rootCmd.Flags().BoolP(ArgNamePipeStderr, "", true, `redirects external commands standard error to benchy's standard error`)
+	rootCmd.Flags().BoolP(ArgNamePipeStdout, "", true, `pipes external commands standard out to benchy's standard out`)
+	rootCmd.Flags().BoolP(ArgNamePipeStderr, "", true, `pipes external commands standard error to benchy's standard error`)
 
 	rootCmd.PersistentFlags().BoolP(ArgNameDebug, "d", false, `logs extra debug information`)
 	rootCmd.PersistentFlags().BoolP(ArgNameSilent, "s", false, `logs only fatal errors`)
