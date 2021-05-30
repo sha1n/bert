@@ -106,7 +106,7 @@ func requestEnvVars() map[string]string {
 func requestScenario() *api.ScenarioSpec {
 	return &api.ScenarioSpec{
 		Name:             requestString("scenario name", true),
-		WorkingDirectory: requestOptionalExistingDirectory("working directory", "inherits benchy's"),
+		WorkingDirectory: requestOptionalExistingDirectory("working directory", "inherits current"),
 		Env:              requestEnvVars(),
 		BeforeAll:        requestCommand("add setup command", false),
 		AfterAll:         requestCommand("add teardown command", false),
