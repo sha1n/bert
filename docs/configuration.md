@@ -1,5 +1,6 @@
 # Benchmark Configuration 
 
+- [Home](README.md)
 - [Benchmark Configuration](#benchmark-configuration)
   - [Interactive Configuration Utility](#interactive-configuration-utility)
   - [Minimal Example](#minimal-example)
@@ -31,7 +32,7 @@ more here: https://github.com/sha1n/benchy/blob/master/docs/configuration.md
 number of executions *: 30
 alternate executions (false) ?: 1
 scenario name *: sleepy scenario
-working directory (inherits benchy's) ?:
+working directory (inherits current) ?:
 define custom env vars? (y/n|enter):
 add setup command? (y/n|enter): y
 working directory (inherits scenario) ?:
