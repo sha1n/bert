@@ -4,6 +4,9 @@ import (
 	"context"
 	"errors"
 	"io"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/fatih/color"
@@ -19,6 +22,8 @@ var (
 	sprintGreen = color.New(color.FgGreen).Sprint
 	sprintBold  = color.New(color.Bold).Sprint
 )
+
+const richOutputExperimentName = "rich_output"
 
 // this writer should be used when background threads write messages without a new line suffix to stdout.
 // this is common with progress indicartors from the termite package.
@@ -73,17 +78,32 @@ func configureNonInteractiveOutput(cmd *cobra.Command) (cancel context.CancelFun
 
 	configureOutput(cmd)
 
-	if termite.Tty && !GetBool(cmd, ArgNamePipeStdout) {
-		cancelSpinner := configureSpinner()
+	if termite.Tty {
 		textFormatter := &log.TextFormatter{
 			DisableTimestamp: true,
 			ForceColors:      true, // TTY mode
 		}
 		log.SetFormatter(textFormatter)
-		log.StandardLogger().SetOutput(&alwaysRewritingWriter{log.StandardLogger().Out})
 
-		cancel = cancelSpinner
+		if !GetBool(cmd, ArgNamePipeStdout) && IsExperimentEnabled(cmd, richOutputExperimentName) {
+			cancel = configureSpinner()
+			registerCursorGuard()
+
+			log.StandardLogger().SetOutput(&alwaysRewritingWriter{log.StandardLogger().Out})
+		}
 	}
-
 	return cancel
+}
+
+func registerCursorGuard() {
+	signals := make(chan os.Signal, 1)
+
+	signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		_ = <-signals
+		termite.NewCursor(StdoutWriter).Show()
+		log.Info("Terminating..")
+		os.Exit(1)
+	}()
 }

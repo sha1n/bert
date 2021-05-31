@@ -45,6 +45,8 @@ csv/raw - CSV in which each row represents a raw trace event. useful if you want
 
 	rootCmd.PersistentFlags().BoolP(ArgNameDebug, "d", false, `logs extra debug information`)
 	rootCmd.PersistentFlags().BoolP(ArgNameSilent, "s", false, `logs only fatal errors`)
+	
+	rootCmd.PersistentFlags().StringSliceP(ArgNameExperimental, "", []string{}, `enables a named experimental feature`)
 
 	_ = rootCmd.MarkFlagRequired(ArgNameConfig)
 	_ = rootCmd.MarkFlagFilename(ArgNameConfig, "yml", "yaml", "json")

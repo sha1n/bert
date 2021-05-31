@@ -40,18 +40,35 @@ func TestSilentOn(t *testing.T) {
 	cmd.Execute()
 }
 
-func TestTTYModeConfiguration(t *testing.T) {
-	cmd := aCommandWithArgs("-s")
-	origTty := termite.Tty
-	termite.Tty = true
-	defer func() {
-		termite.Tty = origTty
-	}()
+func TestTTYModeWithExperimentalRichOutputEnabled(t *testing.T) {
+	withTty(func() {
+		cmd := aCommandWithArgs("-s", "--experimental=rich_output")
 
-	cancel := configureNonInteractiveOutput(cmd)
-	assert.NotEqual(t, StdoutWriter, log.StandardLogger().Out)
-	assert.IsType(t, &alwaysRewritingWriter{}, log.StandardLogger().Out)
-	cancel()
+		cmd.Run = func(cmd *cobra.Command, args []string) {
+			cancel := configureNonInteractiveOutput(cmd)
+			defer cancel()
+
+			assert.NotEqual(t, StdoutWriter, log.StandardLogger().Out)
+			assert.IsType(t, &alwaysRewritingWriter{}, log.StandardLogger().Out)
+		}
+
+		cmd.Execute()
+	})
+}
+
+func TestTTYModeWithExperimentalRichOutputDisabled(t *testing.T) {
+	withTty(func() {
+		cmd := aCommandWithArgs()
+		cmd.Run = func(cmd *cobra.Command, args []string) {
+			cancel := configureNonInteractiveOutput(cmd)
+			defer cancel()
+
+			assert.Equal(t, StdoutWriter, log.StandardLogger().Out)
+		}
+
+		cmd.Execute()
+	})
+
 }
 
 func aCommandWithArgs(args ...string) *cobra.Command {
@@ -59,4 +76,15 @@ func aCommandWithArgs(args ...string) *cobra.Command {
 	rootCmd.SetArgs(append(args, "--config=../../test/data/integration.yaml"))
 
 	return rootCmd
+}
+
+func withTty(test func()) {
+	origTty := termite.Tty
+	termite.Tty = true
+
+	defer func() {
+		termite.Tty = origTty
+	}()
+
+	test()
 }

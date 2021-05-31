@@ -22,10 +22,15 @@ const (
 	ArgNamePipeStdout = "pipe-stdout"
 	// ArgNamePipeStderr : program arg name
 	ArgNamePipeStderr = "pipe-stderr"
+
 	// ArgNameDebug : program arg name
 	ArgNameDebug = "debug"
 	// ArgNameSilent : program arg name
 	ArgNameSilent = "silent"
+
+	// ArgNameExperimental : enables a named experimental feature
+	ArgNameExperimental = "experimental"
+
 	// ArgNameLabel : program arg name
 	ArgNameLabel = "label"
 	// ArgNameHeaders : program arg name
@@ -84,6 +89,19 @@ func GetStringSlice(cmd *cobra.Command, name string) []string {
 	CheckUserArgFatal(err)
 
 	return v
+}
+
+// IsExperimentEnabled checks whether the specified experiment is enabled by the command line
+func IsExperimentEnabled(cmd *cobra.Command, name string) bool {
+	if slice, err := cmd.PersistentFlags().GetStringSlice(ArgNameExperimental); err == nil {
+		for _, item := range slice {
+			if item == name {
+				return true
+			}
+		}
+	}
+
+	return false
 }
 
 // TODO this has been copied from pgk/command_exec.go. Maybe share or use an existing implementation if exists.
