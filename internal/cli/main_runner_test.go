@@ -106,18 +106,14 @@ func TestWithCombinedDebugAndSilent(t *testing.T) {
 func runBenchmarkCommandWithPipedStdoutAnd(t *testing.T, assert func(output string, err error), args ...string) {
 	defer expectNoPanic(t)
 
-	origWriter := StdoutWriter
 	buf := new(bytes.Buffer)
-	StdoutWriter = buf
 
-	defer func() {
-		StdoutWriter = origWriter
-	}()
-
-	rootCmd := NewRootCommand(test.RandomString(), test.RandomString(), test.RandomString())
+	ioContext := NewIOContext()
+	ioContext.StdoutWriter = buf
+	rootCmd := NewRootCommand(test.RandomString(), test.RandomString(), test.RandomString(), ioContext)
 	rootCmd.SetArgs(append(args, "--pipe-stdout=true"))
-	rootCmd.SetOut(StdoutWriter)
-	rootCmd.SetErr(StderrWriter)
+	rootCmd.SetOut(ioContext.StdoutWriter)
+	rootCmd.SetErr(ioContext.StderrWriter)
 
 	err := rootCmd.Execute()
 
@@ -129,12 +125,13 @@ func runBenchmarkCommandWithPipedStdoutAndExpectPanicWith(t *testing.T, args ...
 
 	buf := new(bytes.Buffer)
 	writer := bufio.NewWriter(buf)
+	ioContext := NewIOContext()
+	ioContext.StdoutWriter = bufio.NewWriter(buf)
 
 	originalWriter := log.StandardLogger().Out
-	log.StandardLogger().SetOutput(buf)
 	defer log.StandardLogger().SetOutput(originalWriter)
 
-	rootCmd := NewRootCommand(test.RandomString(), test.RandomString(), test.RandomString())
+	rootCmd := NewRootCommand(test.RandomString(), test.RandomString(), test.RandomString(), ioContext)
 	rootCmd.SetArgs(append(args, "--pipe-stdout=true"))
 	rootCmd.SetOut(writer)
 	rootCmd.SetErr(os.Stderr)

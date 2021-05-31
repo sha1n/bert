@@ -18,11 +18,13 @@ var (
 
 func main() {
 	defer handlePanics()
-	rootCmd := cli.NewRootCommand(ProgramName, Version, Build)
+
+	ctx := cli.NewIOContext()
+	rootCmd := cli.NewRootCommand(ProgramName, Version, Build, ctx)
 
 	// Subcommands
-	rootCmd.AddCommand(cli.CreateConfigCommand())
-	rootCmd.AddCommand(cli.CreateUpdateCommand(Version, ProgramName))
+	rootCmd.AddCommand(cli.CreateConfigCommand(ctx))
+	rootCmd.AddCommand(cli.CreateUpdateCommand(Version, ProgramName, ctx))
 
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)

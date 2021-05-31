@@ -11,12 +11,12 @@ import (
 )
 
 // CreateConfigCommand creates the 'config' sub command
-func CreateConfigCommand() *cobra.Command {
+func CreateConfigCommand(ctx IOContext) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "config",
 		Long:  `Interactively walks through a benchmark configuration creation process`,
 		Short: `Interactively creates a benchmark config`,
-		Run:   CreateConfig,
+		Run:   createConfigFn(ctx),
 	}
 
 	cmd.Flags().StringP(ArgNameOutputFile, "o", "", `output file path. Optional. Writes to stdout by default.`)
@@ -26,38 +26,40 @@ func CreateConfigCommand() *cobra.Command {
 	return cmd
 }
 
-// CreateConfig runs the config tool
-func CreateConfig(cmd *cobra.Command, args []string) {
-	configureOutput(cmd)
+// createConfigFn returns a function that runs the config tool with the specified IOContext
+func createConfigFn(ctx IOContext) func(*cobra.Command, []string) {
+	return func(cmd *cobra.Command, args []string) {
+		configureOutput(cmd, ctx)
 
-	printHints()
-	writeCloser := ResolveOutputArg(cmd, ArgNameOutputFile)
-	defer writeCloser.Close()
+		printHints()
+		writeCloser := ResolveOutputArg(cmd, ArgNameOutputFile)
+		defer writeCloser.Close()
 
-	spec := &api.BenchmarkSpec{
-		Executions: int(requestUint("number of executions", true)),
-		Alternate:  requestOptionalBool("alternate executions", false),
-		Scenarios:  requestScenarios(),
-	}
+		spec := &api.BenchmarkSpec{
+			Executions: int(requestUint("number of executions", true, ctx)),
+			Alternate:  requestOptionalBool("alternate executions", false, ctx),
+			Scenarios:  requestScenarios(ctx),
+		}
 
-	fmt.Print(`
+		fmt.Print(`
+	
+	Writing your configuration...
+	
+	`)
 
-Writing your configuration...
-
-`)
-
-	if err := pkg.SaveSpec(spec, writeCloser); err != nil {
-		log.Error(err)
-		log.Exit(1)
+		if err := pkg.SaveSpec(spec, writeCloser); err != nil {
+			log.Error(err)
+			log.Exit(1)
+		}
 	}
 }
 
-func requestScenarios() []*api.ScenarioSpec {
+func requestScenarios(ctx IOContext) []*api.ScenarioSpec {
 	specs := []*api.ScenarioSpec{}
 
 	for {
-		specs = append(specs, requestScenario())
-		if !questionYN("add another scenario?") {
+		specs = append(specs, requestScenario(ctx))
+		if !questionYN("add another scenario?", ctx) {
 			break
 		}
 	}
@@ -65,11 +67,11 @@ func requestScenarios() []*api.ScenarioSpec {
 	return specs
 }
 
-func requestCommand(description string, required bool) *api.CommandSpec {
+func requestCommand(description string, required bool, ctx IOContext) *api.CommandSpec {
 	requestCommand := func() *api.CommandSpec {
 		return &api.CommandSpec{
-			WorkingDirectory: requestOptionalExistingDirectory("working directory", "inherits scenario"),
-			Cmd:              requestCommandLine("command line", true),
+			WorkingDirectory: requestOptionalExistingDirectory("working directory", "inherits scenario", ctx),
+			Cmd:              requestCommandLine("command line", true, ctx),
 		}
 	}
 
@@ -77,20 +79,20 @@ func requestCommand(description string, required bool) *api.CommandSpec {
 		_, _ = fmt.Printf("%s:\r\n", description)
 		return requestCommand()
 	}
-	if questionYN(fmt.Sprintf("%s?", description)) {
+	if questionYN(fmt.Sprintf("%s?", description), ctx) {
 		return requestCommand()
 	}
 
 	return nil
 }
 
-func requestEnvVars() map[string]string {
+func requestEnvVars(ctx IOContext) map[string]string {
 	var envVars map[string]string
 
-	if questionYN("define custom env vars?") {
+	if questionYN("define custom env vars?", ctx) {
 		envVars = map[string]string{}
 		for {
-			kv := requestString("K=v", false)
+			kv := requestString("K=v", false, ctx)
 			if kv != "" {
 				kvSlice := strings.Split(kv, "=")
 				envVars[kvSlice[0]] = kvSlice[1]
@@ -103,16 +105,16 @@ func requestEnvVars() map[string]string {
 	return envVars
 }
 
-func requestScenario() *api.ScenarioSpec {
+func requestScenario(ctx IOContext) *api.ScenarioSpec {
 	return &api.ScenarioSpec{
-		Name:             requestString("scenario name", true),
-		WorkingDirectory: requestOptionalExistingDirectory("working directory", "inherits current"),
-		Env:              requestEnvVars(),
-		BeforeAll:        requestCommand("add setup command", false),
-		AfterAll:         requestCommand("add teardown command", false),
-		BeforeEach:       requestCommand("add before each command", false),
-		AfterEach:        requestCommand("add after each command", false),
-		Command:          requestCommand("benchmarked command", true),
+		Name:             requestString("scenario name", true, ctx),
+		WorkingDirectory: requestOptionalExistingDirectory("working directory", "inherits current", ctx),
+		Env:              requestEnvVars(ctx),
+		BeforeAll:        requestCommand("add setup command", false, ctx),
+		AfterAll:         requestCommand("add teardown command", false, ctx),
+		BeforeEach:       requestCommand("add before each command", false, ctx),
+		AfterEach:        requestCommand("add after each command", false, ctx),
+		Command:          requestCommand("benchmarked command", true, ctx),
 	}
 }
 

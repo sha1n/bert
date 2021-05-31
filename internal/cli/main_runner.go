@@ -15,14 +15,14 @@ import (
 )
 
 // NewRootCommand creates the main command parse
-func NewRootCommand(programName, version, build string) *cobra.Command {
+func NewRootCommand(programName, version, build string, ctx IOContext) *cobra.Command {
 	var rootCmd = &cobra.Command{
 		Use: programName,
 		Version: fmt.Sprintf(`Version: %s
 Build label: %s`, version, build),
 		Example:      fmt.Sprintf("%s --%s <config file path>", programName, ArgNameConfig),
 		SilenceUsage: false,
-		Run:          Run,
+		Run:          runFn(ctx),
 	}
 
 	rootCmd.Flags().StringP(ArgNameConfig, "c", "", `config file path. '~' will be expanded.`)
@@ -45,7 +45,7 @@ csv/raw - CSV in which each row represents a raw trace event. useful if you want
 
 	rootCmd.PersistentFlags().BoolP(ArgNameDebug, "d", false, `logs extra debug information`)
 	rootCmd.PersistentFlags().BoolP(ArgNameSilent, "s", false, `logs only fatal errors`)
-	
+
 	rootCmd.PersistentFlags().StringSliceP(ArgNameExperimental, "", []string{}, `enables a named experimental feature`)
 
 	_ = rootCmd.MarkFlagRequired(ArgNameConfig)
@@ -57,32 +57,35 @@ csv/raw - CSV in which each row represents a raw trace event. useful if you want
 	return rootCmd
 }
 
-// Run parses CLI arguments and runs the benchmark process
-func Run(cmd *cobra.Command, args []string) {
-	var err error
-	var closer io.Closer
-	defer configureNonInteractiveOutput(cmd)()
+// runFn returns a function that parses CLI arguments and runs the benchmark process with the specified IOContext
+func runFn(ctx IOContext) func(*cobra.Command, []string) {
+	return func(cmd *cobra.Command, args []string) {
+		var err error
+		var closer io.Closer
+		defer configureNonInteractiveOutput(cmd, ctx)()
 
-	log.Info("Starting benchy...")
+		log.Info("Starting benchy...")
 
-	var spec *api.BenchmarkSpec
-	spec, err = loadSpec(cmd)
-	CheckBenchmarkInitFatal(err)
+		var spec *api.BenchmarkSpec
+		spec, err = loadSpec(cmd)
+		CheckBenchmarkInitFatal(err)
 
-	var reportHandler api.ReportHandler
-	reportHandler, closer, err = resolveReportHandler(cmd, spec)
-	defer closer.Close()
+		var reportHandler api.ReportHandler
+		reportHandler, closer, err = resolveReportHandler(cmd, spec)
+		defer closer.Close()
 
-	if err == nil {
-		tracer := pkg.NewTracer(spec.Executions * len(spec.Scenarios))
-		reportHandler.Subscribe(tracer.Stream())
+		if err == nil {
+			tracer := pkg.NewTracer(spec.Executions * len(spec.Scenarios))
+			reportHandler.Subscribe(tracer.Stream())
 
-		pkg.Execute(spec, resolveExecutionContext(cmd, tracer))
+			pkg.Execute(spec, resolveExecutionContext(cmd, tracer))
 
-		err = reportHandler.Finalize()
+			err = reportHandler.Finalize()
+		}
+
+		CheckFatal(err)
 	}
 
-	CheckFatal(err)
 }
 
 func loadSpec(cmd *cobra.Command) (spec *api.BenchmarkSpec, err error) {
