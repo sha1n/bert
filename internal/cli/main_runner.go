@@ -37,7 +37,7 @@ csv     - CSV in which each row represents a scenario and contains calculated st
 csv/raw - CSV in which each row represents a raw trace event. useful if you want to import to a spreadsheet for further analysis`,
 	)
 	rootCmd.Flags().StringSliceP(ArgNameLabel, "l", []string{}, `labels to attach to be included in the benchmark report`)
-	rootCmd.Flags().BoolP(ArgNameHeaders, "", true, `in tabular formats, whether to include headers in the report`)
+	rootCmd.Flags().Bool(ArgNameHeaders, true, `in tabular formats, whether to include headers in the report`)
 
 	// Stdout
 	rootCmd.Flags().BoolP(ArgNamePipeStdout, "", false, `pipes external commands standard out to benchy's standard out`)
@@ -46,7 +46,7 @@ csv/raw - CSV in which each row represents a raw trace event. useful if you want
 	rootCmd.PersistentFlags().BoolP(ArgNameDebug, "d", false, `logs extra debug information`)
 	rootCmd.PersistentFlags().BoolP(ArgNameSilent, "s", false, `logs only fatal errors`)
 
-	rootCmd.PersistentFlags().StringSliceP(ArgNameExperimental, "", []string{}, `enables a named experimental feature`)
+	rootCmd.PersistentFlags().StringSlice(ArgNameExperimental, []string{}, `enables a named experimental features`)
 
 	_ = rootCmd.MarkFlagRequired(ArgNameConfig)
 	_ = rootCmd.MarkFlagFilename(ArgNameConfig, "yml", "yaml", "json")

@@ -85,6 +85,7 @@ func configureNonInteractiveOutput(cmd *cobra.Command, ctx IOContext) (cancel co
 		}
 		log.SetFormatter(textFormatter)
 	}
+
 	if IsExperimentEnabled(cmd, richOutputExperimentName) {
 		cancel = configureSpinner(ctx.StdoutWriter)
 		registerCursorGuard(ctx.StdoutWriter)
@@ -105,9 +106,9 @@ func registerCursorGuard(writer io.Writer) {
 	signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
 
 	go func() {
-		_ = <-signals
+		<-signals
 		termite.NewCursor(writer).Show()
 		log.Info("Terminating..")
-		os.Exit(1)
+		log.Exit(1)
 	}()
 }

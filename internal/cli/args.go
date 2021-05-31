@@ -93,7 +93,7 @@ func GetStringSlice(cmd *cobra.Command, name string) []string {
 
 // IsExperimentEnabled checks whether the specified experiment is enabled by the command line
 func IsExperimentEnabled(cmd *cobra.Command, name string) bool {
-	if slice, err := cmd.PersistentFlags().GetStringSlice(ArgNameExperimental); err == nil {
+	if slice, err := cmd.Flags().GetStringSlice(ArgNameExperimental); err == nil {
 		for _, item := range slice {
 			if item == name {
 				return true
