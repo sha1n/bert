@@ -28,7 +28,8 @@ func TestDebugOn(t *testing.T) {
 		assert.Equal(t, log.DebugLevel, log.StandardLogger().Level)
 		assert.Equal(t, ctx.StdoutWriter, log.StandardLogger().Out)
 	}
-	cmd.Execute()
+
+	assert.NoError(t, cmd.Execute())
 }
 
 func TestSilentOn(t *testing.T) {
@@ -40,7 +41,8 @@ func TestSilentOn(t *testing.T) {
 		assert.Equal(t, log.PanicLevel, log.StandardLogger().Level)
 		assert.Equal(t, ctx.StderrWriter, log.StandardLogger().Out)
 	}
-	cmd.Execute()
+
+	assert.NoError(t, cmd.Execute())
 }
 
 func TestTTYModeWithExperimentalRichOutputEnabled(t *testing.T) {
@@ -55,7 +57,7 @@ func TestTTYModeWithExperimentalRichOutputEnabled(t *testing.T) {
 			assert.IsType(t, &alwaysRewritingWriter{}, log.StandardLogger().Out)
 		}
 
-		cmd.Execute()
+		assert.NoError(t, cmd.Execute())
 	})
 }
 
@@ -69,7 +71,7 @@ func TestTTYModeWithExperimentalRichOutputDisabled(t *testing.T) {
 			assert.Equal(t, ctx.StdoutWriter, log.StandardLogger().Out)
 		}
 
-		cmd.Execute()
+		assert.NoError(t, cmd.Execute())
 	})
 
 }

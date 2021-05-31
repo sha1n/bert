@@ -30,7 +30,8 @@ func TestBasicInteractiveFlow(t *testing.T) {
 	rootCmd, configPath, teardown := configureCommand(t, ctx)
 	defer teardown()
 
-	rootCmd.Execute()
+	err := rootCmd.Execute()
+	assert.NoError(t, err)
 
 	actual, err := pkg.LoadSpec(configPath)
 
