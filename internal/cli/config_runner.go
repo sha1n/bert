@@ -41,11 +41,7 @@ func createConfigFn(ctx IOContext) func(*cobra.Command, []string) {
 			Scenarios:  requestScenarios(ctx),
 		}
 
-		fmt.Print(`
-	
-	Writing your configuration...
-	
-	`)
+		fmt.Print("\r\nWriting your configuration...\r\n\r\n")
 
 		if err := pkg.SaveSpec(spec, writeCloser); err != nil {
 			log.Error(err)
