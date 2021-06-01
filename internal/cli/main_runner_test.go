@@ -29,7 +29,7 @@ func init() {
 }
 
 func TestBasic(t *testing.T) {
-	output, err := runBenchmarkCommandWith(t, itConfigFileArgValue)
+	output, err := runBenchmarkCommandWithPipedStdout(t, itConfigFileArgValue)
 
 	assert.NoError(t, err)
 	assert.Contains(t, output, "NAME")
@@ -37,7 +37,7 @@ func TestBasic(t *testing.T) {
 }
 
 func TestBasicMd(t *testing.T) {
-	output, err := runBenchmarkCommandWith(t, itConfigFileArgValue, "--format=md")
+	output, err := runBenchmarkCommandWithPipedStdout(t, itConfigFileArgValue, "--format=md")
 
 	assert.NoError(t, err)
 	assert.Contains(t, output, "|NAME|")
@@ -45,7 +45,7 @@ func TestBasicMd(t *testing.T) {
 }
 
 func TestBasicMdRaw(t *testing.T) {
-	output, err := runBenchmarkCommandWith(t, itConfigFileArgValue, "--format=md/raw")
+	output, err := runBenchmarkCommandWithPipedStdout(t, itConfigFileArgValue, "--format=md/raw")
 
 	assert.NoError(t, err)
 	assert.Contains(t, output, "|NAME|")
@@ -53,7 +53,7 @@ func TestBasicMdRaw(t *testing.T) {
 }
 
 func TestBasicCsv(t *testing.T) {
-	output, err := runBenchmarkCommandWith(t, itConfigFileArgValue, "--format=csv")
+	output, err := runBenchmarkCommandWithPipedStdout(t, itConfigFileArgValue, "--format=csv")
 
 	assert.NoError(t, err)
 	assert.Contains(t, output, ",NAME,")
@@ -61,7 +61,7 @@ func TestBasicCsv(t *testing.T) {
 }
 
 func TestBasicCsvRaw(t *testing.T) {
-	output, err := runBenchmarkCommandWith(t, itConfigFileArgValue, "--format=csv/raw")
+	output, err := runBenchmarkCommandWithPipedStdout(t, itConfigFileArgValue, "--format=csv/raw")
 
 	assert.NoError(t, err)
 	assert.Contains(t, output, ",NAME,")
@@ -82,7 +82,7 @@ func TestWithCombinedDebugAndSilent(t *testing.T) {
 	_, _ = runBenchmarkCommandExpectPanic(t, "-s", "-d", itConfigFileArgValue)
 }
 
-func runBenchmarkCommandWith(t *testing.T, args ...string) (output string, err error) {
+func runBenchmarkCommandWithPipedStdout(t *testing.T, args ...string) (output string, err error) {
 	defer expectNoPanic(t)
 
 	buf := new(bytes.Buffer)
@@ -93,7 +93,7 @@ func runBenchmarkCommandWith(t *testing.T, args ...string) (output string, err e
 	defer log.StandardLogger().SetOutput(originalWriter)
 
 	rootCmd := NewRootCommand(test.RandomString(), test.RandomString(), test.RandomString())
-	rootCmd.SetArgs(args)
+	rootCmd.SetArgs(append(args, "--pipe-stdout"))
 	rootCmd.SetOut(writer)
 	rootCmd.SetErr(os.Stderr)
 
