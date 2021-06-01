@@ -42,7 +42,7 @@ func configureSpinner(writer io.Writer) context.CancelFunc {
 	cursor := termite.NewCursor(writer)
 	cursor.Hide()
 
-	spinner := termite.NewSpinner(writer, "", time.Millisecond*100)
+	spinner := termite.NewSpinner(writer, "", time.Millisecond*100, termite.DefaultSpinnerFormatter())
 	cancel, _ := spinner.Start()
 
 	return func() {

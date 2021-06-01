@@ -11,7 +11,7 @@ require (
 	github.com/google/uuid v1.2.0
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/montanaflynn/stats v0.6.6
-	github.com/sha1n/termite v0.0.8
+	github.com/sha1n/termite v0.0.9
 	github.com/sha1n/uneatest v0.0.1
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.1.3
