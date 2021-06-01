@@ -2,32 +2,43 @@ package cli
 
 import (
 	"errors"
-	"os"
 
+	"github.com/fatih/color"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
-func init() {
-	log.SetFormatter(&log.TextFormatter{
-		DisableTimestamp: true,
-	})
-	log.SetOutput(os.Stdout)
-	log.SetLevel(log.InfoLevel)
-}
+var (
+	printfRed   = color.New(color.FgRed).Printf
+	printRed    = color.New(color.FgRed).Print
+	sprintRed   = color.New(color.FgRed).Sprint
+	sprintGreen = color.New(color.FgGreen).Sprint
+	sprintBold  = color.New(color.Bold).Sprint
+)
 
-func configureOutput(cmd *cobra.Command) {
+func configureOutput(cmd *cobra.Command, ctx IOContext) {
 	silent := GetBool(cmd, ArgNameSilent)
 	debug := GetBool(cmd, ArgNameDebug)
+	var level = log.InfoLevel
+	// var writer = ctx.StdoutWriter
 
 	if silent && debug {
 		CheckUserArgFatal(errors.New("'--%s' and '--%s' are mutually exclusive"))
 	}
 	if silent {
-		log.StandardLogger().SetLevel(log.PanicLevel)
-		log.StandardLogger().SetOutput(os.Stderr)
+		level = log.PanicLevel
+		// writer = ctx.StderrWriter
 	}
 	if debug {
-		log.StandardLogger().SetLevel(log.DebugLevel)
+		level = log.DebugLevel
 	}
+	if ctx.Tty {
+		log.SetFormatter(&log.TextFormatter{
+			DisableTimestamp: true,
+			ForceColors:      true,
+		})
+	}
+
+	log.StandardLogger().SetLevel(level)
+	log.StandardLogger().SetOutput(ctx.StderrWriter)
 }

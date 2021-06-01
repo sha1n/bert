@@ -13,19 +13,17 @@ import (
 
 func TestRequestString(t *testing.T) {
 	expected := test.RandomString()
-	cleanup := givenStdInWith(expected)
-	defer cleanup()
+	ctx := givenIOContextWithInputContent(expected)
 
-	actual := requestString("", false)
+	actual := requestString("", false, ctx)
 	assert.Equal(t, expected, actual)
 }
 
 func TestRequestRequiredString(t *testing.T) {
 	expected := test.RandomString()
-	cleanup := givenStdInWith(fmt.Sprintf("\r\n\r\n%s", expected))
-	defer cleanup()
+	ctx := givenIOContextWithInputContent(fmt.Sprintf("\r\n\r\n%s", expected))
 
-	actual := requestString("", true)
+	actual := requestString("", true, ctx)
 	assert.Equal(t, expected, actual)
 }
 
@@ -34,8 +32,7 @@ func TestRequestInputWithInvalidInput(t *testing.T) {
 	stdin := fmt.Sprintf(`rejected
 %s`, expected)
 
-	cleanup := givenStdInWith(stdin)
-	defer cleanup()
+	ctx := givenIOContextWithInputContent(stdin)
 
 	callCount := 1
 	isValidFn := func(s string) bool {
@@ -46,17 +43,16 @@ func TestRequestInputWithInvalidInput(t *testing.T) {
 		return true
 	}
 
-	actual := requestInput("", false, isValidFn)
+	actual := requestInput("", false, isValidFn, ctx)
 	assert.Equal(t, expected, actual)
 	assert.Equal(t, 2, callCount)
 }
 
 func TestRequestOptionalBool(t *testing.T) {
 	expected := test.RandomBool()
-	cleanup := givenStdInWith(fmt.Sprint(expected))
-	defer cleanup()
+	ctx := givenIOContextWithInputContent(fmt.Sprint(expected))
 
-	actual := requestOptionalBool("", false)
+	actual := requestOptionalBool("", false, ctx)
 	assert.Equal(t, expected, actual)
 }
 
@@ -65,78 +61,69 @@ func TestRequestOptionalBoolWithInvalidInput(t *testing.T) {
 	t.Skip("Skipped due to instability (looks like buffering issue on the faked stdin)")
 	attempt1 := "12"
 	attempt2 := 1 // 1 == true
-	cleanup := givenStdInWith(fmt.Sprintf("%s\r\n%d", attempt1, attempt2))
-	defer cleanup()
+	ctx := givenIOContextWithInputContent(fmt.Sprintf("%s\r\n%d", attempt1, attempt2))
 
-	actual := requestOptionalBool("", false)
+	actual := requestOptionalBool("", false, ctx)
 	assert.Equal(t, true, actual)
 }
 
 func TestRequestOptionalBoolWithSkip(t *testing.T) {
-	cleanup := givenStdInWith("\r\n")
-	defer cleanup()
+	ctx := givenIOContextWithInputContent("\r\n")
 
-	actual := requestOptionalBool("", false)
+	actual := requestOptionalBool("", false, ctx)
 	assert.Equal(t, false, actual)
 }
 
 func TestQuestionYNWithPositiveInput(t *testing.T) {
-	cleanup := givenStdInWith("y")
-	defer cleanup()
+	ctx := givenIOContextWithInputContent("y")
 
-	actual := questionYN("")
+	actual := questionYN("", ctx)
 	assert.True(t, actual)
 }
 
 func TestQuestionYNWithNegativeInput(t *testing.T) {
-	cleanup := givenStdInWith("n")
-	defer cleanup()
+	ctx := givenIOContextWithInputContent("n")
 
-	actual := questionYN("")
+	actual := questionYN("", ctx)
 	assert.False(t, actual)
 }
 
 func TestQuestionYNWithEmptyResponse(t *testing.T) {
-	cleanup := givenStdInWith("")
-	defer cleanup()
+	ctx := givenIOContextWithInputContent("")
 
-	actual := questionYN("")
+	actual := questionYN("", ctx)
 	assert.False(t, actual) // empty == no
 }
 
 func TestRequestOptionalExistingDirectoryWithExistingDir(t *testing.T) {
 	path := os.TempDir()
-	cleanup := givenStdInWith(path)
-	defer cleanup()
+	ctx := givenIOContextWithInputContent(path)
 
-	actual := requestOptionalExistingDirectory("", "")
+	actual := requestOptionalExistingDirectory("", "", ctx)
 	assert.Equal(t, path, actual)
 }
 
 func TestRequestOptionalExistingDirectoryWithNonExistingDir(t *testing.T) {
 	attempt1 := path.Join(os.TempDir(), test.RandomString())
 	attempt2 := os.TempDir()
-	cleanup := givenStdInWith(fmt.Sprintf("%s\r\n%s", attempt1, attempt2))
-	defer cleanup()
+	ctx := givenIOContextWithInputContent(fmt.Sprintf("%s\r\n%s", attempt1, attempt2))
 
-	actual := requestOptionalExistingDirectory("", "")
+	actual := requestOptionalExistingDirectory("", "", ctx)
 	assert.Equal(t, attempt2, actual)
 }
 
 func TestRequestOptionalExistingDirectoryWithSkip(t *testing.T) {
-	cleanup := givenStdInWith("\r\n")
-	defer cleanup()
+	ctx := givenIOContextWithInputContent("\r\n")
 
-	actual := requestOptionalExistingDirectory("", "")
+	actual := requestOptionalExistingDirectory("", "", ctx)
 	assert.Equal(t, "", actual)
 }
 
 func TestRequestUint(t *testing.T) {
 	expected := test.RandomUint()
-	cleanup := givenStdInWith(fmt.Sprint(expected))
-	defer cleanup()
+	ctx := givenIOContextWithInputContent(fmt.Sprint(expected))
 
-	actual := requestUint("", false)
+	actual := requestUint("", false, ctx)
 	assert.Equal(t, expected, actual)
 }
 
@@ -146,17 +133,15 @@ func TestRequestRequiredUint(t *testing.T) {
 
 	attempt1 := -1
 	attempt2 := test.RandomUint()
-	cleanup := givenStdInWith(fmt.Sprintf("%d\r\n%d", attempt1, attempt2))
-	defer cleanup()
+	ctx := givenIOContextWithInputContent(fmt.Sprintf("%d\r\n%d", attempt1, attempt2))
 
-	actual := requestUint("", false)
+	actual := requestUint("", false, ctx)
 	assert.Equal(t, attempt2, actual)
 }
 
-func givenStdInWith(content string) func() {
-	StdinReader = uneatest.NewEmulatedStdinReader(content)
+func givenIOContextWithInputContent(content string) IOContext {
+	ctx := NewIOContext()
+	ctx.StdinReader = uneatest.NewEmulatedStdinReader(content)
 
-	return func() {
-		StdinReader = os.Stdin
-	}
+	return ctx
 }
