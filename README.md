@@ -19,6 +19,8 @@
   - [Usage](#usage)
   - [Configuration](#configuration)
   - [Report Formats](#report-formats)
+  - [Output Control](#output-control)
+    - [Terminal Detection](#terminal-detection)
 
 ## Main Features
 - Benchmark any number of commands
@@ -147,3 +149,15 @@ Timestamp,Scenario,Labels,Duration,Error
 2021-05-21T00:58:46+03:00,scenario B,example-label,3981022,false
 
 ```
+
+
+## Output Control
+By default `benchy` logs informative messages to standard err and report data to standard out (if no output file is specified). 
+However, there are several ways you can control what is logged and in what level of details.
+
+- `--pipe-stdout` and `--pipe-stderr` - pipe the standard out and err of executed benchmark commands respectively, to standard err.
+- `--silent` or `-s` - sets the logging level to the lowest level possible, which includes only fatal errors. That is a softer version of `2>/dev/null` and should be preferred in general.
+- `--debug` or `-d` - sets the logging level to the highest possible level, for troubleshooting.
+
+### Terminal Detection
+To make `benchy` scripting friendly, when standard outputs are not attached to a terminal, for example when redirects or pipes are used, logs and reports are written as plain text with no colors or other terminal effects.
