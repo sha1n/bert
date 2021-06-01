@@ -86,17 +86,13 @@ func configureNonInteractiveOutput(cmd *cobra.Command, ctx IOContext) (cancel co
 		log.SetFormatter(textFormatter)
 	}
 
-	if IsExperimentEnabled(cmd, richOutputExperimentName) {
+	if !GetBool(cmd, ArgNamePipeStdout) && IsExperimentEnabled(cmd, richOutputExperimentName) {
 		cancel = configureSpinner(ctx.StdoutWriter)
 		registerCursorGuard(ctx.StdoutWriter)
 
-		if !GetBool(cmd, ArgNamePipeStdout) && IsExperimentEnabled(cmd, richOutputExperimentName) {
-			cancel = configureSpinner(ctx.StdoutWriter)
-			registerCursorGuard(ctx.StdoutWriter)
-
-			log.StandardLogger().SetOutput(&alwaysRewritingWriter{log.StandardLogger().Out})
-		}
+		log.StandardLogger().SetOutput(&alwaysRewritingWriter{log.StandardLogger().Out})
 	}
+
 	return cancel
 }
 
