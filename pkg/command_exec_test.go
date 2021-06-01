@@ -6,6 +6,8 @@ import (
 	"testing"
 	"time"
 
+	log "github.com/sirupsen/logrus"
+
 	"os/exec"
 
 	"github.com/sha1n/benchy/api"
@@ -69,6 +71,30 @@ func TestConfigureCommandWithCustomEnv(t *testing.T) {
 	assert.Equal(t, defaultWorkingDir, execCmd.Dir)
 	assert.Equal(t, expectedEnvFor(env), execCmd.Env)
 	assert.Equal(t, cmd, execCmd.Args)
+}
+
+func TestConfigureCommandWithStdoutPiping(t *testing.T) {
+	execCmd := configureCommandWithIOSpec(true, false)
+
+	assert.Equal(t, log.StandardLogger().Out, execCmd.Stdout)
+	assert.Equal(t, nil, execCmd.Stderr)
+}
+
+func TestConfigureCommandWithStderrPiping(t *testing.T) {
+	execCmd := configureCommandWithIOSpec(false, true)
+
+	assert.Equal(t, nil, execCmd.Stdout)
+	assert.Equal(t, log.StandardLogger().Out, execCmd.Stderr)
+}
+
+func configureCommandWithIOSpec(pipeStdout, pipeStderr bool) *exec.Cmd {
+	spec := aCommandSpec(aNonExistingCommand(), "")
+	executor := NewCommandExecutor(pipeStdout, pipeStderr).(*commandExecutor)
+	execCmd := exec.Command(spec.Cmd[0], spec.Cmd[1:]...)
+
+	executor.configureCommand(spec, execCmd, "", map[string]string{})
+
+	return execCmd
 }
 
 func configureCommand(spec *api.CommandSpec, defaultWorkingDir string, env map[string]string) *exec.Cmd {
