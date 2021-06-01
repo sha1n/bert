@@ -15,9 +15,9 @@ var defaultIsValidFn = func(s string) bool { return true }
 
 // requestInput prompts for input, reads, validates it and returns it.
 // If 'required' is specified, the function will keep asking for inputs until a valid input is entered.
-func requestInput(prompt string, required bool, isValidFn IsValidFn) string {
+func requestInput(prompt string, required bool, isValidFn IsValidFn, ctx IOContext) string {
 	var str string
-	reader := bufio.NewReader(StdinReader)
+	reader := bufio.NewReader(ctx.StdinReader)
 
 	displayPrompt := func() {
 		if required {
@@ -39,9 +39,9 @@ func requestInput(prompt string, required bool, isValidFn IsValidFn) string {
 	}
 }
 
-func questionYN(prompt string) bool {
+func questionYN(prompt string, ctx IOContext) bool {
 	var str string
-	reader := bufio.NewReader(StdinReader)
+	reader := bufio.NewReader(ctx.StdinReader)
 
 	displayPrompt := func() {
 		_, _ = fmt.Printf("%s (y/n|enter): ", prompt)
@@ -59,11 +59,11 @@ func questionYN(prompt string) bool {
 	}
 }
 
-func requestString(prompt string, required bool) string {
-	return requestInput(prompt, required, defaultIsValidFn)
+func requestString(prompt string, required bool, ctx IOContext) string {
+	return requestInput(prompt, required, defaultIsValidFn, ctx)
 }
 
-func requestOptionalExistingDirectory(prompt string, defaultVal string) string {
+func requestOptionalExistingDirectory(prompt string, defaultVal string, ctx IOContext) string {
 	return requestInput(
 		formatOptionalPrompt(prompt, defaultVal),
 		false,
@@ -79,13 +79,14 @@ func requestOptionalExistingDirectory(prompt string, defaultVal string) string {
 
 			return exists
 		},
+		ctx,
 	)
 }
 
-func requestUint(prompt string, required bool) uint {
+func requestUint(prompt string, required bool, ctx IOContext) uint {
 	var str string
 	for {
-		str = requestInput(prompt, required, defaultIsValidFn)
+		str = requestInput(prompt, required, defaultIsValidFn, ctx)
 		if str == "" {
 			return 0
 		}
@@ -97,10 +98,10 @@ func requestUint(prompt string, required bool) uint {
 	}
 }
 
-func requestOptionalBool(prompt string, defaultVal bool) bool {
+func requestOptionalBool(prompt string, defaultVal bool, ctx IOContext) bool {
 	var str string
 	for {
-		str = requestInput(formatOptionalPrompt(prompt, defaultVal), false, defaultIsValidFn)
+		str = requestInput(formatOptionalPrompt(prompt, defaultVal), false, defaultIsValidFn, ctx)
 		if str == "" {
 			return false
 		}
@@ -112,9 +113,9 @@ func requestOptionalBool(prompt string, defaultVal bool) bool {
 	}
 }
 
-func requestCommandLine(prompt string, required bool) []string {
+func requestCommandLine(prompt string, required bool, ctx IOContext) []string {
 	var final []string
-	str := requestInput(prompt, required, defaultIsValidFn)
+	str := requestInput(prompt, required, defaultIsValidFn, ctx)
 	if str != "" {
 		final = parseCommand(str)
 	}

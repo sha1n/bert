@@ -25,13 +25,13 @@ var (
 )
 
 func TestBasicInteractiveFlow(t *testing.T) {
-	teardown := givenStdInWith(userInput())
+	ctx := givenIOContextWithInputContent(userInput())
+
+	rootCmd, configPath, teardown := configureCommand(t, ctx)
 	defer teardown()
 
-	rootCmd, configPath, teardown := configureCommand(t)
-	defer teardown()
-
-	rootCmd.Execute()
+	err := rootCmd.Execute()
+	assert.NoError(t, err)
 
 	actual, err := pkg.LoadSpec(configPath)
 
@@ -39,9 +39,9 @@ func TestBasicInteractiveFlow(t *testing.T) {
 	assert.Equal(t, expectedSpec(), actual)
 }
 
-func configureCommand(t *testing.T) (command *cobra.Command, configPath string, teardown func()) {
-	rootCmd := NewRootCommand(test.RandomString(), test.RandomString(), test.RandomString())
-	cmd := CreateConfigCommand()
+func configureCommand(t *testing.T, ctx IOContext) (command *cobra.Command, configPath string, teardown func()) {
+	rootCmd := NewRootCommand(test.RandomString(), test.RandomString(), test.RandomString(), ctx)
+	cmd := CreateConfigCommand(ctx)
 	rootCmd.AddCommand(cmd)
 
 	tmpFile, err := ioutil.TempFile("", "TestBasicInteractiveFlow")

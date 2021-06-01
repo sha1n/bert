@@ -22,10 +22,15 @@ const (
 	ArgNamePipeStdout = "pipe-stdout"
 	// ArgNamePipeStderr : program arg name
 	ArgNamePipeStderr = "pipe-stderr"
+
 	// ArgNameDebug : program arg name
 	ArgNameDebug = "debug"
 	// ArgNameSilent : program arg name
 	ArgNameSilent = "silent"
+
+	// ArgNameExperimental : enables a named experimental feature
+	ArgNameExperimental = "experimental"
+
 	// ArgNameLabel : program arg name
 	ArgNameLabel = "label"
 	// ArgNameHeaders : program arg name
@@ -45,8 +50,8 @@ const (
 
 // ResolveOutputArg resolves an output file argument based on user input.
 // If the specified argument is empty, stdout is returned.
-func ResolveOutputArg(cmd *cobra.Command, name string) io.WriteCloser {
-	var outputFile io.WriteCloser = stdOutNonClosingWriteCloser{}
+func ResolveOutputArg(cmd *cobra.Command, name string, ctx IOContext) io.WriteCloser {
+	var outputFile io.WriteCloser = stdOutNonClosingWriteCloser{out: ctx.StdoutWriter}
 	var err error = nil
 
 	if outputFilePath := GetString(cmd, name); outputFilePath != "" {
@@ -86,6 +91,19 @@ func GetStringSlice(cmd *cobra.Command, name string) []string {
 	return v
 }
 
+// IsExperimentEnabled checks whether the specified experiment is enabled by the command line
+func IsExperimentEnabled(cmd *cobra.Command, name string) bool {
+	if slice, err := cmd.Flags().GetStringSlice(ArgNameExperimental); err == nil {
+		for _, item := range slice {
+			if item == name {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
 // TODO this has been copied from pgk/command_exec.go. Maybe share or use an existing implementation if exists.
 func expandPath(path string) string {
 	if strings.HasPrefix(path, "~") {
@@ -99,14 +117,13 @@ func expandPath(path string) string {
 }
 
 // stdOutNonClosingWriteCloser a wrapper around os.Stdout that implements the io.WriteCloser interface but never closes the file
-type stdOutNonClosingWriteCloser struct{}
+type stdOutNonClosingWriteCloser struct {
+	out io.Writer
+}
 
 // Write forwards the call to standard output
 func (wc stdOutNonClosingWriteCloser) Write(b []byte) (int, error) {
-	logger := log.StandardLogger()
-	// logger.Writer().Write(b)
-	return logger.Out.Write(b)
-	// return os.Stdout.Write(b) //log.StandardLogger().Writer().Write(b)
+	return wc.out.Write(b)
 }
 
 // Close NOOP
