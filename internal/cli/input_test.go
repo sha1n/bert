@@ -57,14 +57,14 @@ func TestRequestOptionalBool(t *testing.T) {
 }
 
 func TestRequestOptionalBoolWithInvalidInput(t *testing.T) {
-	// FIXME this doesn't seem to be a real bug, but it just might...
-	t.Skip("Skipped due to instability (looks like buffering issue on the faked stdin)")
 	attempt1 := "12"
 	attempt2 := 1 // 1 == true
-	ctx := givenIOContextWithInputContent(fmt.Sprintf("%s\r\n%d", attempt1, attempt2))
+	userInputSequence := fmt.Sprintf(`%s
+%d`, attempt1, attempt2)
+	ctx := givenIOContextWithInputContent(userInputSequence)
 
 	actual := requestOptionalBool("", false, ctx)
-	assert.Equal(t, true, actual)
+	assert.True(t, actual)
 }
 
 func TestRequestOptionalBoolWithSkip(t *testing.T) {
@@ -144,16 +144,26 @@ func TestRequestUint(t *testing.T) {
 	assert.Equal(t, expected, actual)
 }
 
-func TestRequestRequiredUint(t *testing.T) {
-	// FIXME this doesn't seem to be a real bug, but it just might...
-	t.Skip("Skipped due to instability (looks like buffering issue on the faked stdin)")
-
-	attempt1 := -1
-	attempt2 := test.RandomUint()
-	ctx := givenIOContextWithInputContent(fmt.Sprintf("%d\r\n%d", attempt1, attempt2))
+func TestRequestUintWithEmptyInput(t *testing.T) {
+	expected := uint(0)
+	ctx := givenIOContextWithInputContent("\r\n")
 
 	actual := requestUint("", false, ctx)
-	assert.Equal(t, attempt2, actual)
+	assert.Equal(t, expected, actual)
+}
+
+func TestRequestUintWithInvalidInput(t *testing.T) {
+	expected := uint(2)
+	userInputSequence := fmt.Sprintf(`invalid
+-1
+%d`,
+		expected,
+	)
+
+	ctx := givenIOContextWithInputContent(userInputSequence)
+
+	actual := requestUint("", true, ctx)
+	assert.Equal(t, expected, actual)
 }
 
 func givenIOContextWithInputContent(content string) IOContext {
