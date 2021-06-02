@@ -106,10 +106,27 @@ func TestRequestOptionalExistingDirectoryWithExistingDir(t *testing.T) {
 func TestRequestOptionalExistingDirectoryWithNonExistingDir(t *testing.T) {
 	attempt1 := path.Join(os.TempDir(), test.RandomString())
 	attempt2 := os.TempDir()
-	ctx := givenIOContextWithInputContent(fmt.Sprintf("%s\r\n%s", attempt1, attempt2))
+	userInputSequence := fmt.Sprintf(`%s
+n
+%s`, attempt1, attempt2)
+
+	ctx := givenIOContextWithInputContent(userInputSequence)
 
 	actual := requestOptionalExistingDirectory("", "", ctx)
 	assert.Equal(t, attempt2, actual)
+}
+
+func TestRequestOptionalExistingDirectoryWithNonExistingDirAndAutoCreation(t *testing.T) {
+	userEnteredNonExistingDir := path.Join(os.TempDir(), test.RandomString())
+	userInputSequence := fmt.Sprintf(`%s
+y`,
+		userEnteredNonExistingDir,
+	)
+
+	ctx := givenIOContextWithInputContent(userInputSequence)
+
+	actual := requestOptionalExistingDirectory("", "", ctx)
+	assert.Equal(t, userEnteredNonExistingDir, actual)
 }
 
 func TestRequestOptionalExistingDirectoryWithSkip(t *testing.T) {
