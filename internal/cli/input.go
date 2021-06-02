@@ -71,11 +71,12 @@ func requestOptionalExistingDirectory(prompt string, defaultVal string, ctx IOCo
 			if path == "" {
 				return true
 			}
-			_, err := os.Stat(expandPath(path))
+			expandedPath := expandPath(path)
+			_, err := os.Stat(expandedPath)
 			exists := !os.IsNotExist(err)
 			if !exists {
 				if questionYN(fmt.Sprintf("the directory '%s' does not exist. create it now?", path), ctx) {
-					exists = os.MkdirAll(path, 0755) == nil
+					exists = os.MkdirAll(expandedPath, 0755) == nil
 				} else {
 					_, _ = printfRed("the directory '%s' does not exist\r\n", path)
 				}
