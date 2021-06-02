@@ -35,7 +35,7 @@ func createConfigFn(ctx IOContext) func(*cobra.Command, []string) {
 		writeCloser := ResolveOutputArg(cmd, ArgNameOutputFile, ctx)
 		defer writeCloser.Close()
 
-		spec := &api.BenchmarkSpec{
+		spec := api.BenchmarkSpec{
 			Executions: int(requestUint("number of executions", true, ctx)),
 			Alternate:  requestOptionalBool("alternate executions", false, ctx),
 			Scenarios:  requestScenarios(ctx),
@@ -50,8 +50,8 @@ func createConfigFn(ctx IOContext) func(*cobra.Command, []string) {
 	}
 }
 
-func requestScenarios(ctx IOContext) []*api.ScenarioSpec {
-	specs := []*api.ScenarioSpec{}
+func requestScenarios(ctx IOContext) []api.ScenarioSpec {
+	specs := []api.ScenarioSpec{}
 
 	for {
 		specs = append(specs, requestScenario(ctx))
@@ -101,8 +101,8 @@ func requestEnvVars(ctx IOContext) map[string]string {
 	return envVars
 }
 
-func requestScenario(ctx IOContext) *api.ScenarioSpec {
-	return &api.ScenarioSpec{
+func requestScenario(ctx IOContext) api.ScenarioSpec {
+	return api.ScenarioSpec{
 		Name:             requestString("scenario name", true, ctx),
 		WorkingDirectory: requestOptionalExistingDirectory("working directory", "inherits current", ctx),
 		Env:              requestEnvVars(ctx),

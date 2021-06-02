@@ -20,7 +20,7 @@ func TestSummaryReportHandlerFinalizeError(t *testing.T) {
 func testSummaryReportHandlerFinalizeWith(t *testing.T, expectedError error) {
 	tracer := NewTracer(1)
 	expectedSpec := exampleSpec()
-	expectedCtx := &api.ReportContext{}
+	expectedCtx := api.ReportContext{}
 
 	interceptor := newWriteReportInterceptor(expectedError)
 
@@ -41,8 +41,8 @@ func testSummaryReportHandlerFinalizeWith(t *testing.T, expectedError error) {
 }
 
 type writeReportInterceptor struct {
-	capturedSpec    *api.BenchmarkSpec
-	capturedCtx     *api.ReportContext
+	capturedSpec    api.BenchmarkSpec
+	capturedCtx     api.ReportContext
 	capturedSummary api.Summary
 	expectedError   error
 }
@@ -53,7 +53,7 @@ func newWriteReportInterceptor(expectedError error) *writeReportInterceptor {
 	}
 }
 
-func (i *writeReportInterceptor) intercept(summary api.Summary, spec *api.BenchmarkSpec, ctx *api.ReportContext) error {
+func (i *writeReportInterceptor) intercept(summary api.Summary, spec api.BenchmarkSpec, ctx api.ReportContext) error {
 	i.capturedSummary = summary
 	i.capturedSpec = spec
 	i.capturedCtx = ctx
@@ -61,10 +61,10 @@ func (i *writeReportInterceptor) intercept(summary api.Summary, spec *api.Benchm
 	return i.expectedError
 }
 
-func exampleSpec() *api.BenchmarkSpec {
-	return &api.BenchmarkSpec{
+func exampleSpec() api.BenchmarkSpec {
+	return api.BenchmarkSpec{
 		Executions: 1,
-		Scenarios: []*api.ScenarioSpec{
+		Scenarios: []api.ScenarioSpec{
 			{
 				Name: "scenario",
 				Command: &api.CommandSpec{

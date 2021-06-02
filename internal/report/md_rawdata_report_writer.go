@@ -13,13 +13,13 @@ import (
 
 // MarkdownStreamReportWriter a simple human readable test report writer
 type MarkdownStreamReportWriter struct {
-	writer *MarkdownTableWriter
-	ctx    *api.ReportContext
+	writer MarkdownTableWriter
+	ctx    api.ReportContext
 }
 
 // NewMarkdownStreamReportWriter returns a streaming CSV report writer.
-func NewMarkdownStreamReportWriter(writer *bufio.Writer, ctx *api.ReportContext) RawDataHandler {
-	w := &MarkdownStreamReportWriter{
+func NewMarkdownStreamReportWriter(writer *bufio.Writer, ctx api.ReportContext) RawDataHandler {
+	w := MarkdownStreamReportWriter{
 		writer: NewMarkdownTableWriter(writer),
 		ctx:    ctx,
 	}
@@ -32,7 +32,7 @@ func NewMarkdownStreamReportWriter(writer *bufio.Writer, ctx *api.ReportContext)
 }
 
 // Handle handles a real time trace event
-func (rw *MarkdownStreamReportWriter) Handle(trace api.Trace) (err error) {
+func (rw MarkdownStreamReportWriter) Handle(trace api.Trace) (err error) {
 	timeStr := time.Now().Format("2006-01-02T15:04:05Z07:00")
 	err = rw.writer.WriteRow([]string{
 		timeStr,
@@ -45,7 +45,7 @@ func (rw *MarkdownStreamReportWriter) Handle(trace api.Trace) (err error) {
 	return err
 }
 
-func (rw *MarkdownStreamReportWriter) writeHeaders() (err error) {
+func (rw MarkdownStreamReportWriter) writeHeaders() (err error) {
 	if rw.ctx.IncludeHeaders {
 		err = rw.writer.WriteHeaders(RawDataReportHeaders)
 	}

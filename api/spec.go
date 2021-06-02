@@ -20,12 +20,12 @@ type ScenarioSpec struct {
 
 // BenchmarkSpec benchmark specs top level structure
 type BenchmarkSpec struct {
-	Scenarios  []*ScenarioSpec `json:"scenarios" yaml:"scenarios" validate:"required,min=1,dive"`
-	Executions int             `validate:"required,gte=1"`
-	Alternate  bool            `json:"alternate,omitempty" yaml:"alternate,omitempty"`
+	Scenarios  []ScenarioSpec `json:"scenarios" yaml:"scenarios" validate:"required,min=1,dive"`
+	Executions int            `validate:"required,gte=1"`
+	Alternate  bool           `json:"alternate,omitempty" yaml:"alternate,omitempty"`
 }
 
 // ID returns a unique identifier
-func (s *ScenarioSpec) ID() string {
+func (s ScenarioSpec) ID() string {
 	return s.Name
 }

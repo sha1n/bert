@@ -61,7 +61,7 @@ func TestExecuteBenchmarkWithSetupAndTeardownSpecs(t *testing.T) {
 	assertScenarioCommand(spec.Scenarios[0].AfterAll, execRecordingMock.RecordedCommandSeq[7])
 }
 
-func executeWith(spec *api.BenchmarkSpec) *CmdRecordingExecutor {
+func executeWith(spec api.BenchmarkSpec) *CmdRecordingExecutor {
 	recordingCtx := recordingExecutionContext()
 
 	Execute(spec, recordingCtx)
@@ -69,7 +69,7 @@ func executeWith(spec *api.BenchmarkSpec) *CmdRecordingExecutor {
 	return recordingCtx.Executor.(*CmdRecordingExecutor)
 }
 
-func assertRecordedCommandWith(t *testing.T, scenario *api.ScenarioSpec) func(expected *api.CommandSpec, actual *RecordedExecutionParams) {
+func assertRecordedCommandWith(t *testing.T, scenario api.ScenarioSpec) func(expected *api.CommandSpec, actual *RecordedExecutionParams) {
 	return func(expected *api.CommandSpec, actual *RecordedExecutionParams) {
 		assert.Equal(t, expected, actual.Spec)
 		assert.Equal(t, scenario.WorkingDirectory, actual.DefaultWorkingDir)
@@ -77,18 +77,18 @@ func assertRecordedCommandWith(t *testing.T, scenario *api.ScenarioSpec) func(ex
 	}
 }
 
-func recordingExecutionContext() *api.ExecutionContext {
+func recordingExecutionContext() api.ExecutionContext {
 	return api.NewExecutionContext(
 		NewTracer(100),
 		&CmdRecordingExecutor{},
 	)
 }
 
-func aBasicSpecWith(alternate bool, executions int) *api.BenchmarkSpec {
-	return &api.BenchmarkSpec{
+func aBasicSpecWith(alternate bool, executions int) api.BenchmarkSpec {
+	return api.BenchmarkSpec{
 		Executions: executions,
 		Alternate:  alternate,
-		Scenarios: []*api.ScenarioSpec{
+		Scenarios: []api.ScenarioSpec{
 			{
 				Name: "scenario A",
 				Command: &api.CommandSpec{
@@ -107,11 +107,11 @@ func aBasicSpecWith(alternate bool, executions int) *api.BenchmarkSpec {
 	}
 }
 
-func aSpecWithSetupAndTeardownCommands(executions int) *api.BenchmarkSpec {
-	return &api.BenchmarkSpec{
+func aSpecWithSetupAndTeardownCommands(executions int) api.BenchmarkSpec {
+	return api.BenchmarkSpec{
 		Executions: executions,
 		Alternate:  false,
-		Scenarios: []*api.ScenarioSpec{
+		Scenarios: []api.ScenarioSpec{
 			{
 				Name:       "scenario",
 				BeforeAll:  &api.CommandSpec{Cmd: []string{"before", "all"}},

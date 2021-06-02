@@ -13,6 +13,7 @@ type fakeTrace struct {
 	error   error
 }
 
+// NewFakeTrace creates a fake trace with the specified data
 func NewFakeTrace(id string, elapsed time.Duration, err error) api.Trace {
 	return &fakeTrace{
 		id:      id,
@@ -33,6 +34,7 @@ func (t *fakeTrace) Error() error {
 	return t.error
 }
 
+// NewFakeSummary creates a new fake summary object with the specified trace events
 func NewFakeSummary(traces ...api.Trace) api.Summary {
 	traceByID := map[string][]api.Trace{}
 

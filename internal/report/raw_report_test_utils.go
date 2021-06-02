@@ -14,10 +14,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var randomLabels = test.RandomLabels()
+var randomLabels = test.RandomStrings()
 
 // GetRawDataHandler a provider for a RawDataHandler instance
-type GetRawDataHandler = func(*bufio.Writer, *api.ReportContext) RawDataHandler
+type GetRawDataHandler = func(*bufio.Writer, api.ReportContext) RawDataHandler
 
 // ParseRecords parses report records from a reader
 type ParseRecords = func(io.Reader) ([][]string, error)
@@ -35,7 +35,7 @@ func assertRawTraceRecord(t *testing.T, trace api.Trace, actualRecord []string) 
 
 func writeRawReport(t *testing.T, getHandler GetRawDataHandler, parseRecords ParseRecords, includeHeaders bool, traces ...api.Trace) [][]string {
 	buf := new(bytes.Buffer)
-	ctx := &api.ReportContext{
+	ctx := api.ReportContext{
 		Labels:         randomLabels,
 		IncludeHeaders: includeHeaders,
 	}
