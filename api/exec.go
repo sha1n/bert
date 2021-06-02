@@ -12,8 +12,8 @@ type ExecutionContext struct {
 }
 
 // NewExecutionContext creates a new ExecutionContext.
-func NewExecutionContext(tracer Tracer, executor CommandExecutor) *ExecutionContext {
-	return &ExecutionContext{
+func NewExecutionContext(tracer Tracer, executor CommandExecutor) ExecutionContext {
+	return ExecutionContext{
 		Executor: executor,
 		Tracer:   tracer,
 	}

@@ -17,14 +17,14 @@ type csvReportWriter struct {
 
 // NewCsvReportWriter returns a CSV report write handler.
 func NewCsvReportWriter(writer *bufio.Writer) api.WriteSummaryReportFn {
-	w := &csvReportWriter{
+	w := csvReportWriter{
 		writer: csv.NewWriter(writer),
 	}
 
 	return w.Write
 }
 
-func (rw *csvReportWriter) Write(summary api.Summary, config *api.BenchmarkSpec, ctx *api.ReportContext) (err error) {
+func (rw csvReportWriter) Write(summary api.Summary, config api.BenchmarkSpec, ctx api.ReportContext) (err error) {
 	defer rw.writer.Flush()
 
 	if ctx.IncludeHeaders {

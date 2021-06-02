@@ -17,14 +17,14 @@ type MarkdownTableWriter struct {
 }
 
 // NewMarkdownTableWriter creates a new markdown table writer with the specified buffered writer.
-func NewMarkdownTableWriter(writer *bufio.Writer) *MarkdownTableWriter {
-	return &MarkdownTableWriter{
+func NewMarkdownTableWriter(writer *bufio.Writer) MarkdownTableWriter {
+	return MarkdownTableWriter{
 		writer: writer,
 	}
 }
 
 // WriteHeaders writes table headers line
-func (tw *MarkdownTableWriter) WriteHeaders(headers []string) (err error) {
+func (tw MarkdownTableWriter) WriteHeaders(headers []string) (err error) {
 	if err = tw.WriteRow(headers); err == nil {
 		err = tw.writeString(fmt.Sprintf("%s|\r\n", strings.Repeat("|----", len(headers))))
 	}
@@ -33,12 +33,12 @@ func (tw *MarkdownTableWriter) WriteHeaders(headers []string) (err error) {
 }
 
 // WriteRow writes a row line
-func (tw *MarkdownTableWriter) WriteRow(row []string) (err error) {
+func (tw MarkdownTableWriter) WriteRow(row []string) (err error) {
 	// TODO theoretically we need to escape '|' chars
 	return tw.writeString(fmt.Sprintf("|%s|\r\n", strings.Join(row, "|")))
 }
 
-func (tw *MarkdownTableWriter) writeString(str string) error {
+func (tw MarkdownTableWriter) writeString(str string) error {
 	defer tw.writer.Flush()
 	_, err := tw.writer.WriteString(str)
 	return err

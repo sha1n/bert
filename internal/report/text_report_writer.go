@@ -36,7 +36,7 @@ func NewTextReportWriter(writer *bufio.Writer, colorsOn bool) api.WriteSummaryRe
 		fmtRed, fmtGreen, fmtYellow, fmtBold = fmt.Sprintf, fmt.Sprintf, fmt.Sprintf, fmt.Sprintf
 	}
 
-	w := &textReportWriter{
+	w := textReportWriter{
 		writer:    writer,
 		fmtRed:    fmtRed,
 		fmtGreen:  fmtGreen,
@@ -47,7 +47,7 @@ func NewTextReportWriter(writer *bufio.Writer, colorsOn bool) api.WriteSummaryRe
 	return w.Write
 }
 
-func (trw *textReportWriter) Write(summary api.Summary, config *api.BenchmarkSpec, ctx *api.ReportContext) (err error) {
+func (trw textReportWriter) Write(summary api.Summary, config api.BenchmarkSpec, ctx api.ReportContext) (err error) {
 	trw.writeNewLine()
 	trw.writeTitle("BENCHMARK SUMMARY")
 	trw.writeLabels(ctx.Labels)
@@ -79,39 +79,39 @@ func (trw *textReportWriter) Write(summary api.Summary, config *api.BenchmarkSpe
 	return nil
 }
 
-func (trw *textReportWriter) writeNewLine() {
+func (trw textReportWriter) writeNewLine() {
 	trw.writeString("\r\n")
 }
 
-func (trw *textReportWriter) println(s string) {
+func (trw textReportWriter) println(s string) {
 	trw.writeString(fmt.Sprintf("%s\r\n", s))
 }
 
-func (trw *textReportWriter) writeTitle(title string) {
+func (trw textReportWriter) writeTitle(title string) {
 	line := strings.Repeat("-", len(title)+2)
 	trw.println(line)
 	trw.println(trw.fmtGreen(" %s ", title))
 	trw.println(line)
 }
 
-func (trw *textReportWriter) writeLabels(labels []string) {
+func (trw textReportWriter) writeLabels(labels []string) {
 	trw.writeStatTitle("labels")
 	trw.writeString(fmt.Sprintf("%s\r\n", strings.Join(labels, ",")))
 }
 
-func (trw *textReportWriter) writeDate(time time.Time) {
+func (trw textReportWriter) writeDate(time time.Time) {
 	trw.writeStatTitle("date")
 	timeStr := time.Format("Jan 02 2006")
 	trw.writeString(fmt.Sprintf("%s\r\n", timeStr))
 }
 
-func (trw *textReportWriter) writeTime(time time.Time) {
+func (trw textReportWriter) writeTime(time time.Time) {
 	trw.writeStatTitle("time")
 	timeStr := time.Format("15:04:05Z07:00")
 	trw.writeString(fmt.Sprintf("%s\r\n", timeStr))
 }
 
-func (trw *textReportWriter) writeStatNano2Sec(name string, f func() (float64, error)) {
+func (trw textReportWriter) writeStatNano2Sec(name string, f func() (float64, error)) {
 	value, err := f()
 	if err == nil {
 		trw.writeStatTitle(name)
@@ -121,7 +121,7 @@ func (trw *textReportWriter) writeStatNano2Sec(name string, f func() (float64, e
 	}
 }
 
-func (trw *textReportWriter) writeErrorRateStat(name string, f func() float64) {
+func (trw textReportWriter) writeErrorRateStat(name string, f func() float64) {
 	trw.writeStatTitle(name)
 
 	value := f()
@@ -133,7 +133,7 @@ func (trw *textReportWriter) writeErrorRateStat(name string, f func() float64) {
 	}
 }
 
-func (trw *textReportWriter) writeInt64Stat(name string, f func() (int64, error)) {
+func (trw textReportWriter) writeInt64Stat(name string, f func() (int64, error)) {
 	value, err := f()
 	if err == nil {
 		trw.writeStatTitle(name)
@@ -143,21 +143,21 @@ func (trw *textReportWriter) writeInt64Stat(name string, f func() (int64, error)
 	}
 }
 
-func (trw *textReportWriter) writeBoolProperty(name string, value bool) {
+func (trw textReportWriter) writeBoolProperty(name string, value bool) {
 	trw.writeStatTitle(name)
 	trw.writeString(fmt.Sprintf("%v\r\n", value))
 }
 
-func (trw *textReportWriter) writeStatTitle(name string) {
+func (trw textReportWriter) writeStatTitle(name string) {
 	trw.writeString(trw.fmtBold("%11s: ", name))
 }
 
-func (trw *textReportWriter) writeStatError(name string) {
+func (trw textReportWriter) writeStatError(name string) {
 	trw.writeString(trw.fmtBold("%11s: ", name))
 	trw.writeString(trw.fmtRed("%s\r\n", "ERROR"))
 }
 
-func (trw *textReportWriter) writeString(str string) {
+func (trw textReportWriter) writeString(str string) {
 	_, err := trw.writer.WriteString(str)
 	if err != nil {
 		log.Error(err)

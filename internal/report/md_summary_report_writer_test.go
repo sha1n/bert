@@ -57,8 +57,8 @@ func generateTestMdReport(t *testing.T, includeHeaders bool) ([]string, api.Summ
 	t2 := test.NewFakeTrace(spec.Scenarios[1].ID(), 2, errors.New("err2"))
 
 	summary := test.NewFakeSummary(t1, t2)
-	ctx := &api.ReportContext{
-		Labels:         test.RandomLabels(),
+	ctx := api.ReportContext{
+		Labels:         test.RandomStrings(),
 		IncludeHeaders: includeHeaders,
 	}
 
@@ -72,10 +72,10 @@ func generateTestMdReport(t *testing.T, includeHeaders bool) ([]string, api.Summ
 	return lines, summary
 }
 
-func aTwoScenarioSpec() *api.BenchmarkSpec {
-	return &api.BenchmarkSpec{
+func aTwoScenarioSpec() api.BenchmarkSpec {
+	return api.BenchmarkSpec{
 		Executions: 1,
-		Scenarios: []*api.ScenarioSpec{
+		Scenarios: []api.ScenarioSpec{
 			{
 				Name: test.RandomString(),
 				Command: &api.CommandSpec{

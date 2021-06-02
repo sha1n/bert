@@ -61,7 +61,7 @@ func expectedTitleFor(id api.Identifiable) string {
 	return fmt.Sprintf("SCENARIO: '%s'", id.ID())
 }
 
-func writeTxtReport(t *testing.T, summary api.Summary, spec *api.BenchmarkSpec) (string, []string) {
+func writeTxtReport(t *testing.T, summary api.Summary, spec api.BenchmarkSpec) (string, []string) {
 	buf := new(bytes.Buffer)
 
 	txtWriter := NewTextReportWriter(bufio.NewWriter(buf), false)
@@ -69,7 +69,7 @@ func writeTxtReport(t *testing.T, summary api.Summary, spec *api.BenchmarkSpec) 
 		txtWriter(
 			summary,
 			spec,
-			&api.ReportContext{
+			api.ReportContext{
 				Labels:         randomLabels,
 				IncludeHeaders: false,
 			}),

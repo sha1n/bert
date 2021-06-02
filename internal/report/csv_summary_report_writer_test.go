@@ -88,8 +88,8 @@ func writeCsvReport(t *testing.T, summary api.Summary, includeHeaders bool) [][]
 	assert.NoError(t,
 		csvWriter(
 			summary,
-			nil, /* unused */
-			&api.ReportContext{
+			api.BenchmarkSpec{}, /* unused */
+			api.ReportContext{
 				Labels:         randomLabels,
 				IncludeHeaders: includeHeaders,
 			}),

@@ -24,7 +24,7 @@ func TestStreamReportHandlerFinalizeTraceError(t *testing.T) {
 func testStreamReportHandlerFinalizeWith(t *testing.T, expectedHandleError error, expectedTraceError error) {
 	tracer := NewTracer(1)
 	expectedSpec := exampleSpec()
-	expectedCtx := &api.ReportContext{}
+	expectedCtx := api.ReportContext{}
 
 	interceptor := newHandleInterceptor(expectedHandleError)
 

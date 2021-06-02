@@ -66,7 +66,7 @@ func runFn(ctx IOContext) func(*cobra.Command, []string) {
 
 		log.Info("Starting benchy...")
 
-		var spec *api.BenchmarkSpec
+		var spec api.BenchmarkSpec
 		spec, err = loadSpec(cmd)
 		CheckBenchmarkInitFatal(err)
 
@@ -88,7 +88,7 @@ func runFn(ctx IOContext) func(*cobra.Command, []string) {
 
 }
 
-func loadSpec(cmd *cobra.Command) (spec *api.BenchmarkSpec, err error) {
+func loadSpec(cmd *cobra.Command) (spec api.BenchmarkSpec, err error) {
 	var filePath string
 	filePath = GetString(cmd, ArgNameConfig)
 	filePath, err = filepath.Abs(expandPath(filePath))
@@ -107,7 +107,7 @@ func loadSpec(cmd *cobra.Command) (spec *api.BenchmarkSpec, err error) {
 	return spec, err
 }
 
-func resolveReportHandler(cmd *cobra.Command, spec *api.BenchmarkSpec, ctx IOContext) (handler api.ReportHandler, closer io.Closer, err error) {
+func resolveReportHandler(cmd *cobra.Command, spec api.BenchmarkSpec, ctx IOContext) (handler api.ReportHandler, closer io.Closer, err error) {
 	reportCtx := resolveReportContext(cmd)
 	writeCloser := ResolveOutputArg(cmd, ArgNameOutputFile, ctx)
 	writer := bufio.NewWriter(writeCloser)
@@ -142,14 +142,14 @@ func resolveReportHandler(cmd *cobra.Command, spec *api.BenchmarkSpec, ctx IOCon
 	return handler, writeCloser, err
 }
 
-func resolveReportContext(cmd *cobra.Command) *api.ReportContext {
-	return &api.ReportContext{
+func resolveReportContext(cmd *cobra.Command) api.ReportContext {
+	return api.ReportContext{
 		Labels:         GetStringSlice(cmd, ArgNameLabel),
 		IncludeHeaders: GetBool(cmd, ArgNameHeaders),
 	}
 }
 
-func resolveExecutionContext(cmd *cobra.Command, tracer api.Tracer) *api.ExecutionContext {
+func resolveExecutionContext(cmd *cobra.Command, tracer api.Tracer) api.ExecutionContext {
 	pipeStdOut := GetBool(cmd, ArgNamePipeStdout)
 	pipeStdErr := GetBool(cmd, ArgNamePipeStderr)
 

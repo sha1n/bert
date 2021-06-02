@@ -5,16 +5,16 @@ import (
 )
 
 type summaryReportHandler struct {
-	spec          *api.BenchmarkSpec
-	ctx           *api.ReportContext
-	sink          *TraceSink
+	spec          api.BenchmarkSpec
+	ctx           api.ReportContext
+	sink          TraceSink
 	unsubscribe   Unsubscribe
 	writeReportFn api.WriteSummaryReportFn
 }
 
 // NewSummaryReportHandler create summary report subscriber
 // Summary report handlers typically need to accumulate all the data in order to generate a report.
-func NewSummaryReportHandler(spec *api.BenchmarkSpec, ctx *api.ReportContext, writeReportFn api.WriteSummaryReportFn) api.ReportHandler {
+func NewSummaryReportHandler(spec api.BenchmarkSpec, ctx api.ReportContext, writeReportFn api.WriteSummaryReportFn) api.ReportHandler {
 	return &summaryReportHandler{
 		spec:          spec,
 		ctx:           ctx,
@@ -23,7 +23,7 @@ func NewSummaryReportHandler(spec *api.BenchmarkSpec, ctx *api.ReportContext, wr
 }
 
 func (h *summaryReportHandler) Subscribe(stream api.TraceStream) {
-	h.sink = NewTraceSink(stream)
+	h.sink = *NewTraceSink(stream)
 	h.unsubscribe = h.sink.Subscribe()
 }
 

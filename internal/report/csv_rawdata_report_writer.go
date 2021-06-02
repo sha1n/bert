@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"encoding/csv"
+
 	log "github.com/sirupsen/logrus"
 
 	"github.com/sha1n/benchy/api"
@@ -15,12 +16,12 @@ import (
 // CsvStreamReportWriter a simple human readable test report writer
 type CsvStreamReportWriter struct {
 	writer *csv.Writer
-	ctx    *api.ReportContext
+	ctx    api.ReportContext
 }
 
 // NewCsvStreamReportWriter returns a streaming CSV report writer.
-func NewCsvStreamReportWriter(writer *bufio.Writer, ctx *api.ReportContext) RawDataHandler {
-	w := &CsvStreamReportWriter{
+func NewCsvStreamReportWriter(writer *bufio.Writer, ctx api.ReportContext) RawDataHandler {
+	w := CsvStreamReportWriter{
 		writer: csv.NewWriter(writer),
 		ctx:    ctx,
 	}
@@ -32,7 +33,7 @@ func NewCsvStreamReportWriter(writer *bufio.Writer, ctx *api.ReportContext) RawD
 	return w
 }
 
-func (rw *CsvStreamReportWriter) writeHeaders() (err error) {
+func (rw CsvStreamReportWriter) writeHeaders() (err error) {
 	if rw.ctx.IncludeHeaders {
 		err = rw.writer.Write(RawDataReportHeaders)
 	}
@@ -41,7 +42,7 @@ func (rw *CsvStreamReportWriter) writeHeaders() (err error) {
 }
 
 // Handle handles a real time trace event
-func (rw *CsvStreamReportWriter) Handle(trace api.Trace) (err error) {
+func (rw CsvStreamReportWriter) Handle(trace api.Trace) (err error) {
 	defer rw.writer.Flush()
 
 	timeStr := time.Now().Format(TabularReportDateFormat)

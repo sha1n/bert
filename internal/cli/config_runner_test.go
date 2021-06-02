@@ -83,13 +83,13 @@ func userInput() string {
 		userInputExecutions, userInputAlternate, userInputScenarioName, userInputScenarioWorkingDir, userInputDefineEnvVarsAnswer, userInputEnvVarValue, userInputCommand)
 }
 
-func expectedSpec() *api.BenchmarkSpec {
+func expectedSpec() api.BenchmarkSpec {
 	kv := strings.Split(userInputEnvVarValue, "=")
 
-	return &api.BenchmarkSpec{
+	return api.BenchmarkSpec{
 		Executions: int(userInputExecutions),
 		Alternate:  userInputAlternate,
-		Scenarios: []*api.ScenarioSpec{
+		Scenarios: []api.ScenarioSpec{
 			{
 				Name:             userInputScenarioName,
 				WorkingDirectory: userInputScenarioWorkingDir,
