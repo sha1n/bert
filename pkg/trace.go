@@ -16,20 +16,20 @@ type trace struct {
 	error   error
 }
 
-func (t *trace) ID() string {
+func (t trace) ID() string {
 	return t.id
 }
 
-func (t *trace) Elapsed() time.Duration {
+func (t trace) Elapsed() time.Duration {
 	return t.elapsed
 }
 
-func (t *trace) Error() error {
+func (t trace) Error() error {
 	return t.error
 }
 
-func newTrace(id string) *trace {
-	return &trace{
+func newTrace(id string) trace {
+	return trace{
 		id:    id,
 		start: time.Now(),
 	}
@@ -48,7 +48,7 @@ func (tr *tracer) Start(i api.Identifiable) api.End {
 	return tr.endFn(t)
 }
 
-func (tr *tracer) endFn(t *trace) api.End {
+func (tr *tracer) endFn(t trace) api.End {
 	return func(exitError error) {
 		t.elapsed = time.Since(t.start)
 		t.error = exitError

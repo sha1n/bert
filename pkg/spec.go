@@ -21,7 +21,7 @@ import (
 )
 
 // LoadSpec loads benchmark specs from the specified file.
-func LoadSpec(path string) (*api.BenchmarkSpec, error) {
+func LoadSpec(path string) (api.BenchmarkSpec, error) {
 	var unmarshalFn func([]byte, interface{}) error
 
 	log.Infof("Loading benchmark specs from '%s'...", path)
@@ -36,7 +36,7 @@ func LoadSpec(path string) (*api.BenchmarkSpec, error) {
 }
 
 // SaveSpec saves the specified spec to the provided writer in YAML format and closes.
-func SaveSpec(spec *api.BenchmarkSpec, wc io.WriteCloser) (err error) {
+func SaveSpec(spec api.BenchmarkSpec, wc io.WriteCloser) (err error) {
 	if err = validate(spec); err != nil {
 		return err
 	}
@@ -44,7 +44,7 @@ func SaveSpec(spec *api.BenchmarkSpec, wc io.WriteCloser) (err error) {
 	return save(spec, wc)
 }
 
-func save(spec *api.BenchmarkSpec, wc io.WriteCloser) (err error) {
+func save(spec api.BenchmarkSpec, wc io.WriteCloser) (err error) {
 	var data []byte
 	if data, err = yaml.Marshal(spec); err == nil {
 		_, err = wc.Write(data)
@@ -57,7 +57,7 @@ func save(spec *api.BenchmarkSpec, wc io.WriteCloser) (err error) {
 	return err
 }
 
-func load(path string, unmarshal func([]byte, interface{}) error) (spec *api.BenchmarkSpec, err error) {
+func load(path string, unmarshal func([]byte, interface{}) error) (spec api.BenchmarkSpec, err error) {
 	var bytes []byte
 	if bytes, err = os.ReadFile(path); err == nil {
 		err = unmarshal(bytes, &spec)
@@ -70,7 +70,7 @@ func load(path string, unmarshal func([]byte, interface{}) error) (spec *api.Ben
 	return spec, err
 }
 
-func validate(spec *api.BenchmarkSpec) (err error) {
+func validate(spec api.BenchmarkSpec) (err error) {
 	v := validator.New()
 	english := en.New()
 	uni := ut.New(english, english)

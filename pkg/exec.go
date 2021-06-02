@@ -6,7 +6,7 @@ import (
 )
 
 // Execute executes a benchmark and returns an object that provides access to collected stats.
-func Execute(spec *api.BenchmarkSpec, ctx *api.ExecutionContext) {
+func Execute(spec api.BenchmarkSpec, ctx api.ExecutionContext) {
 	if spec.Alternate {
 		executeAlternately(spec, ctx)
 	} else {
@@ -14,7 +14,7 @@ func Execute(spec *api.BenchmarkSpec, ctx *api.ExecutionContext) {
 	}
 }
 
-func executeAlternately(spec *api.BenchmarkSpec, ctx *api.ExecutionContext) {
+func executeAlternately(spec api.BenchmarkSpec, ctx api.ExecutionContext) {
 	for i := 1; i <= spec.Executions; i++ {
 		for si := range spec.Scenarios {
 			scenario := spec.Scenarios[si]
@@ -30,7 +30,7 @@ func executeAlternately(spec *api.BenchmarkSpec, ctx *api.ExecutionContext) {
 	}
 }
 
-func executeSequentially(spec *api.BenchmarkSpec, ctx *api.ExecutionContext) {
+func executeSequentially(spec api.BenchmarkSpec, ctx api.ExecutionContext) {
 	for si := range spec.Scenarios {
 		scenario := spec.Scenarios[si]
 
@@ -42,21 +42,21 @@ func executeSequentially(spec *api.BenchmarkSpec, ctx *api.ExecutionContext) {
 	}
 }
 
-func executeScenarioSetup(scenario *api.ScenarioSpec, ctx *api.ExecutionContext) {
+func executeScenarioSetup(scenario api.ScenarioSpec, ctx api.ExecutionContext) {
 	if scenario.BeforeAll != nil {
 		log.Debugf("Running setup for scenario '%s'...", scenario.Name)
 		logError(ctx.Executor.Execute(scenario.BeforeAll, scenario.WorkingDirectory, scenario.Env))
 	}
 }
 
-func executeScenarioTeardown(scenario *api.ScenarioSpec, ctx *api.ExecutionContext) {
+func executeScenarioTeardown(scenario api.ScenarioSpec, ctx api.ExecutionContext) {
 	if scenario.BeforeAll != nil {
 		log.Debugf("Running teardown for scenario '%s'...", scenario.Name)
 		logError(ctx.Executor.Execute(scenario.AfterAll, scenario.WorkingDirectory, scenario.Env))
 	}
 }
 
-func executeScenarioCommand(scenario *api.ScenarioSpec, execIndex int, totalExec int, ctx *api.ExecutionContext) {
+func executeScenarioCommand(scenario api.ScenarioSpec, execIndex int, totalExec int, ctx api.ExecutionContext) {
 	log.Infof("Executing scenario '%s'... (%d/%d)", scenario.Name, execIndex, totalExec)
 	if scenario.BeforeEach != nil {
 		log.Debugf("Executing 'before' command %v", scenario.BeforeEach.Cmd)

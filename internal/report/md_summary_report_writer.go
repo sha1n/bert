@@ -10,19 +10,19 @@ import (
 
 // mdReportWriter a simple human readable test report writer
 type mdReportWriter struct {
-	tableWriter *MarkdownTableWriter
+	tableWriter MarkdownTableWriter
 }
 
 // NewMarkdownSummaryReportWriter returns a Markdown report write handler.
 func NewMarkdownSummaryReportWriter(writer *bufio.Writer) api.WriteSummaryReportFn {
-	w := &mdReportWriter{
+	w := mdReportWriter{
 		tableWriter: NewMarkdownTableWriter(writer),
 	}
 
 	return w.Write
 }
 
-func (rw *mdReportWriter) Write(summary api.Summary, spec *api.BenchmarkSpec, ctx *api.ReportContext) (err error) {
+func (rw mdReportWriter) Write(summary api.Summary, spec api.BenchmarkSpec, ctx api.ReportContext) (err error) {
 	if ctx.IncludeHeaders {
 		err = rw.tableWriter.WriteHeaders(SummaryReportHeaders)
 	}

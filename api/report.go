@@ -7,7 +7,7 @@ type ReportContext struct {
 }
 
 // WriteSummaryReportFn a benchmark report handler
-type WriteSummaryReportFn = func(Summary, *BenchmarkSpec, *ReportContext) error
+type WriteSummaryReportFn = func(Summary, BenchmarkSpec, ReportContext) error
 
 // ReportHandler an async handler
 type ReportHandler interface {

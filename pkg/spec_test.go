@@ -64,11 +64,11 @@ func testLoad(t *testing.T, filePath string) {
 	assert.Equal(t, expected, benchmark)
 }
 
-func expectedBenchmarkSpec() *api.BenchmarkSpec {
-	return &api.BenchmarkSpec{
+func expectedBenchmarkSpec() api.BenchmarkSpec {
+	return api.BenchmarkSpec{
 		Executions: 10,
 		Alternate:  true,
-		Scenarios: []*api.ScenarioSpec{
+		Scenarios: []api.ScenarioSpec{
 			{
 				Name:             "scenario A",
 				WorkingDirectory: "/tmp",
@@ -101,7 +101,7 @@ func expectedBenchmarkSpec() *api.BenchmarkSpec {
 
 }
 
-func loadYaml(t *testing.T, filePath string) (spec *api.BenchmarkSpec, err error) {
+func loadYaml(t *testing.T, filePath string) (spec api.BenchmarkSpec, err error) {
 	var bytes []byte
 	bytes, err = os.ReadFile(filePath)
 	assert.NoError(t, err)
