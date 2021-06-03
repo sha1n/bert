@@ -85,12 +85,12 @@ func configureRichOutput(cmd *cobra.Command, ctx IOContext) (cancel context.Canc
 			DisableTimestamp: true,
 			ForceColors:      true, // TTY mode
 		})
-	}
 
-	if IsExperimentEnabled(cmd, richOutputExperimentName) {
-		cancel = configureSpinner(ctx.StdoutWriter)
+		if IsExperimentEnabled(cmd, richOutputExperimentName) {
+			cancel = configureSpinner(ctx.StdoutWriter)
 
-		log.StandardLogger().SetOutput(&alwaysRewritingWriter{log.StandardLogger().Out})
+			log.StandardLogger().SetOutput(&alwaysRewritingWriter{log.StandardLogger().Out})
+		}
 	}
 
 	return cancel
