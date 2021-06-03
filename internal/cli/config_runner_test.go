@@ -9,19 +9,19 @@ import (
 
 	"github.com/sha1n/benchy/api"
 	"github.com/sha1n/benchy/pkg"
-	"github.com/sha1n/benchy/test"
+	clibtest "github.com/sha1n/clib/pkg/test"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 )
 
 var (
-	userInputExecutions          = test.RandomUint()
-	userInputAlternate           = test.RandomBool()
-	userInputScenarioName        = test.RandomString()
+	userInputExecutions          = clibtest.RandomUint()
+	userInputAlternate           = clibtest.RandomBool()
+	userInputScenarioName        = clibtest.RandomString()
 	userInputScenarioWorkingDir  = os.TempDir() // has to exist
 	userInputDefineEnvVarsAnswer = "y"
-	userInputEnvVarValue         = fmt.Sprintf("X=%s", test.RandomString())
-	userInputCommand             = fmt.Sprintf("cmd %s", test.RandomString())
+	userInputEnvVarValue         = fmt.Sprintf("X=%s", clibtest.RandomString())
+	userInputCommand             = fmt.Sprintf("cmd %s", clibtest.RandomString())
 )
 
 func TestBasicInteractiveFlow(t *testing.T) {
@@ -40,7 +40,7 @@ func TestBasicInteractiveFlow(t *testing.T) {
 }
 
 func configureCommand(t *testing.T, ctx IOContext) (command *cobra.Command, configPath string, teardown func()) {
-	rootCmd := NewRootCommand(test.RandomString(), test.RandomString(), test.RandomString(), ctx)
+	rootCmd := NewRootCommand(clibtest.RandomString(), clibtest.RandomString(), clibtest.RandomString(), ctx)
 	cmd := CreateConfigCommand(ctx)
 	rootCmd.AddCommand(cmd)
 

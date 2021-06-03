@@ -3,7 +3,7 @@ package cli
 import (
 	"testing"
 
-	"github.com/sha1n/benchy/test"
+	clibtest "github.com/sha1n/clib/pkg/test"
 	"github.com/sha1n/termite"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -62,7 +62,7 @@ func TestTtyMode(t *testing.T) {
 
 func aCommandWithArgs(ctx IOContext, args ...string) *cobra.Command {
 	ioContext := NewIOContext()
-	rootCmd := NewRootCommand(test.RandomString(), test.RandomString(), test.RandomString(), ioContext)
+	rootCmd := NewRootCommand(clibtest.RandomString(), clibtest.RandomString(), clibtest.RandomString(), ioContext)
 	rootCmd.SetArgs(append(args, "--config=../../test/data/integration.yaml"))
 
 	return rootCmd

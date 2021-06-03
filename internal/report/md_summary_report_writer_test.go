@@ -9,6 +9,7 @@ import (
 
 	"github.com/sha1n/benchy/api"
 	"github.com/sha1n/benchy/test"
+	clibtest "github.com/sha1n/clib/pkg/test"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -58,7 +59,7 @@ func generateTestMdReport(t *testing.T, includeHeaders bool) ([]string, api.Summ
 
 	summary := test.NewFakeSummary(t1, t2)
 	ctx := api.ReportContext{
-		Labels:         test.RandomStrings(),
+		Labels:         clibtest.RandomStrings(),
 		IncludeHeaders: includeHeaders,
 	}
 
@@ -77,13 +78,13 @@ func aTwoScenarioSpec() api.BenchmarkSpec {
 		Executions: 1,
 		Scenarios: []api.ScenarioSpec{
 			{
-				Name: test.RandomString(),
+				Name: clibtest.RandomString(),
 				Command: &api.CommandSpec{
 					Cmd: []string{"cmd"},
 				},
 			},
 			{
-				Name: test.RandomString(),
+				Name: clibtest.RandomString(),
 				Command: &api.CommandSpec{
 					Cmd: []string{"cmd"},
 				},
