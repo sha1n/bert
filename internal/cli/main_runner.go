@@ -64,9 +64,10 @@ func runFn(ctx IOContext) func(*cobra.Command, []string) {
 		var closer io.Closer
 
 		if GetBool(cmd, ArgNamePipeStdout) || GetBool(cmd, ArgNamePipeStderr) {
-			configureDefaultOutput(cmd, ctx)
+			ctx = configureDefaultIOContext(cmd, ctx)
 		} else {
-			teardown := configureRichOutput(cmd, ctx)
+			var teardown func()
+			ctx, teardown = configureRichOutputIOContext(cmd, ctx)
 			defer teardown()
 		}
 

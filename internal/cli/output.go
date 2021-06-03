@@ -24,7 +24,7 @@ var (
 	sprintBold  = color.New(color.Bold).Sprint
 )
 
-func configureDefaultOutput(cmd *cobra.Command, ctx IOContext) {
+func configureDefaultIOContext(cmd *cobra.Command, ctx IOContext) IOContext {
 	silent := GetBool(cmd, ArgNameSilent)
 	debug := GetBool(cmd, ArgNameDebug)
 	var level = log.InfoLevel
@@ -47,6 +47,8 @@ func configureDefaultOutput(cmd *cobra.Command, ctx IOContext) {
 
 	log.StandardLogger().SetLevel(level)
 	log.StandardLogger().SetOutput(ctx.StderrWriter)
+
+	return ctx
 }
 
 // configureSpinner starts a spinner progress indicator on Stdout and hides the cursor.
@@ -75,10 +77,10 @@ func configureSpinner(writer io.Writer) context.CancelFunc {
 	}
 }
 
-func configureRichOutput(cmd *cobra.Command, ctx IOContext) (cancel context.CancelFunc) {
-	cancel = func() {}
+func configureRichOutputIOContext(cmd *cobra.Command, ctx IOContext) (IOContext, context.CancelFunc) {
+	var cancel = func() {}
 
-	configureDefaultOutput(cmd, ctx)
+	configureDefaultIOContext(cmd, ctx)
 
 	if ctx.Tty {
 		log.SetFormatter(&log.TextFormatter{
@@ -89,11 +91,13 @@ func configureRichOutput(cmd *cobra.Command, ctx IOContext) (cancel context.Canc
 		if IsExperimentEnabled(cmd, richOutputExperimentName) {
 			cancel = configureSpinner(ctx.StdoutWriter)
 
-			log.StandardLogger().SetOutput(&alwaysRewritingWriter{log.StandardLogger().Out})
+			ctx.StdoutWriter = &alwaysRewritingWriter{ctx.StdoutWriter}
+			ctx.StderrWriter = &alwaysRewritingWriter{ctx.StderrWriter}
+			log.StandardLogger().SetOutput(ctx.StderrWriter)
 		}
 	}
 
-	return cancel
+	return ctx, cancel
 }
 
 // this writer should be used when background threads write messages without a new line suffix to stdout.

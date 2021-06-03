@@ -29,7 +29,8 @@ func CreateUpdateCommand(version, binaryName string, ctx IOContext) *cobra.Comma
 // currentVersion is used to determine whether a newer one is available
 func runSelfUpdateFn(currentVersion, binaryName string, ctx IOContext) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
-		teardown := configureRichOutput(cmd, ctx)
+		var teardown func()
+		ctx, teardown = configureRichOutputIOContext(cmd, ctx)
 		defer teardown()
 
 		CheckFatal(clibcmd.RunSelfUpdate(gitHusRepoOwner, gitHusRepoName, currentVersion, binaryName, os.Executable, clibcmd.GetLatestRelease))

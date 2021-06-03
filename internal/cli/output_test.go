@@ -13,7 +13,7 @@ import (
 func TestDefaultLogLevel(t *testing.T) {
 	ctx := NewIOContext()
 	cmd := aCommandWithArgs(ctx)
-	configureDefaultOutput(cmd, ctx)
+	ctx = configureDefaultIOContext(cmd, ctx)
 
 	assert.Equal(t, log.InfoLevel, log.StandardLogger().Level)
 	assert.Equal(t, ctx.StderrWriter, log.StandardLogger().Out)
@@ -23,7 +23,7 @@ func TestDebugOn(t *testing.T) {
 	ctx := NewIOContext()
 	cmd := aCommandWithArgs(ctx, "-d")
 	cmd.Run = func(cmd *cobra.Command, args []string) {
-		configureDefaultOutput(cmd, ctx)
+		ctx = configureDefaultIOContext(cmd, ctx)
 
 		assert.Equal(t, log.DebugLevel, log.StandardLogger().Level)
 		assert.Equal(t, ctx.StderrWriter, log.StandardLogger().Out)
@@ -36,7 +36,7 @@ func TestSilentOn(t *testing.T) {
 	ctx := NewIOContext()
 	cmd := aCommandWithArgs(ctx, "-s")
 	cmd.Run = func(cmd *cobra.Command, args []string) {
-		configureDefaultOutput(cmd, ctx)
+		ctx = configureDefaultIOContext(cmd, ctx)
 
 		assert.Equal(t, log.PanicLevel, log.StandardLogger().Level)
 		assert.Equal(t, ctx.StderrWriter, log.StandardLogger().Out)
@@ -49,7 +49,7 @@ func TestTtyMode(t *testing.T) {
 	withTty(func(ctx IOContext) {
 		cmd := aCommandWithArgs(ctx)
 		cmd.Run = func(cmd *cobra.Command, args []string) {
-			configureDefaultOutput(cmd, ctx)
+			ctx = configureDefaultIOContext(cmd, ctx)
 
 			assert.Equal(t, ctx.StderrWriter, log.StandardLogger().Out)
 			assert.True(t, log.StandardLogger().Formatter.(*log.TextFormatter).DisableTimestamp)
@@ -65,7 +65,7 @@ func TestTTYModeWithExperimentalRichOutputEnabled(t *testing.T) {
 		cmd := aCommandWithArgs(ctx, "--experimental=rich_output")
 
 		cmd.Run = func(cmd *cobra.Command, args []string) {
-			cancel := configureRichOutput(cmd, ctx)
+			ctx, cancel := configureRichOutputIOContext(cmd, ctx)
 			defer cancel()
 
 			assert.NotEqual(t, ctx.StdoutWriter, log.StandardLogger().Out)
@@ -80,7 +80,7 @@ func TestTTYModeWithExperimentalRichOutputDisabled(t *testing.T) {
 	withTty(func(ctx IOContext) {
 		cmd := aCommandWithArgs(ctx)
 		cmd.Run = func(cmd *cobra.Command, args []string) {
-			cancel := configureRichOutput(cmd, ctx)
+			ctx, cancel := configureRichOutputIOContext(cmd, ctx)
 			defer cancel()
 
 			assert.Equal(t, ctx.StderrWriter, log.StandardLogger().Out)
