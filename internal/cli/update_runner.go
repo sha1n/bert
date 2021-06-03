@@ -4,7 +4,6 @@ import (
 	"os"
 
 	clibcmd "github.com/sha1n/clib/pkg/cmd"
-	"github.com/sha1n/termite"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -30,13 +29,8 @@ func CreateUpdateCommand(version, binaryName string, ctx IOContext) *cobra.Comma
 // currentVersion is used to determine whether a newer one is available
 func runSelfUpdateFn(currentVersion, binaryName string, ctx IOContext) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
-		// configureOutput(cmd, ctx)
 		teardown := configureRichOutput(cmd, ctx)
 		defer teardown()
-
-		spinner := termite.NewDefaultSpinner()
-		cancel, _ := spinner.Start()
-		defer cancel()
 
 		CheckFatal(clibcmd.RunSelfUpdate(gitHusRepoOwner, gitHusRepoName, currentVersion, binaryName, os.Executable, clibcmd.GetLatestRelease))
 
