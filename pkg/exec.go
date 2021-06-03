@@ -7,11 +7,13 @@ import (
 
 // Execute executes a benchmark and returns an object that provides access to collected stats.
 func Execute(spec api.BenchmarkSpec, ctx api.ExecutionContext) {
+	log.Info("Executing benchmark scenarios...")
 	if spec.Alternate {
 		executeAlternately(spec, ctx)
 	} else {
 		executeSequentially(spec, ctx)
 	}
+	log.Info("Finished executing all benchmark scenarios")
 }
 
 func executeAlternately(spec api.BenchmarkSpec, ctx api.ExecutionContext) {

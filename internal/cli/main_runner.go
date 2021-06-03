@@ -85,11 +85,14 @@ func runFn(ctx IOContext) func(*cobra.Command, []string) {
 			tracer := pkg.NewTracer(spec.Executions * len(spec.Scenarios))
 			reportHandler.Subscribe(tracer.Stream())
 
-			pkg.Execute(spec, resolveExecutionContext(cmd, tracer))
+			exeCtx := resolveExecutionContext(cmd, tracer)
+			pkg.Execute(spec, exeCtx)
 
+			log.Info("Finalizing report...")
 			err = reportHandler.Finalize()
 		}
 
+		log.Info("Done.")
 		CheckFatal(err)
 	}
 
