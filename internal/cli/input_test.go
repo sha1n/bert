@@ -6,13 +6,12 @@ import (
 	"path"
 	"testing"
 
-	"github.com/sha1n/benchy/test"
-	"github.com/sha1n/uneatest"
+	clibtest "github.com/sha1n/clib/pkg/test"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestRequestString(t *testing.T) {
-	expected := test.RandomString()
+	expected := clibtest.RandomString()
 	ctx := givenIOContextWithInputContent(expected)
 
 	actual := requestString("", false, ctx)
@@ -20,7 +19,7 @@ func TestRequestString(t *testing.T) {
 }
 
 func TestRequestRequiredString(t *testing.T) {
-	expected := test.RandomString()
+	expected := clibtest.RandomString()
 	ctx := givenIOContextWithInputContent(fmt.Sprintf("\r\n\r\n%s", expected))
 
 	actual := requestString("", true, ctx)
@@ -28,7 +27,7 @@ func TestRequestRequiredString(t *testing.T) {
 }
 
 func TestRequestInputWithInvalidInput(t *testing.T) {
-	expected := test.RandomString()
+	expected := clibtest.RandomString()
 	stdin := fmt.Sprintf(`rejected
 %s`, expected)
 
@@ -49,7 +48,7 @@ func TestRequestInputWithInvalidInput(t *testing.T) {
 }
 
 func TestRequestOptionalBool(t *testing.T) {
-	expected := test.RandomBool()
+	expected := clibtest.RandomBool()
 	ctx := givenIOContextWithInputContent(fmt.Sprint(expected))
 
 	actual := requestOptionalBool("", false, ctx)
@@ -104,7 +103,7 @@ func TestRequestOptionalExistingDirectoryWithExistingDir(t *testing.T) {
 }
 
 func TestRequestOptionalExistingDirectoryWithNonExistingDir(t *testing.T) {
-	attempt1 := path.Join(os.TempDir(), test.RandomString())
+	attempt1 := path.Join(os.TempDir(), clibtest.RandomString())
 	attempt2 := os.TempDir()
 	userInputSequence := fmt.Sprintf(`%s
 n
@@ -117,7 +116,7 @@ n
 }
 
 func TestRequestOptionalExistingDirectoryWithNonExistingDirAndAutoCreation(t *testing.T) {
-	userEnteredNonExistingDir := path.Join(os.TempDir(), test.RandomString())
+	userEnteredNonExistingDir := path.Join(os.TempDir(), clibtest.RandomString())
 	userInputSequence := fmt.Sprintf(`%s
 y`,
 		userEnteredNonExistingDir,
@@ -137,7 +136,7 @@ func TestRequestOptionalExistingDirectoryWithSkip(t *testing.T) {
 }
 
 func TestRequestUint(t *testing.T) {
-	expected := test.RandomUint()
+	expected := clibtest.RandomUint()
 	ctx := givenIOContextWithInputContent(fmt.Sprint(expected))
 
 	actual := requestUint("", false, ctx)
@@ -168,7 +167,7 @@ func TestRequestUintWithInvalidInput(t *testing.T) {
 
 func givenIOContextWithInputContent(content string) IOContext {
 	ctx := NewIOContext()
-	ctx.StdinReader = uneatest.NewEmulatedStdinReader(content)
+	ctx.StdinReader = clibtest.NewEmulatedStdinReader(content)
 
 	return ctx
 }

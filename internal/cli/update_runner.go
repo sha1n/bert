@@ -1,21 +1,17 @@
 package cli
 
 import (
-	"io"
-	"io/ioutil"
 	"os"
 
-	"github.com/sha1n/benchy/internal/github"
+	clibcmd "github.com/sha1n/clib/pkg/cmd"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"golang.org/x/mod/semver"
 )
 
-// GetLatestReleaseFn ...
-type GetLatestReleaseFn = func() (github.Release, error)
-
-// ResolveBinaryPathFn ...
-type ResolveBinaryPathFn = func() (string, error)
+const (
+	gitHusRepoOwner = "sha1n"
+	gitHusRepoName  = "benchy"
+)
 
 // CreateUpdateCommand creates the 'config' sub command
 func CreateUpdateCommand(version, binaryName string, ctx IOContext) *cobra.Command {
@@ -35,43 +31,8 @@ func runSelfUpdateFn(currentVersion, binaryName string, ctx IOContext) func(cmd 
 	return func(cmd *cobra.Command, args []string) {
 		configureOutput(cmd, ctx)
 
-		CheckFatal(runSelfUpdateWith(currentVersion, binaryName, os.Executable, github.GetLatestRelease))
+		CheckFatal(clibcmd.RunSelfUpdate(gitHusRepoOwner, gitHusRepoName, currentVersion, binaryName, os.Executable, clibcmd.GetLatestRelease))
 
 		log.Info("Done!")
 	}
-}
-
-func runSelfUpdateWith(version, binaryName string, resolveBinaryPathFn ResolveBinaryPathFn, getLatestReleaseFn GetLatestReleaseFn) (err error) {
-	var binaryPath string
-	if binaryPath, err = resolveBinaryPathFn(); err != nil {
-		return err
-	}
-
-	log.Infof("Fetching latest release...")
-	var release github.Release
-	if release, err = getLatestReleaseFn(); err != nil {
-		return err
-	}
-
-	tagName := release.TagName()
-	log.Infof("Latest release tag is %s", tagName)
-	log.Infof("Current version is %s", version)
-
-	if tagName != "" && tagName != version && semver.Compare(tagName, version) > 0 {
-		log.Infof("Downloading version %s...", tagName)
-		var rc io.ReadCloser
-		if rc, err = release.DownloadAsset(); err != nil {
-			return err
-		}
-
-		var content []byte
-		if content, err = ioutil.ReadAll(rc); err == nil {
-			return ioutil.WriteFile(binaryPath, content, 0755)
-		}
-
-	} else {
-		log.Infof("You are already running the latest version of %s!", binaryName)
-	}
-
-	return err
 }
