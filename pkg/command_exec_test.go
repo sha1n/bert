@@ -105,7 +105,7 @@ func TestRegisterInterruptGuardCancellation(t *testing.T) {
 		assert.NotNil(t, v)
 	}
 	defer expectPanic()
-	
+
 	cancel, c := registerInterruptGuard(aCommand(), func(c *exec.Cmd, s os.Signal) {})
 	cancel()
 
