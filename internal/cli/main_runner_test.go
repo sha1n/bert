@@ -8,7 +8,7 @@ import (
 	"os/exec"
 	"testing"
 
-	"github.com/sha1n/benchy/test"
+	clibtest "github.com/sha1n/clib/pkg/test"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -89,7 +89,7 @@ func TestBasicCsvRaw(t *testing.T) {
 }
 
 func TestWithMissingConfigFile(t *testing.T) {
-	nonExistingConfigArg := fmt.Sprintf("-c=/tmp/%s", test.RandomString())
+	nonExistingConfigArg := fmt.Sprintf("-c=/tmp/%s", clibtest.RandomString())
 	_, _ = runBenchmarkCommandWithPipedStdoutAndExpectPanicWith(t, nonExistingConfigArg)
 }
 
@@ -111,7 +111,7 @@ func runBenchmarkCommandWithPipedStdoutputsAnd(t *testing.T, assert func(stdout,
 	ioContext := NewIOContext()
 	ioContext.StdoutWriter = outBuf
 	ioContext.StderrWriter = errBuf
-	rootCmd := NewRootCommand(test.RandomString(), test.RandomString(), test.RandomString(), ioContext)
+	rootCmd := NewRootCommand(clibtest.RandomString(), clibtest.RandomString(), clibtest.RandomString(), ioContext)
 	rootCmd.SetArgs(append(args, "--pipe-stdout=true", "--pipe-stderr=true"))
 	rootCmd.SetOut(ioContext.StdoutWriter)
 	rootCmd.SetErr(ioContext.StderrWriter)
@@ -130,7 +130,7 @@ func runBenchmarkCommandWithPipedStdoutAndExpectPanicWith(t *testing.T, args ...
 	ioContext.StdoutWriter = bufio.NewWriter(buf)
 	ioContext.StderrWriter = bufio.NewWriter(buf)
 
-	rootCmd := NewRootCommand(test.RandomString(), test.RandomString(), test.RandomString(), ioContext)
+	rootCmd := NewRootCommand(clibtest.RandomString(), clibtest.RandomString(), clibtest.RandomString(), ioContext)
 	rootCmd.SetArgs(append(args, "--pipe-stdout=true"))
 	rootCmd.SetOut(writer)
 	rootCmd.SetErr(os.Stderr)
