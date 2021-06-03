@@ -29,7 +29,7 @@ func CreateConfigCommand(ctx IOContext) *cobra.Command {
 // createConfigFn returns a function that runs the config tool with the specified IOContext
 func createConfigFn(ctx IOContext) func(*cobra.Command, []string) {
 	return func(cmd *cobra.Command, args []string) {
-		configureOutput(cmd, ctx)
+		configureDefaultOutput(cmd, ctx)
 
 		printHints()
 		writeCloser := ResolveOutputArg(cmd, ArgNameOutputFile, ctx)

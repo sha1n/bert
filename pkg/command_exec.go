@@ -1,11 +1,14 @@
 package pkg
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
+	"os/signal"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/sha1n/benchy/api"
 	log "github.com/sirupsen/logrus"
@@ -34,6 +37,9 @@ func (ce *commandExecutor) Execute(cmdSpec *api.CommandSpec, defaultWorkingDir s
 
 	execCmd := exec.Command(cmdSpec.Cmd[0], cmdSpec.Cmd[1:]...)
 	ce.configureCommand(cmdSpec, execCmd, defaultWorkingDir, env)
+
+	cancel, _ := registerInterruptGuard(execCmd, onShutdownSignal)
+	defer cancel()
 
 	exitError = execCmd.Run()
 
@@ -88,4 +94,43 @@ func toEnvVarsArray(env map[string]string) []string {
 	}
 
 	return arr
+}
+
+func onShutdownSignal(execCmd *exec.Cmd, sig os.Signal) {
+	if sig == os.Interrupt {
+		log.Debugf("Got %s signal. Forwarding to %s...", sig, execCmd.Args[0])
+		execCmd.Process.Signal(sig)
+
+		os.Exit(1)
+	}
+}
+
+// channel is returned for testing...
+func registerInterruptGuard(execCmd *exec.Cmd, handleFn func(*exec.Cmd, os.Signal)) (context.CancelFunc, chan os.Signal) {
+	c := make(chan os.Signal)
+	signal.Notify(c, os.Interrupt)
+	ctx, cancel := context.WithCancel(context.Background())
+	startWG := &sync.WaitGroup{}
+	startWG.Add(1)
+
+	go func() {
+		startWG.Done()
+
+		select {
+		case sig, ok := <-c:
+			if ok {
+				handleFn(execCmd, sig)
+			}
+
+		case <-ctx.Done():
+			signal.Stop(c)
+
+			close(c)
+			log.Debug("Context cancelled - OK!")
+		}
+	}()
+
+	startWG.Wait()
+
+	return cancel, c
 }

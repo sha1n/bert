@@ -1,10 +1,8 @@
 package cli
 
 import (
-	"bufio"
 	"bytes"
 	"fmt"
-	"os"
 	"os/exec"
 	"testing"
 
@@ -13,8 +11,16 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var expectedGoVersionOutput string
-var itConfigFileArgValue = "--config=../../test/data/integration.yaml"
+const (
+	itConfigFileArgValue = "--config=../../test/data/integration.yaml"
+	expectedScenarioName = "TEST_SCENARIO_NAME"
+)
+
+var (
+	expectedScenarioMdCell  = fmt.Sprintf("|%s|", expectedScenarioName)
+	expectedScenarioCsvCell = fmt.Sprintf(",%s,", expectedScenarioName)
+	expectedGoVersionOutput string
+)
 
 func init() {
 	buf := new(bytes.Buffer)
@@ -27,12 +33,30 @@ func init() {
 }
 
 func TestBasic(t *testing.T) {
-	runBenchmarkCommandWithPipedStdoutputsAnd(
+	expectedStartupLogMessage := "Starting benchy..."
+	runBenchmarkCommand(
 		t,
 		func(stdout, stderr string, err error) {
 			assert.NoError(t, err)
-			assert.Contains(t, stdout, "NAME")
+
+			assert.Contains(t, stdout, expectedScenarioName)
+
+			assert.Contains(t, stderr, expectedStartupLogMessage)
+			assert.NotContains(t, stdout, expectedStartupLogMessage)
+
+		},
+		itConfigFileArgValue,
+	)
+}
+
+func TestBasicWithPipedStdout(t *testing.T) {
+	runBenchmarkCommandWithPipedStdoutputs(
+		t,
+		func(stdout, stderr string, err error) {
+			assert.NoError(t, err)
+			assert.Contains(t, stdout, expectedScenarioName)
 			assert.Contains(t, stderr, expectedGoVersionOutput)
+			assert.NotContains(t, stdout, expectedGoVersionOutput)
 		},
 		itConfigFileArgValue,
 	)
@@ -40,11 +64,11 @@ func TestBasic(t *testing.T) {
 }
 
 func TestBasicMd(t *testing.T) {
-	runBenchmarkCommandWithPipedStdoutputsAnd(
+	runBenchmarkCommandWithPipedStdoutputs(
 		t,
 		func(stdout, stderr string, err error) {
 			assert.NoError(t, err)
-			assert.Contains(t, stdout, "|NAME|")
+			assert.Contains(t, stdout, expectedScenarioMdCell)
 			assert.Contains(t, stderr, expectedGoVersionOutput)
 		},
 		itConfigFileArgValue, "--format=md",
@@ -52,11 +76,11 @@ func TestBasicMd(t *testing.T) {
 }
 
 func TestBasicMdRaw(t *testing.T) {
-	runBenchmarkCommandWithPipedStdoutputsAnd(
+	runBenchmarkCommandWithPipedStdoutputs(
 		t,
 		func(stdout, stderr string, err error) {
 			assert.NoError(t, err)
-			assert.Contains(t, stdout, "|NAME|")
+			assert.Contains(t, stdout, expectedScenarioMdCell)
 			assert.Contains(t, stderr, expectedGoVersionOutput)
 		},
 		itConfigFileArgValue, "--format=md/raw",
@@ -65,10 +89,10 @@ func TestBasicMdRaw(t *testing.T) {
 }
 
 func TestBasicCsv(t *testing.T) {
-	runBenchmarkCommandWithPipedStdoutputsAnd(t,
+	runBenchmarkCommandWithPipedStdoutputs(t,
 		func(stdout, stderr string, err error) {
 			assert.NoError(t, err)
-			assert.Contains(t, stdout, ",NAME,")
+			assert.Contains(t, stdout, expectedScenarioCsvCell)
 			assert.Contains(t, stderr, expectedGoVersionOutput)
 		},
 		itConfigFileArgValue, "--format=csv")
@@ -76,11 +100,11 @@ func TestBasicCsv(t *testing.T) {
 }
 
 func TestBasicCsvRaw(t *testing.T) {
-	runBenchmarkCommandWithPipedStdoutputsAnd(
+	runBenchmarkCommandWithPipedStdoutputs(
 		t,
 		func(stdout, stderr string, err error) {
 			assert.NoError(t, err)
-			assert.Contains(t, stdout, ",NAME,")
+			assert.Contains(t, stdout, expectedScenarioCsvCell)
 			assert.Contains(t, stderr, expectedGoVersionOutput)
 		},
 		itConfigFileArgValue, "--format=csv/raw",
@@ -90,54 +114,45 @@ func TestBasicCsvRaw(t *testing.T) {
 
 func TestWithMissingConfigFile(t *testing.T) {
 	nonExistingConfigArg := fmt.Sprintf("-c=/tmp/%s", clibtest.RandomString())
-	_, _ = runBenchmarkCommandWithPipedStdoutAndExpectPanicWith(t, nonExistingConfigArg)
+	runBenchmarkCommandWithPipedStdoutAndExpectPanicWith(t, nonExistingConfigArg)
 }
 
 func TestWithInvalidConfigFile(t *testing.T) {
 	invalidConfig := "-c=../../test/data/invalid_config.yml"
-	_, _ = runBenchmarkCommandWithPipedStdoutAndExpectPanicWith(t, invalidConfig)
+	runBenchmarkCommandWithPipedStdoutAndExpectPanicWith(t, invalidConfig)
 }
 
 func TestWithCombinedDebugAndSilent(t *testing.T) {
-	_, _ = runBenchmarkCommandWithPipedStdoutAndExpectPanicWith(t, "-s", "-d", itConfigFileArgValue)
+	runBenchmarkCommandWithPipedStdoutAndExpectPanicWith(t, "-s", "-d", itConfigFileArgValue)
 }
 
-func runBenchmarkCommandWithPipedStdoutputsAnd(t *testing.T, assert func(stdout, stderr string, err error), args ...string) {
+func runBenchmarkCommand(t *testing.T, assert func(stdout, stderr string, err error), args ...string) {
 	defer expectNoPanic(t)
 
-	outBuf := new(bytes.Buffer)
-	errBuf := new(bytes.Buffer)
+	ctx, err := runBenchmark(args...)
 
-	ioContext := NewIOContext()
-	ioContext.StdoutWriter = outBuf
-	ioContext.StderrWriter = errBuf
-	rootCmd := NewRootCommand(clibtest.RandomString(), clibtest.RandomString(), clibtest.RandomString(), ioContext)
-	rootCmd.SetArgs(append(args, "--pipe-stdout=true", "--pipe-stderr=true"))
-	rootCmd.SetOut(ioContext.StdoutWriter)
-	rootCmd.SetErr(ioContext.StderrWriter)
-
-	err := rootCmd.Execute()
-
-	assert(outBuf.String(), errBuf.String(), err)
+	assert(ctx.StdoutWriter.(*bytes.Buffer).String(), ctx.StderrWriter.(*bytes.Buffer).String(), err)
 }
 
-func runBenchmarkCommandWithPipedStdoutAndExpectPanicWith(t *testing.T, args ...string) (output string, err error) {
+func runBenchmarkCommandWithPipedStdoutputs(t *testing.T, assert func(stdout, stderr string, err error), args ...string) {
+	runBenchmarkCommand(t, assert, append(args, "--pipe-stdout", "--pipe-stderr")...)
+}
+
+func runBenchmarkCommandWithPipedStdoutAndExpectPanicWith(t *testing.T, args ...string) {
 	defer expectPanicWithError(t)
 
-	buf := new(bytes.Buffer)
-	writer := bufio.NewWriter(buf)
-	ioContext := NewIOContext()
-	ioContext.StdoutWriter = bufio.NewWriter(buf)
-	ioContext.StderrWriter = bufio.NewWriter(buf)
+	_, _ = runBenchmark(args...)
+}
 
-	rootCmd := NewRootCommand(clibtest.RandomString(), clibtest.RandomString(), clibtest.RandomString(), ioContext)
-	rootCmd.SetArgs(append(args, "--pipe-stdout=true"))
-	rootCmd.SetOut(writer)
-	rootCmd.SetErr(os.Stderr)
+func runBenchmark(args ...string) (IOContext, error) {
+	ctx := newIOContext()
+	rootCmd := NewRootCommand(clibtest.RandomString(), clibtest.RandomString(), clibtest.RandomString(), ctx)
+	rootCmd.SetArgs(args)
+	rootCmd.SetOut(ctx.StdoutWriter)
+	rootCmd.SetErr(ctx.StderrWriter)
 
-	err = rootCmd.Execute()
+	return ctx, rootCmd.Execute()
 
-	return buf.String(), err
 }
 
 func expectNoPanic(t *testing.T) {
@@ -160,5 +175,13 @@ func expectPanicWithError(t *testing.T) {
 	} else {
 		assert.Fail(t, "A panic with an error was expected, but got nothing")
 	}
+}
 
+func newIOContext() IOContext {
+	ctx := NewIOContext()
+	ctx.Tty = clibtest.RandomBool()
+	ctx.StdoutWriter = new(bytes.Buffer)
+	ctx.StderrWriter = new(bytes.Buffer)
+
+	return ctx
 }

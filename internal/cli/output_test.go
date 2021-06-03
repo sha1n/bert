@@ -13,7 +13,7 @@ import (
 func TestDefaultLogLevel(t *testing.T) {
 	ctx := NewIOContext()
 	cmd := aCommandWithArgs(ctx)
-	configureOutput(cmd, ctx)
+	configureDefaultOutput(cmd, ctx)
 
 	assert.Equal(t, log.InfoLevel, log.StandardLogger().Level)
 	assert.Equal(t, ctx.StderrWriter, log.StandardLogger().Out)
@@ -23,7 +23,7 @@ func TestDebugOn(t *testing.T) {
 	ctx := NewIOContext()
 	cmd := aCommandWithArgs(ctx, "-d")
 	cmd.Run = func(cmd *cobra.Command, args []string) {
-		configureOutput(cmd, ctx)
+		configureDefaultOutput(cmd, ctx)
 
 		assert.Equal(t, log.DebugLevel, log.StandardLogger().Level)
 		assert.Equal(t, ctx.StderrWriter, log.StandardLogger().Out)
@@ -36,7 +36,7 @@ func TestSilentOn(t *testing.T) {
 	ctx := NewIOContext()
 	cmd := aCommandWithArgs(ctx, "-s")
 	cmd.Run = func(cmd *cobra.Command, args []string) {
-		configureOutput(cmd, ctx)
+		configureDefaultOutput(cmd, ctx)
 
 		assert.Equal(t, log.PanicLevel, log.StandardLogger().Level)
 		assert.Equal(t, ctx.StderrWriter, log.StandardLogger().Out)
@@ -49,7 +49,7 @@ func TestTtyMode(t *testing.T) {
 	withTty(func(ctx IOContext) {
 		cmd := aCommandWithArgs(ctx)
 		cmd.Run = func(cmd *cobra.Command, args []string) {
-			configureOutput(cmd, ctx)
+			configureDefaultOutput(cmd, ctx)
 
 			assert.Equal(t, ctx.StderrWriter, log.StandardLogger().Out)
 			assert.True(t, log.StandardLogger().Formatter.(*log.TextFormatter).DisableTimestamp)
@@ -58,6 +58,37 @@ func TestTtyMode(t *testing.T) {
 
 		assert.NoError(t, cmd.Execute())
 	})
+}
+
+func TestTTYModeWithExperimentalRichOutputEnabled(t *testing.T) {
+	withTty(func(ctx IOContext) {
+		cmd := aCommandWithArgs(ctx, "--experimental=rich_output")
+
+		cmd.Run = func(cmd *cobra.Command, args []string) {
+			cancel := configureRichOutput(cmd, ctx)
+			defer cancel()
+
+			assert.NotEqual(t, ctx.StdoutWriter, log.StandardLogger().Out)
+			assert.IsType(t, &alwaysRewritingWriter{}, log.StandardLogger().Out)
+		}
+
+		assert.NoError(t, cmd.Execute())
+	})
+}
+
+func TestTTYModeWithExperimentalRichOutputDisabled(t *testing.T) {
+	withTty(func(ctx IOContext) {
+		cmd := aCommandWithArgs(ctx)
+		cmd.Run = func(cmd *cobra.Command, args []string) {
+			cancel := configureRichOutput(cmd, ctx)
+			defer cancel()
+
+			assert.Equal(t, ctx.StderrWriter, log.StandardLogger().Out)
+		}
+
+		assert.NoError(t, cmd.Execute())
+	})
+
 }
 
 func aCommandWithArgs(ctx IOContext, args ...string) *cobra.Command {

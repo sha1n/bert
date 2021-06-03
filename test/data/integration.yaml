@@ -1,6 +1,6 @@
 executions: 1
 scenarios:
-- name: NAME
+- name: TEST_SCENARIO_NAME
   command:
     cmd:
     - go 

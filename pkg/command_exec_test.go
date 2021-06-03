@@ -11,6 +11,7 @@ import (
 	"os/exec"
 
 	"github.com/sha1n/benchy/api"
+	"github.com/sha1n/clib/pkg/test"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -85,6 +86,34 @@ func TestConfigureCommandWithStderrPiping(t *testing.T) {
 
 	assert.Equal(t, nil, execCmd.Stdout)
 	assert.Equal(t, log.StandardLogger().Out, execCmd.Stderr)
+}
+
+func TestRegisterInterruptGuard(t *testing.T) {
+	execCmd := exec.Command("test", "--command")
+	call := make(chan bool)
+	_, c := registerInterruptGuard(execCmd, func(c *exec.Cmd, s os.Signal) {
+		call <- true
+	})
+
+	c <- os.Interrupt
+	assert.Eventually(t, func() bool { return <-call }, time.Second*10, time.Millisecond)
+}
+
+func TestRegisterInterruptGuardCancellation(t *testing.T) {
+	expectPanic := func() {
+		v := recover()
+		assert.NotNil(t, v)
+	}
+	defer expectPanic()
+	
+	cancel, c := registerInterruptGuard(aCommand(), func(c *exec.Cmd, s os.Signal) {})
+	cancel()
+
+	c <- os.Interrupt // this should fail panic because the channel is closed
+}
+
+func aCommand() *exec.Cmd {
+	return exec.Command(test.RandomString(), test.RandomString())
 }
 
 func configureCommandWithIOSpec(pipeStdout, pipeStderr bool) *exec.Cmd {

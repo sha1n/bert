@@ -62,7 +62,13 @@ func runFn(ctx IOContext) func(*cobra.Command, []string) {
 	return func(cmd *cobra.Command, args []string) {
 		var err error
 		var closer io.Closer
-		configureOutput(cmd, ctx)
+
+		if GetBool(cmd, ArgNamePipeStdout) || GetBool(cmd, ArgNamePipeStderr) {
+			configureDefaultOutput(cmd, ctx)
+		} else {
+			teardown := configureRichOutput(cmd, ctx)
+			defer teardown()
+		}
 
 		log.Info("Starting benchy...")
 
