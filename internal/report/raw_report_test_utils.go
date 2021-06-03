@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var randomLabels = clibtest.RandomStrings()
+var randomLabels = append(clibtest.RandomStrings(), "test-label")
 
 // GetRawDataHandler a provider for a RawDataHandler instance
 type GetRawDataHandler = func(*bufio.Writer, api.ReportContext) RawDataHandler
