@@ -18,10 +18,10 @@ import (
 func TestExecuteReturnsErrorOnCommandFailure(t *testing.T) {
 	defaultWorkingDir := "default/dir"
 	env := map[string]string{}
-	exec := NewCommandExecutor(true, true, api.NewIOContext())
+	exec := NewCommandExecutor(true, true)
 	cmdSpec := aCommandSpec(aNonExistingCommand(), "")
 
-	err := exec.Execute(cmdSpec, defaultWorkingDir, env)
+	err := exec.Execute(cmdSpec, defaultWorkingDir, env, recordingExecutionContext())
 
 	assert.Error(t, err)
 }
@@ -94,7 +94,7 @@ func aCommand() *exec.Cmd {
 
 func configureCommandWithIOSpec(pipeStdout, pipeStderr bool) *exec.Cmd {
 	spec := aCommandSpec(aNonExistingCommand(), "")
-	executor := NewCommandExecutor(pipeStdout, pipeStderr, api.NewIOContext()).(*commandExecutor)
+	executor := NewCommandExecutor(pipeStdout, pipeStderr).(*commandExecutor)
 	execCmd := exec.Command(spec.Cmd[0], spec.Cmd[1:]...)
 
 	executor.configureCommand(spec, execCmd, "", map[string]string{})
@@ -103,7 +103,7 @@ func configureCommandWithIOSpec(pipeStdout, pipeStderr bool) *exec.Cmd {
 }
 
 func configureCommand(spec *api.CommandSpec, defaultWorkingDir string, env map[string]string) *exec.Cmd {
-	executor := NewCommandExecutor(false, false, api.NewIOContext()).(*commandExecutor)
+	executor := NewCommandExecutor(false, false).(*commandExecutor)
 	execCmd := exec.Command(spec.Cmd[0], spec.Cmd[1:]...)
 
 	executor.configureCommand(spec, execCmd, defaultWorkingDir, env)

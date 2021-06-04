@@ -81,6 +81,7 @@ func recordingExecutionContext() api.ExecutionContext {
 	return api.NewExecutionContext(
 		NewTracer(100),
 		&CmdRecordingExecutor{},
+		api.NewIOContext(),
 	)
 }
 

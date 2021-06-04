@@ -21,9 +21,8 @@ func TestRunCommandFnFor(t *testing.T) {
 		args args
 		want RunCommandFn
 	}{
-		{name: "with stdout piping", args: args{ce: &commandExecutor{pipeStdout: true, pipeStderr: false, ctx: NewIOContextTty(false)}}, want: RunCommand},
-		{name: "without stdout piping and no tty", args: args{ce: &commandExecutor{pipeStdout: false, pipeStderr: false, ctx: NewIOContextTty(false)}}, want: RunCommand},
-		{name: "without stdout piping", args: args{ce: &commandExecutor{pipeStdout: false, pipeStderr: false, ctx: NewIOContextTty(true)}}, want: RunCommandWithProgressIndicator},
+		{name: "with stdout piping", args: args{ce: &commandExecutor{pipeStdout: true, pipeStderr: false}}, want: RunCommand},
+		{name: "without stdout piping", args: args{ce: &commandExecutor{pipeStdout: false, pipeStderr: false}}, want: RunCommandWithProgressIndicator},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -36,18 +35,19 @@ func TestRunCommandFnFor(t *testing.T) {
 func TestRunCommand(t *testing.T) {
 	type args struct {
 		cmd *exec.Cmd
+		ctx api.IOContext
 	}
 	tests := []struct {
 		name    string
 		args    args
 		wantErr bool
 	}{
-		{name: "with expected error", args: args{cmd: exec.Command("non-existing-command")}, wantErr: true},
-		{name: "with no error", args: args{cmd: exec.Command("go", "version")}, wantErr: false},
+		{name: "with expected error", args: args{cmd: exec.Command("non-existing-command"), ctx: NewIOContextTty(false)}, wantErr: true},
+		{name: "with no error", args: args{cmd: exec.Command("go", "version"), ctx: NewIOContextTty(false)}, wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := RunCommand(tt.args.cmd); (err != nil) != tt.wantErr {
+			if err := RunCommand(tt.args.cmd, tt.args.ctx); (err != nil) != tt.wantErr {
 				t.Errorf("RunCommand() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -57,18 +57,19 @@ func TestRunCommand(t *testing.T) {
 func TestRunCommandWithProgressIndicator(t *testing.T) {
 	type args struct {
 		cmd *exec.Cmd
+		ctx api.IOContext
 	}
 	tests := []struct {
 		name    string
 		args    args
 		wantErr bool
 	}{
-		{name: "with expected error", args: args{cmd: exec.Command("non-existing-command")}, wantErr: true},
-		{name: "with no error", args: args{cmd: exec.Command("go", "version")}, wantErr: false},
+		{name: "with expected error", args: args{cmd: exec.Command("non-existing-command"), ctx: NewIOContextTty(false)}, wantErr: true},
+		{name: "with no error", args: args{cmd: exec.Command("go", "version"), ctx: NewIOContextTty(false)}, wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := RunCommandWithProgressIndicator(tt.args.cmd); (err != nil) != tt.wantErr {
+			if err := RunCommandWithProgressIndicator(tt.args.cmd, tt.args.ctx); (err != nil) != tt.wantErr {
 				t.Errorf("RunCommandWithProgressIndicator() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

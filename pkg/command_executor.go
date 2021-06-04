@@ -14,20 +14,18 @@ import (
 type commandExecutor struct {
 	pipeStdout bool
 	pipeStderr bool
-	ctx        api.IOContext
 }
 
 // NewCommandExecutor creates a new command executor.
-func NewCommandExecutor(pipeStdout bool, pipeStderr bool, ctx api.IOContext) api.CommandExecutor {
+func NewCommandExecutor(pipeStdout bool, pipeStderr bool) api.CommandExecutor {
 	return &commandExecutor{
 		pipeStdout: pipeStdout,
 		pipeStderr: pipeStderr,
-		ctx:        ctx,
 	}
 }
 
 // Executes a single command in a subprocess based on the specified specs.
-func (ce *commandExecutor) Execute(cmdSpec *api.CommandSpec, defaultWorkingDir string, env map[string]string) (exitError error) {
+func (ce *commandExecutor) Execute(cmdSpec *api.CommandSpec, defaultWorkingDir string, env map[string]string, ctx api.ExecutionContext) (exitError error) {
 	if cmdSpec == nil {
 		return nil
 	}
@@ -37,7 +35,7 @@ func (ce *commandExecutor) Execute(cmdSpec *api.CommandSpec, defaultWorkingDir s
 	execCmd := exec.Command(cmdSpec.Cmd[0], cmdSpec.Cmd[1:]...)
 	ce.configureCommand(cmdSpec, execCmd, defaultWorkingDir, env)
 
-	exitError = RunCommandFnFor(ce)(execCmd)
+	exitError = RunCommandFnFor(ce)(execCmd, ctx.IOContext)
 
 	if exitError != nil {
 		log.Errorf("Command '%s' failed. Error: %s", cmdSpec.Cmd, exitError.Error())

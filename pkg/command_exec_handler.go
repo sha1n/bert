@@ -11,20 +11,21 @@ import (
 	"time"
 
 	"github.com/fatih/color"
+	"github.com/sha1n/benchy/api"
 	"github.com/sha1n/termite"
 	log "github.com/sirupsen/logrus"
 )
 
-type RunCommandFn = func(cmd *exec.Cmd) (err error)
+type RunCommandFn = func(cmd *exec.Cmd, ctx api.IOContext) (err error)
 
 func RunCommandFnFor(ce *commandExecutor) RunCommandFn {
-	if ce.pipeStdout || ce.pipeStderr || !ce.ctx.Tty || ce.ctx.DisbaleRichTerminalEffects {
-		return RunCommand
-	}
+	// if ce.pipeStdout || ce.pipeStderr || !ce.ctx.Tty || ce.ctx.DisbaleRichTerminalEffects {
+	// 	return RunCommand
+	// }
 	return RunCommandWithProgressIndicator
 }
 
-func RunCommand(cmd *exec.Cmd) (err error) {
+func RunCommand(cmd *exec.Cmd, ctx api.IOContext) (err error) {
 	registerInterruptGuard(cmd, func(c *exec.Cmd, s os.Signal) {
 		onShutdownSignal(c, s)
 	})
@@ -32,7 +33,7 @@ func RunCommand(cmd *exec.Cmd) (err error) {
 	return cmd.Run()
 }
 
-func RunCommandWithProgressIndicator(cmd *exec.Cmd) (err error) {
+func RunCommandWithProgressIndicator(cmd *exec.Cmd, ctx api.IOContext) (err error) {
 	cursor := termite.NewCursor(termite.StdoutWriter)
 	cursor.Hide()
 	defer cursor.Show()
@@ -42,7 +43,7 @@ func RunCommandWithProgressIndicator(cmd *exec.Cmd) (err error) {
 		onShutdownSignal(c, s)
 	})
 
-	spinner := termite.NewSpinner(termite.StdoutWriter, "Preparing...", time.Millisecond*100, &spinnerFormatter{})
+	spinner := termite.NewSpinner(ctx.StdoutWriter, "Preparing...", time.Millisecond*100, &spinnerFormatter{})
 
 	if _, err = spinner.Start(); err == nil {
 		_ = spinner.SetTitle(fmt.Sprintf("Executing command %v", cmd.Args))

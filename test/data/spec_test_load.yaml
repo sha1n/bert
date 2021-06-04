@@ -1,6 +1,6 @@
 ---
 alternate: true
-executions: 10
+executions: 30
 scenarios:
 - name: scenario A
   workingDir: "/tmp"
@@ -31,4 +31,54 @@ scenarios:
   command:
     cmd:
     - sleep
-    - '0'
+    - '0.2'
+- name: scenario c
+  command:
+    cmd:
+    - sleep
+    - '0.3'
+- name: scenario d
+  command:
+    cmd:
+    - sleep
+    - '0.6'
+- name: scenario A
+  workingDir: "/tmp"
+  env:
+    KEY: value
+  beforeAll:
+    cmd:
+    - echo
+    - setupA
+  afterAll:
+    cmd:
+    - echo
+    - teardownA
+  beforeEach:
+    workingDir: "~/tmp"
+    cmd:
+    - echo
+    - beforeA
+  afterEach:
+    cmd:
+    - echo
+    - afterA
+  command:
+    cmd:
+    - sleep
+    - '0.1'
+- name: scenario B
+  command:
+    cmd:
+    - sleep
+    - '0.2'
+- name: scenario c
+  command:
+    cmd:
+    - sleep
+    - '0.3'
+- name: scenario d
+  command:
+    cmd:
+    - sleep
+    - '0.6'
