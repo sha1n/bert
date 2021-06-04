@@ -15,7 +15,7 @@ import (
 )
 
 // NewRootCommand creates the main command parse
-func NewRootCommand(programName, version, build string, ctx IOContext) *cobra.Command {
+func NewRootCommand(programName, version, build string, ctx api.IOContext) *cobra.Command {
 	var rootCmd = &cobra.Command{
 		Use: programName,
 		Version: fmt.Sprintf(`Version: %s
@@ -58,18 +58,12 @@ csv/raw - CSV in which each row represents a raw trace event. useful if you want
 }
 
 // runFn returns a function that parses CLI arguments and runs the benchmark process with the specified IOContext
-func runFn(ctx IOContext) func(*cobra.Command, []string) {
+func runFn(ctx api.IOContext) func(*cobra.Command, []string) {
 	return func(cmd *cobra.Command, args []string) {
 		var err error
 		var closer io.Closer
 
-		if GetBool(cmd, ArgNamePipeStdout) || GetBool(cmd, ArgNamePipeStderr) {
-			ctx = configureDefaultIOContext(cmd, ctx)
-		} else {
-			var teardown func()
-			ctx, teardown = configureRichOutputIOContext(cmd, ctx)
-			defer teardown()
-		}
+		ctx = configureIOContext(cmd, ctx)
 
 		log.Info("Starting benchy...")
 
@@ -85,7 +79,7 @@ func runFn(ctx IOContext) func(*cobra.Command, []string) {
 			tracer := pkg.NewTracer(spec.Executions * len(spec.Scenarios))
 			reportHandler.Subscribe(tracer.Stream())
 
-			exeCtx := resolveExecutionContext(cmd, tracer)
+			exeCtx := resolveExecutionContext(cmd, tracer, ctx)
 			pkg.Execute(spec, exeCtx)
 
 			log.Info("Finalizing report...")
@@ -117,7 +111,7 @@ func loadSpec(cmd *cobra.Command) (spec api.BenchmarkSpec, err error) {
 	return spec, err
 }
 
-func resolveReportHandler(cmd *cobra.Command, spec api.BenchmarkSpec, ctx IOContext) (handler api.ReportHandler, closer io.Closer, err error) {
+func resolveReportHandler(cmd *cobra.Command, spec api.BenchmarkSpec, ctx api.IOContext) (handler api.ReportHandler, closer io.Closer, err error) {
 	reportCtx := resolveReportContext(cmd)
 	writeCloser := ResolveOutputArg(cmd, ArgNameOutputFile, ctx)
 	writer := bufio.NewWriter(writeCloser)
@@ -159,9 +153,9 @@ func resolveReportContext(cmd *cobra.Command) api.ReportContext {
 	}
 }
 
-func resolveExecutionContext(cmd *cobra.Command, tracer api.Tracer) api.ExecutionContext {
+func resolveExecutionContext(cmd *cobra.Command, tracer api.Tracer, ctx api.IOContext) api.ExecutionContext {
 	pipeStdOut := GetBool(cmd, ArgNamePipeStdout)
 	pipeStdErr := GetBool(cmd, ArgNamePipeStderr)
 
-	return api.NewExecutionContext(tracer, pkg.NewCommandExecutor(pipeStdOut, pipeStdErr))
+	return api.NewExecutionContext(tracer, pkg.NewCommandExecutor(pipeStdOut, pipeStdErr, ctx))
 }

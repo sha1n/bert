@@ -3,6 +3,7 @@ package cli
 import (
 	"os"
 
+	"github.com/sha1n/benchy/api"
 	clibcmd "github.com/sha1n/clib/pkg/cmd"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -14,7 +15,7 @@ const (
 )
 
 // CreateUpdateCommand creates the 'config' sub command
-func CreateUpdateCommand(version, binaryName string, ctx IOContext) *cobra.Command {
+func CreateUpdateCommand(version, binaryName string, ctx api.IOContext) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update",
 		Long:  `Checks for a newer release on GitHub and updates if one is found (https://github.com/sha1n/benchy/releases)`,
@@ -27,11 +28,9 @@ func CreateUpdateCommand(version, binaryName string, ctx IOContext) *cobra.Comma
 
 // runSelfUpdateFn runs the self update command based on the current version and binary name.
 // currentVersion is used to determine whether a newer one is available
-func runSelfUpdateFn(currentVersion, binaryName string, ctx IOContext) func(cmd *cobra.Command, args []string) {
+func runSelfUpdateFn(currentVersion, binaryName string, ctx api.IOContext) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
-		var teardown func()
-		ctx, teardown = configureRichOutputIOContext(cmd, ctx)
-		defer teardown()
+		ctx = configureIOContext(cmd, ctx)
 
 		CheckFatal(clibcmd.RunSelfUpdate(gitHusRepoOwner, gitHusRepoName, currentVersion, binaryName, os.Executable, clibcmd.GetLatestRelease))
 

@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 
+	"github.com/sha1n/benchy/api"
 	"github.com/sha1n/benchy/internal/cli"
 	log "github.com/sirupsen/logrus"
 )
@@ -19,7 +20,7 @@ var (
 func main() {
 	defer handlePanics()
 
-	ctx := cli.NewIOContext()
+	ctx := api.NewIOContext()
 	rootCmd := cli.NewRootCommand(ProgramName, Version, Build, ctx)
 
 	// Subcommands

@@ -1,4 +1,4 @@
-package cli
+package api
 
 import (
 	"io"
@@ -32,14 +32,17 @@ type IOContext struct {
 	StdinReader io.Reader
 	// Tty whether or not if this process is connected to a terminal
 	Tty bool
+	// DisbaleRichTerminalEffects signals that rich text effects should be disabled
+	DisbaleRichTerminalEffects bool
 }
 
 // NewIOContext returns a new IOContext populated with the global system I/O elements.
 func NewIOContext() IOContext {
 	return IOContext{
-		StdoutWriter: stdoutWriter,
-		StderrWriter: stderrWriter,
-		StdinReader:  stdinReader,
-		Tty:          termite.Tty,
+		StdoutWriter:               stdoutWriter,
+		StderrWriter:               stderrWriter,
+		StdinReader:                stdinReader,
+		Tty:                        termite.Tty,
+		DisbaleRichTerminalEffects: false,
 	}
 }

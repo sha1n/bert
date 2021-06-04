@@ -50,9 +50,9 @@ compile:
 	#@cat $(STDERR) | sed -e '1s/.*/\nError:\n/'  | sed 's/make\[.*/ /' | sed "/^/s/^/     /" 1>&2
 
 
-test: install go-test
+test: go-test
 
-cover: install go-cover
+cover: go-cover
 
 clean:
 	@-rm $(GOBIN)/$(PROGRAMNAME)* 2> /dev/null
@@ -69,7 +69,7 @@ go-format:
 go-build: go-get go-build-linux-amd64 go-build-linux-arm64 go-build-darwin-amd64 go-build-windows-amd64 go-build-windows-arm
 
 go-test:
-	go test $(MODFLAGS) `go list $(MODFLAGS) ./...`
+	go test $(MODFLAGS) -covermode=count `go list $(MODFLAGS) ./...`
 
 go-cover:
 	go test $(MODFLAGS) -coverprofile=$(GOBUILD)/.coverprof `go list $(MODFLAGS) ./...`

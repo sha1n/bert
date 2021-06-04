@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"testing"
 
+	"github.com/sha1n/benchy/api"
 	clibtest "github.com/sha1n/clib/pkg/test"
 
 	"github.com/stretchr/testify/assert"
@@ -144,7 +145,7 @@ func runBenchmarkCommandWithPipedStdoutAndExpectPanicWith(t *testing.T, args ...
 	_, _ = runBenchmark(args...)
 }
 
-func runBenchmark(args ...string) (IOContext, error) {
+func runBenchmark(args ...string) (api.IOContext, error) {
 	ctx := newIOContext()
 	rootCmd := NewRootCommand(clibtest.RandomString(), clibtest.RandomString(), clibtest.RandomString(), ctx)
 	rootCmd.SetArgs(args)
@@ -177,8 +178,8 @@ func expectPanicWithError(t *testing.T) {
 	}
 }
 
-func newIOContext() IOContext {
-	ctx := NewIOContext()
+func newIOContext() api.IOContext {
+	ctx := api.NewIOContext()
 	ctx.Tty = clibtest.RandomBool()
 	ctx.StdoutWriter = new(bytes.Buffer)
 	ctx.StderrWriter = new(bytes.Buffer)

@@ -18,7 +18,7 @@ import (
 func TestExecuteReturnsErrorOnCommandFailure(t *testing.T) {
 	defaultWorkingDir := "default/dir"
 	env := map[string]string{}
-	exec := NewCommandExecutor(true, true)
+	exec := NewCommandExecutor(true, true, api.NewIOContext())
 	cmdSpec := aCommandSpec(aNonExistingCommand(), "")
 
 	err := exec.Execute(cmdSpec, defaultWorkingDir, env)
@@ -88,37 +88,13 @@ func TestConfigureCommandWithStderrPiping(t *testing.T) {
 	assert.Equal(t, log.StandardLogger().Out, execCmd.Stderr)
 }
 
-func TestRegisterInterruptGuard(t *testing.T) {
-	execCmd := exec.Command("test", "--command")
-	call := make(chan bool)
-	_, c := registerInterruptGuard(execCmd, func(c *exec.Cmd, s os.Signal) {
-		call <- true
-	})
-
-	c <- os.Interrupt
-	assert.Eventually(t, func() bool { return <-call }, time.Second*10, time.Millisecond)
-}
-
-func TestRegisterInterruptGuardCancellation(t *testing.T) {
-	expectPanic := func() {
-		v := recover()
-		assert.NotNil(t, v)
-	}
-	defer expectPanic()
-
-	cancel, c := registerInterruptGuard(aCommand(), func(c *exec.Cmd, s os.Signal) {})
-	cancel()
-
-	c <- os.Interrupt // this should fail panic because the channel is closed
-}
-
 func aCommand() *exec.Cmd {
 	return exec.Command(test.RandomString(), test.RandomString())
 }
 
 func configureCommandWithIOSpec(pipeStdout, pipeStderr bool) *exec.Cmd {
 	spec := aCommandSpec(aNonExistingCommand(), "")
-	executor := NewCommandExecutor(pipeStdout, pipeStderr).(*commandExecutor)
+	executor := NewCommandExecutor(pipeStdout, pipeStderr, api.NewIOContext()).(*commandExecutor)
 	execCmd := exec.Command(spec.Cmd[0], spec.Cmd[1:]...)
 
 	executor.configureCommand(spec, execCmd, "", map[string]string{})
@@ -127,7 +103,7 @@ func configureCommandWithIOSpec(pipeStdout, pipeStderr bool) *exec.Cmd {
 }
 
 func configureCommand(spec *api.CommandSpec, defaultWorkingDir string, env map[string]string) *exec.Cmd {
-	executor := NewCommandExecutor(false, false).(*commandExecutor)
+	executor := NewCommandExecutor(false, false, api.NewIOContext()).(*commandExecutor)
 	execCmd := exec.Command(spec.Cmd[0], spec.Cmd[1:]...)
 
 	executor.configureCommand(spec, execCmd, defaultWorkingDir, env)
