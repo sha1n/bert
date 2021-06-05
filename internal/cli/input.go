@@ -6,6 +6,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/sha1n/benchy/api"
 )
 
 // IsValidFn validates the input string and returns true if valid otherwise false.
@@ -15,7 +17,7 @@ var defaultIsValidFn = func(s string) bool { return true }
 
 // requestInput prompts for input, reads, validates it and returns it.
 // If 'required' is specified, the function will keep asking for inputs until a valid input is entered.
-func requestInput(prompt string, required bool, isValidFn IsValidFn, ctx IOContext) string {
+func requestInput(prompt string, required bool, isValidFn IsValidFn, ctx api.IOContext) string {
 	var str string
 	reader := bufio.NewReader(ctx.StdinReader)
 
@@ -39,7 +41,7 @@ func requestInput(prompt string, required bool, isValidFn IsValidFn, ctx IOConte
 	}
 }
 
-func questionYN(prompt string, ctx IOContext) bool {
+func questionYN(prompt string, ctx api.IOContext) bool {
 	var str string
 	reader := bufio.NewReader(ctx.StdinReader)
 
@@ -59,11 +61,11 @@ func questionYN(prompt string, ctx IOContext) bool {
 	}
 }
 
-func requestString(prompt string, required bool, ctx IOContext) string {
+func requestString(prompt string, required bool, ctx api.IOContext) string {
 	return requestInput(prompt, required, defaultIsValidFn, ctx)
 }
 
-func requestOptionalExistingDirectory(prompt string, defaultVal string, ctx IOContext) string {
+func requestOptionalExistingDirectory(prompt string, defaultVal string, ctx api.IOContext) string {
 	return requestInput(
 		formatOptionalPrompt(prompt, defaultVal),
 		false,
@@ -88,7 +90,7 @@ func requestOptionalExistingDirectory(prompt string, defaultVal string, ctx IOCo
 	)
 }
 
-func requestUint(prompt string, required bool, ctx IOContext) uint {
+func requestUint(prompt string, required bool, ctx api.IOContext) uint {
 	var str string
 	for {
 		str = requestInput(prompt, required, defaultIsValidFn, ctx)
@@ -103,7 +105,7 @@ func requestUint(prompt string, required bool, ctx IOContext) uint {
 	}
 }
 
-func requestOptionalBool(prompt string, defaultVal bool, ctx IOContext) bool {
+func requestOptionalBool(prompt string, defaultVal bool, ctx api.IOContext) bool {
 	var str string
 	for {
 		str = requestInput(formatOptionalPrompt(prompt, defaultVal), false, defaultIsValidFn, ctx)
@@ -118,7 +120,7 @@ func requestOptionalBool(prompt string, defaultVal bool, ctx IOContext) bool {
 	}
 }
 
-func requestCommandLine(prompt string, required bool, ctx IOContext) []string {
+func requestCommandLine(prompt string, required bool, ctx api.IOContext) []string {
 	var final []string
 	str := requestInput(prompt, required, defaultIsValidFn, ctx)
 	if str != "" {

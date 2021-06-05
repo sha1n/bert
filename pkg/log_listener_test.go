@@ -12,9 +12,9 @@ import (
 )
 
 func TestNewLogProgressListener(t *testing.T) {
-	expected := LogProgressListener{logger: log.StandardLogger()}
+	expected := LoggingProgressListener{logger: log.StandardLogger()}
 
-	assert.Equal(t, expected, NewLogProgressListener())
+	assert.Equal(t, expected, NewLoggingProgressListener())
 }
 
 func TestLogProgressListener_OnBenchmarkStart(t *testing.T) {
@@ -88,9 +88,9 @@ func TestLogProgressListener_OnMessagef(t *testing.T) {
 	assert.Contains(t, actual, fmt.Sprintf(expectedMessageFormat, expectedMessageParam))
 }
 
-func newInterceptableLogProgressListener() LogProgressListener {
+func newInterceptableLogProgressListener() LoggingProgressListener {
 	logger := newInterceptingLogger()
-	l := LogProgressListener{
+	l := LoggingProgressListener{
 		logger: logger,
 	}
 

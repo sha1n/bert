@@ -5,6 +5,7 @@ import (
 	"runtime/debug"
 
 	"github.com/fatih/color"
+	"github.com/sha1n/benchy/api"
 	"github.com/sha1n/benchy/internal/cli"
 	errorhandling "github.com/sha1n/clib/pkg/error_handling"
 	log "github.com/sirupsen/logrus"
@@ -29,10 +30,10 @@ func main() {
 	doRun(doExit)
 }
 
-func doRun(exit func(int)) {
-	defer handlePanics(exit)
+func doRun(exitFn func(int)) {
+	defer handlePanics(exitFn)
 
-	ctx := cli.NewIOContext()
+	ctx := api.NewIOContext()
 	rootCmd := cli.NewRootCommand(ProgramName, Version, Build, ctx)
 
 	// Subcommands
@@ -44,22 +45,22 @@ func doRun(exit func(int)) {
 	}
 }
 
-func handlePanics(exit func(int)) {
+func handlePanics(exitFn func(int)) {
 	if o := recover(); o != nil {
-		if err, ok := o.(error); ok {
-			log.Error(err.Error())
-		} else {
-			log.Error(o)
+		if err, ok := o.(cli.FatalUserError); ok {
+			log.Fatal(err)
+			exitFn(1)
 		}
+
 		issueURL := errorhandling.GenerateGitHubCreateNewIssueURL(
 			"sha1n",
 			"benchy",
 			fmt.Sprintf("Panic Issue (%s, build: %s)", Version, Build),
-			fmt.Sprintf("```Captured error: %s```", debug.Stack()),
+			fmt.Sprintf("**Error:** %s\n**Stacktrace:**\n```%s```", o, debug.Stack()),
 		) + "&labels=bug"
 
 		yellow := color.New(color.FgYellow)
-		yellow.Println("\nPlease kindly report this issue by following this URL:")
+		yellow.Println("\nOh no... Please kindly report this issue by following this URL:")
 		fmt.Printf(`
 
 %s
@@ -68,7 +69,7 @@ func handlePanics(exit func(int)) {
 			issueURL,
 		)
 
-		exit(1)
+		exitFn(1)
 	}
 }
 

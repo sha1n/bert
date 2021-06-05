@@ -3,6 +3,7 @@ package cli
 import (
 	"testing"
 
+	"github.com/sha1n/benchy/api"
 	clibtest "github.com/sha1n/clib/pkg/test"
 	"github.com/sha1n/termite"
 	log "github.com/sirupsen/logrus"
@@ -11,7 +12,7 @@ import (
 )
 
 func TestDefaultLogLevel(t *testing.T) {
-	ctx := NewIOContext()
+	ctx := api.NewIOContext()
 	cmd := aCommandWithArgs(ctx)
 	configureOutput(cmd, ctx)
 
@@ -20,7 +21,7 @@ func TestDefaultLogLevel(t *testing.T) {
 }
 
 func TestDebugOn(t *testing.T) {
-	ctx := NewIOContext()
+	ctx := api.NewIOContext()
 	cmd := aCommandWithArgs(ctx, "-d")
 	cmd.Run = func(cmd *cobra.Command, args []string) {
 		configureOutput(cmd, ctx)
@@ -33,12 +34,12 @@ func TestDebugOn(t *testing.T) {
 }
 
 func TestSilentOn(t *testing.T) {
-	ctx := NewIOContext()
+	ctx := api.NewIOContext()
 	cmd := aCommandWithArgs(ctx, "-s")
 	cmd.Run = func(cmd *cobra.Command, args []string) {
 		configureOutput(cmd, ctx)
 
-		assert.Equal(t, log.PanicLevel, log.StandardLogger().Level)
+		assert.Equal(t, log.FatalLevel, log.StandardLogger().Level)
 		assert.Equal(t, ctx.StderrWriter, log.StandardLogger().Out)
 	}
 
@@ -46,7 +47,7 @@ func TestSilentOn(t *testing.T) {
 }
 
 func TestTtyMode(t *testing.T) {
-	withTty(func(ctx IOContext) {
+	withTty(func(ctx api.IOContext) {
 		cmd := aCommandWithArgs(ctx)
 		cmd.Run = func(cmd *cobra.Command, args []string) {
 			configureOutput(cmd, ctx)
@@ -60,18 +61,18 @@ func TestTtyMode(t *testing.T) {
 	})
 }
 
-func aCommandWithArgs(ctx IOContext, args ...string) *cobra.Command {
-	ioContext := NewIOContext()
+func aCommandWithArgs(ctx api.IOContext, args ...string) *cobra.Command {
+	ioContext := api.NewIOContext()
 	rootCmd := NewRootCommand(clibtest.RandomString(), clibtest.RandomString(), clibtest.RandomString(), ioContext)
 	rootCmd.SetArgs(append(args, "--config=../../test/data/integration.yaml"))
 
 	return rootCmd
 }
 
-func withTty(test func(IOContext)) {
+func withTty(test func(api.IOContext)) {
 	origTty := termite.Tty
 	termite.Tty = true
-	ioContext := NewIOContext()
+	ioContext := api.NewIOContext()
 	ioContext.Tty = true
 
 	defer func() {

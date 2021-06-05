@@ -1,41 +1,15 @@
 package main
 
 import (
-	"bytes"
 	"os"
-	"os/exec"
 	"testing"
 
+	"github.com/sha1n/termite"
 	"github.com/stretchr/testify/assert"
 )
 
-var runMainCommand = []string{
-	"go",
-	"run",
-	"-mod=readonly",
-	"main.go",
-}
-
-func TestExitCodeWhenRequiredConfigArgIsMissing(t *testing.T) {
-	expectedExitCode := 1
-	buf := new(bytes.Buffer)
-
-	cmd := exec.Command(runMainCommand[0], runMainCommand[1:]...)
-
-	cmd.Stdout = buf
-	cmd.Stderr = buf
-
-	assert.NoError(t, cmd.Start())
-	state, err := cmd.Process.Wait()
-
-	assert.Contains(t, buf.String(), "Error: required flag(s) \"config\" not set")
-	assert.NoError(t, err)
-	assert.Equal(t, expectedExitCode, state.ExitCode())
-
-}
-
-func TestExitCodeWithMissingConfig(t *testing.T) {
-	expectedExitCode := 1
+func TestExitCodeWithMissingRequiredArguments(t *testing.T) {
+	expectedPanicExitCode := 1
 	actualExitcode := 0
 
 	os.Args = []string{}
@@ -43,5 +17,41 @@ func TestExitCodeWithMissingConfig(t *testing.T) {
 		actualExitcode = i
 	})
 
-	assert.Equal(t, expectedExitCode, actualExitcode)
+	assert.Equal(t, expectedPanicExitCode, actualExitcode)
+}
+
+func TestSanity(t *testing.T) {
+	testWith(
+		t,
+		[]string{
+			"program",
+			"-c",
+			"../test/data/integration.yaml",
+			"--debug",
+			"--pipe-stdout",
+			"--pipe-stderr",
+		},
+		true,
+		func(t *testing.T) {
+			doRun(func(code int) {
+				assert.Equal(t, 0, code)
+			})
+		},
+	)
+}
+
+func testWith(t *testing.T, args []string, tty bool, test func(t *testing.T)) {
+	origTtyValue := termite.Tty
+	origOsArgs := os.Args
+	termite.Tty = true
+
+	defer func() {
+		termite.Tty = origTtyValue
+		os.Args = origOsArgs
+	}()
+
+	os.Args = args
+	termite.Tty = tty
+
+	test(t)
 }

@@ -10,12 +10,13 @@ import (
 	"github.com/sha1n/benchy/api"
 	"github.com/sha1n/benchy/internal/report"
 	"github.com/sha1n/benchy/pkg"
+	"github.com/sha1n/termite"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
 // NewRootCommand creates the main command parse
-func NewRootCommand(programName, version, build string, ctx IOContext) *cobra.Command {
+func NewRootCommand(programName, version, build string, ctx api.IOContext) *cobra.Command {
 	var rootCmd = &cobra.Command{
 		Use: programName,
 		Version: fmt.Sprintf(`Version: %s
@@ -58,7 +59,7 @@ csv/raw - CSV in which each row represents a raw trace event. useful if you want
 }
 
 // runFn returns a function that parses CLI arguments and runs the benchmark process with the specified IOContext
-func runFn(ctx IOContext) func(*cobra.Command, []string) {
+func runFn(ctx api.IOContext) func(*cobra.Command, []string) {
 	return func(cmd *cobra.Command, args []string) {
 		var err error
 		var closer io.Closer
@@ -78,9 +79,13 @@ func runFn(ctx IOContext) func(*cobra.Command, []string) {
 			tracer := pkg.NewTracer(spec.Executions * len(spec.Scenarios))
 			reportHandler.Subscribe(tracer.Stream())
 
-			pkg.Execute(spec, resolveExecutionContext(cmd, tracer))
+			log.Info("Executing...")
+			pkg.Execute(spec, resolveExecutionContext(cmd, spec, ctx, tracer))
 
+			log.Info("Finalizing report...")
 			err = reportHandler.Finalize()
+
+			log.Info("Done")
 		}
 
 		CheckFatal(err)
@@ -107,7 +112,7 @@ func loadSpec(cmd *cobra.Command) (spec api.BenchmarkSpec, err error) {
 	return spec, err
 }
 
-func resolveReportHandler(cmd *cobra.Command, spec api.BenchmarkSpec, ctx IOContext) (handler api.ReportHandler, closer io.Closer, err error) {
+func resolveReportHandler(cmd *cobra.Command, spec api.BenchmarkSpec, ctx api.IOContext) (handler api.ReportHandler, closer io.Closer, err error) {
 	reportCtx := resolveReportContext(cmd)
 	writeCloser := ResolveOutputArg(cmd, ArgNameOutputFile, ctx)
 	writer := bufio.NewWriter(writeCloser)
@@ -149,13 +154,40 @@ func resolveReportContext(cmd *cobra.Command) api.ReportContext {
 	}
 }
 
-func resolveExecutionContext(cmd *cobra.Command, tracer api.Tracer) api.ExecutionContext {
+func resolveExecutionContext(cmd *cobra.Command, spec api.BenchmarkSpec, ctx api.IOContext, tracer api.Tracer) api.ExecutionContext {
 	pipeStdOut := GetBool(cmd, ArgNamePipeStdout)
 	pipeStdErr := GetBool(cmd, ArgNamePipeStderr)
 
 	return api.NewExecutionContext(
-		tracer, 
+		tracer,
 		pkg.NewCommandExecutor(pipeStdOut, pipeStdErr),
-		pkg.NewLogProgressListener(),
+		resolveExecutionListener(cmd, spec, ctx),
 	)
+}
+
+func resolveExecutionListener(cmd *cobra.Command, spec api.BenchmarkSpec, ctx api.IOContext) api.Listener {
+	if enableTerminalGUI(cmd, ctx) {
+		return pkg.NewProgressView(spec, terminalWidthOrFake, ctx)
+	}
+
+	return pkg.NewLoggingProgressListener()
+}
+
+func enableTerminalGUI(cmd *cobra.Command, ctx api.IOContext) bool {
+	reportToFile := GetString(cmd, ArgNameOutputFile) != ""
+	enableRichOut := IsExperimentEnabled(cmd, "ui") && (reportToFile || !StreamingReportFormats[GetString(cmd, ArgNameFormat)])
+	silentMode := GetBool(cmd, ArgNameSilent)
+	debugMode := GetBool(cmd, ArgNameDebug)
+	pipeOutputsMode := GetBool(cmd, ArgNamePipeStdout)
+	pipeOutputsMode = pipeOutputsMode || GetBool(cmd, ArgNamePipeStderr)
+
+	return ctx.Tty && enableRichOut && !(silentMode || debugMode || pipeOutputsMode)
+}
+
+func terminalWidthOrFake() int {
+	if w, _, err := termite.GetTerminalDimensions(); err == nil {
+		return w
+	}
+	return 0
+
 }

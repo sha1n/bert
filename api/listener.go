@@ -10,4 +10,3 @@ type Listener interface {
 	OnMessage(id ID, message string)
 	OnError(id ID, err error)
 }
-

@@ -26,22 +26,15 @@ func NewCommandExecutor(pipeStdout bool, pipeStderr bool) api.CommandExecutor {
 
 // Executes a single command in a subprocess based on the specified specs.
 func (ce *commandExecutor) Execute(cmdSpec *api.CommandSpec, defaultWorkingDir string, env map[string]string) (exitError error) {
-	if cmdSpec == nil {
-		return nil
-	}
-
 	log.Debugf("Going to execute command %v", cmdSpec.Cmd)
 
 	execCmd := exec.Command(cmdSpec.Cmd[0], cmdSpec.Cmd[1:]...)
 	ce.configureCommand(cmdSpec, execCmd, defaultWorkingDir, env)
 
-	exitError = execCmd.Run()
+	cancel, _ := registerInterruptGuard(onShutdownSignalFn(execCmd))
+	defer cancel()
 
-	if exitError != nil {
-		log.Errorf("Command '%s' failed. Error: %s", cmdSpec.Cmd, exitError.Error())
-	}
-
-	return exitError
+	return execCmd.Run()
 }
 
 func (ce *commandExecutor) configureCommand(cmd *api.CommandSpec, execCmd *exec.Cmd, defaultWorkingDir string, env map[string]string) {
@@ -88,4 +81,15 @@ func toEnvVarsArray(env map[string]string) []string {
 	}
 
 	return arr
+}
+
+func onShutdownSignalFn(execCmd *exec.Cmd) func(os.Signal) {
+	return func(sig os.Signal) {
+		if sig == os.Interrupt {
+			log.Debugf("Got %s signal. Forwarding to %s...", sig, execCmd.Args[0])
+			execCmd.Process.Signal(sig)
+
+			os.Exit(1)
+		}
+	}
 }
