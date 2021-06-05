@@ -19,6 +19,7 @@ func executeAlternately(spec api.BenchmarkSpec, ctx api.ExecutionContext) {
 		for si := range spec.Scenarios {
 			scenario := spec.Scenarios[si]
 
+			ctx.Listener.OnScenarioStart(scenario.ID())
 			if i == 1 {
 				executeScenarioSetup(scenario, ctx)
 			}
@@ -26,6 +27,8 @@ func executeAlternately(spec api.BenchmarkSpec, ctx api.ExecutionContext) {
 			if i == spec.Executions {
 				executeScenarioTeardown(scenario, ctx)
 			}
+
+			ctx.Listener.OnScenarioEnd(scenario.ID())
 		}
 	}
 }
@@ -33,34 +36,38 @@ func executeAlternately(spec api.BenchmarkSpec, ctx api.ExecutionContext) {
 func executeSequentially(spec api.BenchmarkSpec, ctx api.ExecutionContext) {
 	for si := range spec.Scenarios {
 		scenario := spec.Scenarios[si]
-
+		
+		ctx.Listener.OnScenarioStart(scenario.ID())
+		
 		executeScenarioSetup(scenario, ctx)
 		for i := 1; i <= spec.Executions; i++ {
 			executeScenarioCommand(scenario, i, spec.Executions, ctx)
 		}
 		executeScenarioTeardown(scenario, ctx)
+		
+		ctx.Listener.OnScenarioEnd(scenario.ID())
 	}
 }
 
 func executeScenarioSetup(scenario api.ScenarioSpec, ctx api.ExecutionContext) {
 	if scenario.BeforeAll != nil {
-		log.Debugf("Running setup for scenario '%s'...", scenario.Name)
-		logError(ctx.Executor.Execute(scenario.BeforeAll, scenario.WorkingDirectory, scenario.Env))
+		ctx.Listener.OnMessage(scenario.ID(), "Running setup...")
+		logError(scenario.ID(), ctx.Executor.Execute(scenario.BeforeAll, scenario.WorkingDirectory, scenario.Env), ctx)
 	}
 }
 
 func executeScenarioTeardown(scenario api.ScenarioSpec, ctx api.ExecutionContext) {
 	if scenario.AfterAll != nil {
-		log.Debugf("Running teardown for scenario '%s'...", scenario.Name)
-		logError(ctx.Executor.Execute(scenario.AfterAll, scenario.WorkingDirectory, scenario.Env))
+		ctx.Listener.OnMessage(scenario.ID(), "Running teardown...")
+		logError(scenario.ID(), ctx.Executor.Execute(scenario.AfterAll, scenario.WorkingDirectory, scenario.Env), ctx)
 	}
 }
 
 func executeScenarioCommand(scenario api.ScenarioSpec, execIndex int, totalExec int, ctx api.ExecutionContext) {
-	log.Infof("Executing scenario '%s'... (%d/%d)", scenario.Name, execIndex, totalExec)
+	ctx.Listener.OnMessagef(scenario.ID(), "Running benchmarked command... (%d/%d)", execIndex, totalExec)
 	if scenario.BeforeEach != nil {
-		log.Debugf("Executing 'before' command %v", scenario.BeforeEach.Cmd)
-		logError(ctx.Executor.Execute(scenario.BeforeEach, scenario.WorkingDirectory, scenario.Env))
+		ctx.Listener.OnMessagef(scenario.ID(), "Running 'before' command %v", scenario.BeforeEach.Cmd)
+		logError(scenario.ID(), ctx.Executor.Execute(scenario.BeforeEach, scenario.WorkingDirectory, scenario.Env), ctx)
 	}
 
 	ctx.Tracer.Start(scenario)(
@@ -68,13 +75,14 @@ func executeScenarioCommand(scenario api.ScenarioSpec, execIndex int, totalExec 
 	)
 
 	if scenario.AfterEach != nil {
-		log.Debugf("Executing 'after' command %v", scenario.AfterEach.Cmd)
-		logError(ctx.Executor.Execute(scenario.AfterEach, scenario.WorkingDirectory, scenario.Env))
+		ctx.Listener.OnMessagef(scenario.ID(), "Running 'after' command %v", scenario.AfterEach.Cmd)
+		logError(scenario.ID(), ctx.Executor.Execute(scenario.AfterEach, scenario.WorkingDirectory, scenario.Env), ctx)
 	}
 }
 
-func logError(err error) {
+func logError(id api.ID, err error, ctx api.ExecutionContext) {
 	if err != nil {
+		ctx.Listener.OnError(id, err)
 		log.Error(err)
 	}
 }

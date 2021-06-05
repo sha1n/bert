@@ -153,5 +153,9 @@ func resolveExecutionContext(cmd *cobra.Command, tracer api.Tracer) api.Executio
 	pipeStdOut := GetBool(cmd, ArgNamePipeStdout)
 	pipeStdErr := GetBool(cmd, ArgNamePipeStderr)
 
-	return api.NewExecutionContext(tracer, pkg.NewCommandExecutor(pipeStdOut, pipeStdErr))
+	return api.NewExecutionContext(
+		tracer, 
+		pkg.NewCommandExecutor(pipeStdOut, pipeStdErr),
+		pkg.NewLogProgressListener(),
+	)
 }
