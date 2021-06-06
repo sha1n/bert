@@ -20,14 +20,12 @@ func configureOutput(cmd *cobra.Command, ctx IOContext) {
 	silent := GetBool(cmd, ArgNameSilent)
 	debug := GetBool(cmd, ArgNameDebug)
 	var level = log.InfoLevel
-	// var writer = ctx.StdoutWriter
 
 	if silent && debug {
 		CheckUserArgFatal(errors.New("'--%s' and '--%s' are mutually exclusive"))
 	}
 	if silent {
 		level = log.PanicLevel
-		// writer = ctx.StderrWriter
 	}
 	if debug {
 		level = log.DebugLevel
