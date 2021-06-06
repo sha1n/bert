@@ -50,7 +50,7 @@ func executeScenarioSetup(scenario api.ScenarioSpec, ctx api.ExecutionContext) {
 }
 
 func executeScenarioTeardown(scenario api.ScenarioSpec, ctx api.ExecutionContext) {
-	if scenario.BeforeAll != nil {
+	if scenario.AfterAll != nil {
 		log.Debugf("Running teardown for scenario '%s'...", scenario.Name)
 		logError(ctx.Executor.Execute(scenario.AfterAll, scenario.WorkingDirectory, scenario.Env))
 	}
