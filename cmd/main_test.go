@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"os"
 	"os/exec"
 	"testing"
 
@@ -31,4 +32,16 @@ func TestExitCodeWhenRequiredConfigArgIsMissing(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, expectedExitCode, state.ExitCode())
 
+}
+
+func TestExitCodeWithMissingConfig(t *testing.T) {
+	expectedExitCode := 1
+	actualExitcode := 0
+
+	os.Args = []string{}
+	doRun(func(i int) {
+		actualExitcode = i
+	})
+
+	assert.Equal(t, expectedExitCode, actualExitcode)
 }
