@@ -112,6 +112,24 @@ go-clean:
 	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go clean $(MODFLAGS) $(GOBASE)/cmd
 	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go clean -modcache
 
+run-sanity-tests: build-docker run-linux-dockerized-tests
+
+build-docker:
+	@echo "  >  Building docker image..."
+	docker build -t sha1n/$(PROJECTNAME):latest .
+	docker tag sha1n/$(PROJECTNAME):latest sha1n/$(PROJECTNAME):$(VERSION:v%=%)
+
+run-linux-dockerized-tests:
+	@echo "  >  Running with experimental UI..."
+	docker run -ti sha1n/benchy /benchy/bin/benchy-linux-amd64 -c /benchy/test/data/spec_test_load.yaml --experimental ui
+	@echo "  >  Running with experimental UI + debug..."
+	docker run -ti sha1n/benchy /benchy/bin/benchy-linux-amd64 -c /benchy/test/data/spec_test_load.yaml --experimental ui -d
+	@echo "  >  Running with experimental UI + silent..."
+	docker run -ti sha1n/benchy /benchy/bin/benchy-linux-amd64 -c /benchy/test/data/spec_test_load.yaml --experimental ui -s
+	@echo "  >  Running with experimental UI + piped stdout..."
+	docker run -ti sha1n/benchy /benchy/bin/benchy-linux-amd64 -c /benchy/test/data/spec_test_load.yaml --experimental ui --pipe-stdout
+	@echo "  >  Running with experimental UI + piped stderr..."
+	docker run -ti sha1n/benchy /benchy/bin/benchy-linux-amd64 -c /benchy/test/data/spec_test_load.yaml --experimental ui --pipe-stderr
 
 
 .PHONY: help
