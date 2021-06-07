@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -39,20 +40,42 @@ func TestBasicInteractiveFlow(t *testing.T) {
 	assert.Equal(t, expectedSpec(), actual)
 }
 
-func configureCommand(t *testing.T, ctx api.IOContext) (command *cobra.Command, configPath string, teardown func()) {
-	rootCmd := NewRootCommand(clibtest.RandomString(), clibtest.RandomString(), clibtest.RandomString(), ctx)
+// Making sure the example we provide to the user is valid
+func TestExampleSpecValidity(t *testing.T) {
+	ctx := api.NewIOContext()
+	buffer := new(bytes.Buffer)
+	ctx.StdoutWriter = buffer
+
+	rootCmd := configureExampleCommand(t, ctx)
+
+	err := rootCmd.Execute()
+	assert.NoError(t, err)
+
+	actual, err := pkg.LoadSpecFromYamlData(buffer.Bytes())
+	assert.NoError(t, err)
+	assert.NotNil(t, actual)
+}
+
+func configureExampleCommand(t *testing.T, ctx api.IOContext) (rootCmd *cobra.Command) {
+	rootCmd = NewRootCommand(clibtest.RandomString(), clibtest.RandomString(), clibtest.RandomString(), ctx)
+	configCmd := CreateConfigCommand(ctx)
+	rootCmd.AddCommand(configCmd)
+
+	rootCmd.SetArgs([]string{"config", "--example"})
+
+	return
+}
+
+func configureCommand(t *testing.T, ctx api.IOContext) (rootCmd *cobra.Command, configPath string, teardown func()) {
+	rootCmd = NewRootCommand(clibtest.RandomString(), clibtest.RandomString(), clibtest.RandomString(), ctx)
 	cmd := CreateConfigCommand(ctx)
 	rootCmd.AddCommand(cmd)
 
-	tmpFile, err := ioutil.TempFile("", "TestBasicInteractiveFlow")
+	tmpFile, err := ioutil.TempFile("", "configureCommand")
 
 	assert.NoError(t, err)
 
-	args := []string{"config", "--out-file", tmpFile.Name()}
-	// cmd.SetArgs(args)
-
-	assert.NoError(t, cmd.Flags().Set("out-file", tmpFile.Name()))
-	rootCmd.SetArgs(args)
+	rootCmd.SetArgs([]string{"config", "--out-file", tmpFile.Name()})
 
 	return rootCmd, tmpFile.Name(), func() { os.Remove(tmpFile.Name()) }
 }
