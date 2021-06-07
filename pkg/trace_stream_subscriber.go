@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"context"
+	"fmt"
 	"reflect"
 	"sync"
 
@@ -40,7 +41,7 @@ func (s *StreamSubscriber) Subscribe() Unsubscribe {
 	defer s.mx.Unlock()
 
 	if s.drainWaitGroup != nil {
-		log.Panicf("Programmer error: %s can only subscribe one.", reflect.TypeOf(s))
+		panic(fmt.Errorf("programmer error: %s can only subscribe one", reflect.TypeOf(s)))
 	}
 
 	context, cancel := context.WithCancel(context.Background())

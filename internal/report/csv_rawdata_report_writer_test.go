@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/sha1n/benchy/api"
-	"github.com/sha1n/benchy/test"
+	"github.com/sha1n/benchy/pkg"
 	clibtest "github.com/sha1n/clib/pkg/test"
 	"github.com/stretchr/testify/assert"
 )
@@ -55,8 +55,8 @@ func writeCsvRawReport(t *testing.T, includeHeaders bool, traces ...api.Trace) [
 }
 
 func twoRandomTraceEvents() (api.Trace, api.Trace) {
-	t1 := test.NewFakeTrace(clibtest.RandomString(), time.Duration(clibtest.RandomUint()), nil)
-	t2 := test.NewFakeTrace(clibtest.RandomString(), time.Duration(clibtest.RandomUint()), errors.New(clibtest.RandomString()))
+	t1 := pkg.NewFakeTrace(clibtest.RandomString(), time.Duration(clibtest.RandomUint()), nil)
+	t2 := pkg.NewFakeTrace(clibtest.RandomString(), time.Duration(clibtest.RandomUint()), errors.New(clibtest.RandomString()))
 
 	return t1, t2
 }

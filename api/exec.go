@@ -9,12 +9,14 @@ type CommandExecutor interface {
 type ExecutionContext struct {
 	Executor CommandExecutor
 	Tracer   Tracer
+	Listener
 }
 
 // NewExecutionContext creates a new ExecutionContext.
-func NewExecutionContext(tracer Tracer, executor CommandExecutor) ExecutionContext {
+func NewExecutionContext(tracer Tracer, executor CommandExecutor, listener Listener) ExecutionContext {
 	return ExecutionContext{
 		Executor: executor,
 		Tracer:   tracer,
+		Listener: listener,
 	}
 }

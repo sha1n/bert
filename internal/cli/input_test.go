@@ -6,6 +6,7 @@ import (
 	"path"
 	"testing"
 
+	"github.com/sha1n/benchy/api"
 	clibtest "github.com/sha1n/clib/pkg/test"
 	"github.com/stretchr/testify/assert"
 )
@@ -165,8 +166,8 @@ func TestRequestUintWithInvalidInput(t *testing.T) {
 	assert.Equal(t, expected, actual)
 }
 
-func givenIOContextWithInputContent(content string) IOContext {
-	ctx := NewIOContext()
+func givenIOContextWithInputContent(content string) api.IOContext {
+	ctx := api.NewIOContext()
 	ctx.StdinReader = clibtest.NewEmulatedStdinReader(content)
 
 	return ctx
