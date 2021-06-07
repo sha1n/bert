@@ -1,11 +1,13 @@
 package pkg
 
 import (
+	"fmt"
 	"os"
 	"path"
 	"testing"
 
 	"github.com/sha1n/benchy/api"
+	"github.com/sha1n/clib/pkg/test"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v2"
 )
@@ -51,6 +53,49 @@ func TestLoadYamlWithMissingRequiredCommand(t *testing.T) {
 
 func TestLoadYamlWithMissingCmdFieldOfOptionalCommand(t *testing.T) {
 	_, err := LoadSpec("../test/data/spec_test_load_with_missing_cmd_of_optional_command.yaml")
+
+	assert.Error(t, err)
+}
+
+func TestLoadSpecFromYamlData(t *testing.T) {
+	exec := test.RandomUint()
+	scenarioName := test.RandomString()
+	command := test.RandomString()
+
+	example := fmt.Sprintf(`executions: %d
+scenarios:
+- name: %s
+  command:
+    cmd:
+    - %s
+`, exec, scenarioName, command)
+
+	expected := api.BenchmarkSpec{
+		Executions: int(exec),
+		Scenarios: []api.ScenarioSpec{
+			{
+				Name:    scenarioName,
+				Command: &api.CommandSpec{Cmd: []string{command}},
+			},
+		},
+	}
+	actual, err := LoadSpecFromYamlData([]byte(example))
+
+	assert.NoError(t, err)
+	assert.Equal(t, expected, actual)
+
+}
+
+func TestLoadSpecFromYamlDataInvalid(t *testing.T) {
+	example := `executions: text
+scenarios:
+- name: test
+  command:
+    cmd:
+    - test
+`
+
+	_, err := LoadSpecFromYamlData([]byte(example))
 
 	assert.Error(t, err)
 }
