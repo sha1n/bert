@@ -56,6 +56,23 @@ func TestExampleSpecValidity(t *testing.T) {
 	assert.NotNil(t, actual)
 }
 
+func TestExampleOutFile(t *testing.T) {
+	ctx := api.NewIOContext()
+	rootCmd, configPath, teardown := configureExampleCommandWithOutFile(t, ctx)
+	teardown()
+
+	expected, err := pkg.LoadSpecFromYamlData([]byte(getExampleSpec()))
+	assert.NoError(t, err)
+	assert.NotNil(t, expected)
+
+	err = rootCmd.Execute()
+	assert.NoError(t, err)
+
+	actual, err := pkg.LoadSpec(configPath)
+	assert.NoError(t, err)
+	assert.Equal(t, expected, actual)
+}
+
 func configureExampleCommand(t *testing.T, ctx api.IOContext) (rootCmd *cobra.Command) {
 	rootCmd = NewRootCommand(clibtest.RandomString(), clibtest.RandomString(), clibtest.RandomString(), ctx)
 	configCmd := CreateConfigCommand(ctx)
@@ -66,13 +83,29 @@ func configureExampleCommand(t *testing.T, ctx api.IOContext) (rootCmd *cobra.Co
 	return
 }
 
+func configureExampleCommandWithOutFile(t *testing.T, ctx api.IOContext) (rootCmd *cobra.Command, configPath string, teardown func()) {
+	rootCmd = NewRootCommand(clibtest.RandomString(), clibtest.RandomString(), clibtest.RandomString(), ctx)
+	configCmd := CreateConfigCommand(ctx)
+	rootCmd.AddCommand(configCmd)
+
+	tmpFile, err := ioutil.TempFile("", "configureCommand")
+	assert.NoError(t, err)
+
+	configPath = tmpFile.Name()
+
+	args := []string{"config", "--example", "-o", configPath}
+
+	rootCmd.SetArgs(args)
+
+	return rootCmd, configPath, func() { os.Remove(tmpFile.Name()) }
+}
+
 func configureCommand(t *testing.T, ctx api.IOContext) (rootCmd *cobra.Command, configPath string, teardown func()) {
 	rootCmd = NewRootCommand(clibtest.RandomString(), clibtest.RandomString(), clibtest.RandomString(), ctx)
 	cmd := CreateConfigCommand(ctx)
 	rootCmd.AddCommand(cmd)
 
 	tmpFile, err := ioutil.TempFile("", "configureCommand")
-
 	assert.NoError(t, err)
 
 	rootCmd.SetArgs([]string{"config", "--out-file", tmpFile.Name()})

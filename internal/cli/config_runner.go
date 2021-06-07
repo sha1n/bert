@@ -37,7 +37,7 @@ func runConfigToolFn(ctx api.IOContext) func(*cobra.Command, []string) {
 		defer writeCloser.Close()
 
 		if GetBool(cmd, ArgNameConfigExample) {
-			io.WriteString(ctx.StdoutWriter, getExampleSpec())
+			io.WriteString(writeCloser, getExampleSpec())
 
 		} else {
 			printHints()
