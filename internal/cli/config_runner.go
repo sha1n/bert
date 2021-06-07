@@ -11,7 +11,7 @@ import (
 )
 
 // CreateConfigCommand creates the 'config' sub command
-func CreateConfigCommand(ctx IOContext) *cobra.Command {
+func CreateConfigCommand(ctx api.IOContext) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "config",
 		Long:  `Interactively walks through a benchmark configuration creation process`,
@@ -27,7 +27,7 @@ func CreateConfigCommand(ctx IOContext) *cobra.Command {
 }
 
 // createConfigFn returns a function that runs the config tool with the specified IOContext
-func createConfigFn(ctx IOContext) func(*cobra.Command, []string) {
+func createConfigFn(ctx api.IOContext) func(*cobra.Command, []string) {
 	return func(cmd *cobra.Command, args []string) {
 		configureOutput(cmd, ctx)
 
@@ -50,7 +50,7 @@ func createConfigFn(ctx IOContext) func(*cobra.Command, []string) {
 	}
 }
 
-func requestScenarios(ctx IOContext) []api.ScenarioSpec {
+func requestScenarios(ctx api.IOContext) []api.ScenarioSpec {
 	specs := []api.ScenarioSpec{}
 
 	for {
@@ -63,7 +63,7 @@ func requestScenarios(ctx IOContext) []api.ScenarioSpec {
 	return specs
 }
 
-func requestCommand(description string, required bool, ctx IOContext) *api.CommandSpec {
+func requestCommand(description string, required bool, ctx api.IOContext) *api.CommandSpec {
 	requestCommand := func() *api.CommandSpec {
 		return &api.CommandSpec{
 			WorkingDirectory: requestOptionalExistingDirectory("working directory", "inherits scenario", ctx),
@@ -82,7 +82,7 @@ func requestCommand(description string, required bool, ctx IOContext) *api.Comma
 	return nil
 }
 
-func requestEnvVars(ctx IOContext) map[string]string {
+func requestEnvVars(ctx api.IOContext) map[string]string {
 	var envVars map[string]string
 
 	if questionYN("define custom env vars?", ctx) {
@@ -101,7 +101,7 @@ func requestEnvVars(ctx IOContext) map[string]string {
 	return envVars
 }
 
-func requestScenario(ctx IOContext) api.ScenarioSpec {
+func requestScenario(ctx api.IOContext) api.ScenarioSpec {
 	return api.ScenarioSpec{
 		Name:             requestString("scenario name", true, ctx),
 		WorkingDirectory: requestOptionalExistingDirectory("working directory", "inherits current", ctx),

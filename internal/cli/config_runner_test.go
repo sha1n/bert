@@ -39,7 +39,7 @@ func TestBasicInteractiveFlow(t *testing.T) {
 	assert.Equal(t, expectedSpec(), actual)
 }
 
-func configureCommand(t *testing.T, ctx IOContext) (command *cobra.Command, configPath string, teardown func()) {
+func configureCommand(t *testing.T, ctx api.IOContext) (command *cobra.Command, configPath string, teardown func()) {
 	rootCmd := NewRootCommand(clibtest.RandomString(), clibtest.RandomString(), clibtest.RandomString(), ctx)
 	cmd := CreateConfigCommand(ctx)
 	rootCmd.AddCommand(cmd)

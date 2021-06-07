@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"testing"
 
+	"github.com/sha1n/benchy/api"
 	clibtest "github.com/sha1n/clib/pkg/test"
 
 	"github.com/stretchr/testify/assert"
@@ -36,7 +37,6 @@ func TestBasic(t *testing.T) {
 		},
 		itConfigFileArgValue,
 	)
-
 }
 
 func TestBasicMd(t *testing.T) {
@@ -61,7 +61,6 @@ func TestBasicMdRaw(t *testing.T) {
 		},
 		itConfigFileArgValue, "--format=md/raw",
 	)
-
 }
 
 func TestBasicCsv(t *testing.T) {
@@ -71,8 +70,8 @@ func TestBasicCsv(t *testing.T) {
 			assert.Contains(t, stdout, ",NAME,")
 			assert.Contains(t, stderr, expectedGoVersionOutput)
 		},
-		itConfigFileArgValue, "--format=csv")
-
+		itConfigFileArgValue, "--format=csv",
+	)
 }
 
 func TestBasicCsvRaw(t *testing.T) {
@@ -85,21 +84,20 @@ func TestBasicCsvRaw(t *testing.T) {
 		},
 		itConfigFileArgValue, "--format=csv/raw",
 	)
-
 }
 
 func TestWithMissingConfigFile(t *testing.T) {
 	nonExistingConfigArg := fmt.Sprintf("-c=/tmp/%s", clibtest.RandomString())
-	_, _ = runBenchmarkCommandWithPipedStdoutAndExpectPanicWith(t, nonExistingConfigArg)
+	runBenchmarkCommandWithPipedStdoutAndExpectPanicWith(t, nonExistingConfigArg)
 }
 
 func TestWithInvalidConfigFile(t *testing.T) {
 	invalidConfig := "-c=../../test/data/invalid_config.yml"
-	_, _ = runBenchmarkCommandWithPipedStdoutAndExpectPanicWith(t, invalidConfig)
+	runBenchmarkCommandWithPipedStdoutAndExpectPanicWith(t, invalidConfig)
 }
 
 func TestWithCombinedDebugAndSilent(t *testing.T) {
-	_, _ = runBenchmarkCommandWithPipedStdoutAndExpectPanicWith(t, "-s", "-d", itConfigFileArgValue)
+	runBenchmarkCommandWithPipedStdoutAndExpectPanicWith(t, "-s", "-d", itConfigFileArgValue)
 }
 
 func runBenchmarkCommandWithPipedStdoutputsAnd(t *testing.T, assert func(stdout, stderr string, err error), args ...string) {
@@ -108,7 +106,7 @@ func runBenchmarkCommandWithPipedStdoutputsAnd(t *testing.T, assert func(stdout,
 	outBuf := new(bytes.Buffer)
 	errBuf := new(bytes.Buffer)
 
-	ioContext := NewIOContext()
+	ioContext := api.NewIOContext()
 	ioContext.StdoutWriter = outBuf
 	ioContext.StderrWriter = errBuf
 	rootCmd := NewRootCommand(clibtest.RandomString(), clibtest.RandomString(), clibtest.RandomString(), ioContext)
@@ -121,12 +119,10 @@ func runBenchmarkCommandWithPipedStdoutputsAnd(t *testing.T, assert func(stdout,
 	assert(outBuf.String(), errBuf.String(), err)
 }
 
-func runBenchmarkCommandWithPipedStdoutAndExpectPanicWith(t *testing.T, args ...string) (output string, err error) {
-	defer expectPanicWithError(t)
-
+func runBenchmarkCommandWithPipedStdoutAndExpectPanicWith(t *testing.T, args ...string) {
 	buf := new(bytes.Buffer)
 	writer := bufio.NewWriter(buf)
-	ioContext := NewIOContext()
+	ioContext := api.NewIOContext()
 	ioContext.StdoutWriter = bufio.NewWriter(buf)
 	ioContext.StderrWriter = bufio.NewWriter(buf)
 
@@ -135,9 +131,7 @@ func runBenchmarkCommandWithPipedStdoutAndExpectPanicWith(t *testing.T, args ...
 	rootCmd.SetOut(writer)
 	rootCmd.SetErr(os.Stderr)
 
-	err = rootCmd.Execute()
-
-	return buf.String(), err
+	assert.Panics(t, func() { _ = rootCmd.Execute() })
 }
 
 func expectNoPanic(t *testing.T) {
@@ -148,17 +142,4 @@ func expectNoPanic(t *testing.T) {
 			assert.NoError(t, fmt.Errorf("%v", o))
 		}
 	}
-}
-
-func expectPanicWithError(t *testing.T) {
-	if o := recover(); o != nil {
-		if err, ok := o.(error); ok {
-			assert.Error(t, err)
-		} else {
-			assert.Fail(t, fmt.Sprintf("A panic with an error was expected, but got: %v", o))
-		}
-	} else {
-		assert.Fail(t, "A panic with an error was expected, but got nothing")
-	}
-
 }

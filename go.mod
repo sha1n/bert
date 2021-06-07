@@ -10,7 +10,7 @@ require (
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/montanaflynn/stats v0.6.6
 	github.com/sha1n/clib v0.0.6
-	github.com/sha1n/termite v0.0.9
+	github.com/sha1n/termite v0.0.14
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.1.3
 	github.com/stretchr/testify v1.7.0

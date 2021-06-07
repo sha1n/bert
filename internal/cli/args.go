@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/sha1n/benchy/api"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/spf13/cobra"
@@ -48,9 +49,12 @@ const (
 	ArgValueReportFormatMarkdownRaw = "md/raw"
 )
 
+// StreamingReportFormats a slice containing the values that represent report formats that are reporting in streaming
+var StreamingReportFormats = map[string]bool{ArgValueReportFormatCsvRaw: true, ArgValueReportFormatMarkdownRaw: true}
+
 // ResolveOutputArg resolves an output file argument based on user input.
 // If the specified argument is empty, stdout is returned.
-func ResolveOutputArg(cmd *cobra.Command, name string, ctx IOContext) io.WriteCloser {
+func ResolveOutputArg(cmd *cobra.Command, name string, ctx api.IOContext) io.WriteCloser {
 	var outputFile io.WriteCloser = stdOutNonClosingWriteCloser{out: ctx.StdoutWriter}
 	var err error = nil
 

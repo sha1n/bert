@@ -130,5 +130,4 @@ func aCommandSpec(cmd []string, workingDir string) *api.CommandSpec {
 		WorkingDirectory: workingDir,
 		Cmd:              cmd,
 	}
-
 }

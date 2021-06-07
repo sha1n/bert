@@ -4,9 +4,15 @@ import (
 	"errors"
 
 	"github.com/fatih/color"
+	"github.com/sha1n/benchy/api"
+	"github.com/sha1n/termite"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
+
+func init() {
+	color.NoColor = !termite.Tty
+}
 
 var (
 	printfRed   = color.New(color.FgRed).Printf
@@ -16,7 +22,7 @@ var (
 	sprintBold  = color.New(color.Bold).Sprint
 )
 
-func configureOutput(cmd *cobra.Command, ctx IOContext) {
+func configureOutput(cmd *cobra.Command, ctx api.IOContext) {
 	silent := GetBool(cmd, ArgNameSilent)
 	debug := GetBool(cmd, ArgNameDebug)
 	var level = log.InfoLevel
@@ -25,7 +31,7 @@ func configureOutput(cmd *cobra.Command, ctx IOContext) {
 		CheckUserArgFatal(errors.New("'--%s' and '--%s' are mutually exclusive"))
 	}
 	if silent {
-		level = log.PanicLevel
+		level = log.FatalLevel
 	}
 	if debug {
 		level = log.DebugLevel

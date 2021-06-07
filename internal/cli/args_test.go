@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/sha1n/benchy/api"
 	clibtest "github.com/sha1n/clib/pkg/test"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
@@ -45,7 +46,7 @@ func experimentalFlagWith(value string) string {
 }
 
 func withCommandWithArgs(t *testing.T, doTest func(cmd *cobra.Command), args ...string) {
-	ctx := NewIOContext()
+	ctx := api.NewIOContext()
 	cmd := NewRootCommand(clibtest.RandomString(), clibtest.RandomString(), clibtest.RandomString(), ctx)
 	cmd.SetArgs(append(args, "--config=xxx"))
 	cmd.Run = func(c *cobra.Command, args []string) {
