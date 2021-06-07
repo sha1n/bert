@@ -17,6 +17,8 @@ const (
 	ArgNameConfig = "config"
 	// ArgNameOutputFile : program arg name
 	ArgNameOutputFile = "out-file"
+	// ArgNameConfigExample : program arg name
+	ArgNameConfigExample = "example"
 	// ArgNameFormat : program arg name
 	ArgNameFormat = "format"
 	// ArgNamePipeStdout : program arg name

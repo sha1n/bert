@@ -35,6 +35,17 @@ func LoadSpec(path string) (api.BenchmarkSpec, error) {
 	return load(path, unmarshalFn)
 }
 
+// LoadSpecFromYamlData loads a spec from the specified slice of bytes, assuming YAML data.
+func LoadSpecFromYamlData(data []byte) (spec api.BenchmarkSpec, err error) {
+	err = yaml.Unmarshal(data, &spec)
+
+	if err == nil {
+		err = validate(spec)
+	}
+
+	return spec, err
+}
+
 // SaveSpec saves the specified spec to the provided writer in YAML format and closes.
 func SaveSpec(spec api.BenchmarkSpec, wc io.WriteCloser) (err error) {
 	if err = validate(spec); err != nil {

@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+	"io"
 	"strings"
 
 	"github.com/sha1n/benchy/api"
@@ -16,36 +17,43 @@ func CreateConfigCommand(ctx api.IOContext) *cobra.Command {
 		Use:   "config",
 		Long:  `Interactively walks through a benchmark configuration creation process`,
 		Short: `Interactively creates a benchmark config`,
-		Run:   createConfigFn(ctx),
+		Run:   runConfigToolFn(ctx),
 	}
 
 	cmd.Flags().StringP(ArgNameOutputFile, "o", "", `output file path. Optional. Writes to stdout by default.`)
+	cmd.Flags().BoolP(ArgNameConfigExample, "e", false, `prints a simple example configuration`)
 
 	_ = cmd.MarkFlagFilename(ArgNameOutputFile, "yml", "yaml")
 
 	return cmd
 }
 
-// createConfigFn returns a function that runs the config tool with the specified IOContext
-func createConfigFn(ctx api.IOContext) func(*cobra.Command, []string) {
+// runConfigToolFn returns a function that runs the config tool with the specified IOContext
+func runConfigToolFn(ctx api.IOContext) func(*cobra.Command, []string) {
 	return func(cmd *cobra.Command, args []string) {
 		configureOutput(cmd, ctx)
 
-		printHints()
 		writeCloser := ResolveOutputArg(cmd, ArgNameOutputFile, ctx)
 		defer writeCloser.Close()
 
-		spec := api.BenchmarkSpec{
-			Executions: int(requestUint("number of executions", true, ctx)),
-			Alternate:  requestOptionalBool("alternate executions", false, ctx),
-			Scenarios:  requestScenarios(ctx),
-		}
+		if GetBool(cmd, ArgNameConfigExample) {
+			io.WriteString(ctx.StdoutWriter, getExampleSpec())
 
-		fmt.Print("\r\nWriting your configuration...\r\n\r\n")
+		} else {
+			printHints()
 
-		if err := pkg.SaveSpec(spec, writeCloser); err != nil {
-			log.Error(err)
-			log.Exit(1)
+			spec := api.BenchmarkSpec{
+				Executions: int(requestUint("number of executions", true, ctx)),
+				Alternate:  requestOptionalBool("alternate executions", false, ctx),
+				Scenarios:  requestScenarios(ctx),
+			}
+
+			fmt.Print("\r\nWriting your configuration...\r\n\r\n")
+
+			if err := pkg.SaveSpec(spec, writeCloser); err != nil {
+				log.Error(err)
+				log.Exit(1)
+			}
 		}
 	}
 }
@@ -133,4 +141,41 @@ more here: https://github.com/sha1n/benchy/blob/master/docs/configuration.md
 		sprintBold(sprintRed("*")),
 		sprintBold(sprintGreen("?")),
 	)
+}
+
+func getExampleSpec() string {
+	return `alternate: true           # 'true' to alternate scenario executions. More details below. (default=false)
+executions: 100           # required. number of times to execute each scenario
+scenarios:                # list of scenarios
+- name: full scenario     # required. unique scenario name 
+  workingDir: "/dir"      # default working directory for commands executed in the context of this scenario 
+  env:                    # environment variables to be set for commands executed in the context of this scenario 
+    NAME: value
+  beforeAll:              # command to be executed once before any other command is executed in the context of this scenario
+    cmd:                  # required. command line arguments.
+    - command
+    - --flag
+  afterAll:               # command to be executed once after all other commands in the context of this scenario
+    cmd:                  # required. command line arguments.
+    - command
+    - --flag
+  beforeEach:             # command to be executed before each execution of this scenario
+    workingDir: "~/dir"   # working directory only for this command
+    cmd:                  # required. command line arguments.
+    - command
+    - --flag
+  afterEach:              # command to be executed after each execution of this scenario
+    cmd:                  # required. command line arguments.
+    - command
+    - --flag
+  command:                # required. the benchmarked command of this scenario - the one stats are collected for
+    cmd:                  # required. command line arguments.
+    - benchmarked-command
+    - --flag
+    - --arg=value
+- name: minimal scenario
+  command:
+    cmd:
+    - command
+`
 }
