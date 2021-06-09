@@ -16,7 +16,7 @@ func TestDefaultLogLevel(t *testing.T) {
 	cmd := aCommandWithArgs(ctx)
 	configureOutput(cmd, ctx)
 
-	assert.Equal(t, log.InfoLevel, log.StandardLogger().Level)
+	assert.Equal(t, log.ErrorLevel, log.StandardLogger().Level)
 	assert.Equal(t, ctx.StderrWriter, log.StandardLogger().Out)
 }
 
