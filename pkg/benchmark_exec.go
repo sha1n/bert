@@ -76,7 +76,7 @@ func executeScenarioCommand(scenario api.ScenarioSpec, execIndex int, totalExec 
 		reportIfError(ctx.Executor.Execute(scenario.BeforeEach, scenario.WorkingDirectory, scenario.Env), scenario.ID(), ctx)
 	}
 
-	ctx.Listener.OnMessagef(scenario.ID(), "running benchamrk command %v", scenario.Command.Cmd)
+	ctx.Listener.OnMessagef(scenario.ID(), "running benchmark command %v", scenario.Command.Cmd)
 	endTrace := ctx.Tracer.Start(scenario)
 	err := ctx.Executor.Execute(scenario.Command, scenario.WorkingDirectory, scenario.Env)
 	reportIfError(err, scenario.ID(), ctx)
