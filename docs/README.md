@@ -67,47 +67,14 @@ More about configuration [here](configuration.md).
 
 
 ## Report Formats
-There are three supported report formats; `txt`, `csv`, `csv/raw`, `md` and `md/raw`. `txt` is the default format and is primarily designed to be used in a terminal. `csv` is especially useful when you want to accumulate stats from multiple benchmarks in a CSV file. In which case you can combine the `csv` format with `-o` and possibly `--header=false`. 
+There are three supported report formats, two of them support `raw` mode as follows. The formats are `txt`, `csv`, `csv/raw`, `md` and `md/raw`. `txt` is the default format and is primarily designed to be used in a terminal. `csv` is especially useful when you want to accumulate stats from multiple benchmarks in a CSV file. In which case you can combine the `csv` format with `-o` and possibly `--header=false`. 
 `csv/raw` is streaming raw trace events as CSV records and is useful if you want to load that data into a spreadsheet or other tools for further analysis.
 `md` and `md/raw` and similar to `csv` and `csv/raw` respectively, but write in Markdown table format.
 
 Run `benchy --help` for more details.
 
 **TXT Example:**
-```bash
--------------------
- BENCHMARK SUMMARY
--------------------
-     labels: example-label
-       date: May 18 2021
-       time: 23:34:13+03:00
-  scenarios: 2
- executions: 10
-  alternate: true
-
-------------------------
- SCENARIO: 'scenario A'
-------------------------
-        min: 1.004s
-        max: 1.007s
-       mean: 1.006s
-     median: 1.006s
-        p90: 1.007s
-     stddev: 0.001s
-     errors: 0%
-
-------------------------
- SCENARIO: 'scenario B'
-------------------------
-        min: 0.003s
-        max: 0.004s
-       mean: 0.004s
-     median: 0.004s
-        p90: 0.004s
-     stddev: 0.000s
-     errors: 0%
-```
-
+<img src="images/txt_report.png" width="100%">
 
 **Equivalent CSV Example:**
 ```csv
