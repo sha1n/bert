@@ -74,32 +74,7 @@ There are three supported report formats, two of them support `raw` mode as foll
 Run `benchy --help` for more details.
 
 **TXT Example:**
-```bash
- BENCHMARK SUMMARY
-     labels: example-label
-       date: Jun 09 2021
-       time: 10:37:11+03:00
-  scenarios: 2
- executions: 10
-  alternate: true
-
-------------------------------------------------------------
-
-   SCENARIO: scenario A
-        min: 1.005s       mean: 1.008s     stddev: 0.001s
-        max: 1.009s     median: 1.008s        p90: 1.009s
-     errors: 0%
-
-------------------------------------------------------------
-
-   SCENARIO: scenario B
-        min: 0.004s       mean: 0.004s     stddev: 0.001s
-        max: 0.006s     median: 0.004s        p90: 0.005s
-     errors: 0%
-
-------------------------------------------------------------
-```
-
+<img src="docs/images/txt_report.png" width="100%">
 
 **Equivalent CSV Example:**
 ```csv
