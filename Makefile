@@ -121,15 +121,15 @@ build-docker:
 
 run-linux-dockerized-tests:
 	@echo "  >  Running with experimental UI..."
-	docker run -ti sha1n/benchy /benchy/bin/benchy-linux-amd64 -c /benchy/test/data/spec_test_load.yaml --experimental ui
+	docker run --rm -ti sha1n/benchy /benchy/bin/benchy-linux-amd64 -c /benchy/test/data/spec_test_load.yaml
 	@echo "  >  Running with experimental UI + debug..."
-	docker run -ti sha1n/benchy /benchy/bin/benchy-linux-amd64 -c /benchy/test/data/spec_test_load.yaml --experimental ui -d
+	docker run --rm -ti sha1n/benchy /benchy/bin/benchy-linux-amd64 -c /benchy/test/data/spec_test_load.yaml -d
 	@echo "  >  Running with experimental UI + silent..."
-	docker run -ti sha1n/benchy /benchy/bin/benchy-linux-amd64 -c /benchy/test/data/spec_test_load.yaml --experimental ui -s
+	docker run --rm -ti sha1n/benchy /benchy/bin/benchy-linux-amd64 -c /benchy/test/data/spec_test_load.yaml -s
 	@echo "  >  Running with experimental UI + piped stdout..."
-	docker run -ti sha1n/benchy /benchy/bin/benchy-linux-amd64 -c /benchy/test/data/spec_test_load.yaml --experimental ui --pipe-stdout
+	docker run --rm -ti sha1n/benchy /benchy/bin/benchy-linux-amd64 -c /benchy/test/data/spec_test_load.yaml --pipe-stdout
 	@echo "  >  Running with experimental UI + piped stderr..."
-	docker run -ti sha1n/benchy /benchy/bin/benchy-linux-amd64 -c /benchy/test/data/spec_test_load.yaml --experimental ui --pipe-stderr
+	docker run --rm -ti sha1n/benchy /benchy/bin/benchy-linux-amd64 -c /benchy/test/data/spec_test_load.yaml --pipe-stderr
 
 
 .PHONY: help
