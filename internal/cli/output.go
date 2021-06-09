@@ -25,7 +25,7 @@ var (
 func configureOutput(cmd *cobra.Command, ctx api.IOContext) {
 	silent := GetBool(cmd, ArgNameSilent)
 	debug := GetBool(cmd, ArgNameDebug)
-	var level = log.InfoLevel
+	var level = log.ErrorLevel
 
 	if silent && debug {
 		CheckUserArgFatal(errors.New("'--%s' and '--%s' are mutually exclusive"))
