@@ -175,7 +175,7 @@ func resolveExecutionListener(cmd *cobra.Command, spec api.BenchmarkSpec, ctx ap
 
 func enableTerminalGUI(cmd *cobra.Command, ctx api.IOContext) bool {
 	reportToFile := GetString(cmd, ArgNameOutputFile) != ""
-	enableRichOut := IsExperimentEnabled(cmd, "ui") && (reportToFile || !StreamingReportFormats[GetString(cmd, ArgNameFormat)])
+	enableRichOut := reportToFile || !StreamingReportFormats[GetString(cmd, ArgNameFormat)]
 	silentMode := GetBool(cmd, ArgNameSilent)
 	debugMode := GetBool(cmd, ArgNameDebug)
 	pipeOutputsMode := GetBool(cmd, ArgNamePipeStdout)
