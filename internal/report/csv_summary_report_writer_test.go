@@ -4,18 +4,32 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/csv"
+	"errors"
 	"fmt"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/sha1n/benchy/api"
 	"github.com/sha1n/benchy/pkg"
+	clibtest "github.com/sha1n/clib/pkg/test"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestWrite(t *testing.T) {
 	var scenario1, scenario2 = scenario{id: "1-id"}, scenario{id: "2-id"}
-	summary := aSummaryFor(scenario1, scenario2)
+	summary := aFakeSummaryFor(
+		struct {
+			id       api.Identifiable
+			duration time.Duration
+			error    bool
+		}{scenario1, time.Second, false},
+		struct {
+			id       api.Identifiable
+			duration time.Duration
+			error    bool
+		}{scenario2, time.Second, true},
+	)
 
 	allRecords := writeCsvReport(t, summary, true)
 
@@ -36,7 +50,18 @@ func TestWrite(t *testing.T) {
 
 func TestWriteWithNoHeaders(t *testing.T) {
 	var scenario1, scenario2 = scenario{id: "1-id"}, scenario{id: "2-id"}
-	summary := aSummaryFor(scenario1, scenario2)
+	summary := aFakeSummaryFor(
+		struct {
+			id       api.Identifiable
+			duration time.Duration
+			error    bool
+		}{scenario1, time.Second, false},
+		struct {
+			id       api.Identifiable
+			duration time.Duration
+			error    bool
+		}{scenario2, time.Second, true},
+	)
 
 	allRecords := writeCsvReport(t, summary, false)
 
@@ -103,27 +128,21 @@ func writeCsvReport(t *testing.T, summary api.Summary, includeHeaders bool) [][]
 	return allRecords
 }
 
-func aSummaryFor(i1 api.Identifiable, i2 api.Identifiable) api.Summary {
-	t := pkg.NewTracer(100)
-	traces := map[api.ID][]api.Trace{}
-	s := pkg.NewStreamSubscriber(t.Stream(), func(t api.Trace) error {
-		if traces[t.ID()] == nil {
-			traces[t.ID()] = []api.Trace{}
+func aFakeSummaryFor(specs ...struct {
+	id       api.Identifiable
+	duration time.Duration
+	error    bool
+}) api.Summary {
+	traces := []api.Trace{}
+	for _, spec := range specs {
+		if spec.error {
+			traces = append(traces, pkg.NewFakeTrace(spec.id.ID(), spec.duration, errors.New(clibtest.RandomString())))
+		} else {
+			traces = append(traces, pkg.NewFakeTrace(spec.id.ID(), spec.duration, nil))
 		}
+	}
 
-		traces[t.ID()] = append(traces[t.ID()], t)
-
-		return nil
-	})
-
-	unsub := s.Subscribe()
-
-	t.Start(i1)(nil)
-	t.Start(i2)(nil)
-
-	unsub()
-
-	return pkg.NewSummary(traces)
+	return pkg.NewFakeSummary(traces...)
 }
 
 type scenario struct {
