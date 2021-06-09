@@ -14,19 +14,19 @@ import (
 )
 
 var (
-	cyan     = color.New(color.FgCyan)
-	hiyellow = color.New(color.FgHiYellow)
-	yellow   = color.New(color.FgYellow)
-	hired    = color.New(color.FgHiRed)
-	red      = color.New(color.FgRed)
+	defaultProgressBarColor = color.New()
+	hiYellow                = color.New(color.FgHiYellow)
+	yellow                  = color.New(color.FgYellow)
+	hiRed                   = color.New(color.FgHiRed)
+	red                     = color.New(color.FgRed)
 
 	// used to change the color of progress bars when errors are reported
 	progressBarErrorColorEscalator = map[*color.Color]*color.Color{
-		cyan:     hiyellow,
-		hiyellow: yellow,
-		yellow:   hired,
-		hired:    red,
-		red:      red,
+		defaultProgressBarColor: hiYellow,
+		hiYellow:                yellow,
+		yellow:                  hiRed,
+		hiRed:                   red,
+		red:                     red,
 	}
 )
 
@@ -50,7 +50,7 @@ type ProgressView struct {
 // NewProgressView creates a new ProgressView for the specified benchmark spec
 func NewProgressView(spec api.BenchmarkSpec, termWidthFn func() int, ioc api.IOContext) api.Listener {
 	scenarioCount := len(spec.Scenarios)
-	matrix := termite.NewMatrix(ioc.StdoutWriter, time.Millisecond*100)
+	matrix := termite.NewMatrix(ioc.StdoutWriter, time.Millisecond*10)
 
 	rows := matrix.NewRange(
 		2 +
@@ -179,7 +179,7 @@ type progressBarFormatter struct {
 
 func newProgressBarFormatter() *progressBarFormatter {
 	return &progressBarFormatter{
-		color: cyan,
+		color: defaultProgressBarColor,
 	}
 }
 
