@@ -58,14 +58,14 @@ func executeSequentially(spec api.BenchmarkSpec, ctx api.ExecutionContext) {
 func executeScenarioSetup(scenario api.ScenarioSpec, ctx api.ExecutionContext) {
 	if scenario.BeforeAll != nil {
 		ctx.Listener.OnMessagef(scenario.ID(), "running 'beforeAll' command %v...", scenario.BeforeAll.Cmd)
-		reportIfError(ctx.Executor.Execute(scenario.BeforeAll, scenario.WorkingDirectory, scenario.Env), scenario.ID(), ctx)
+		reportIfError(ctx.Executor.ExecuteFn(scenario.BeforeAll, scenario.WorkingDirectory, scenario.Env)(), scenario.ID(), ctx)
 	}
 }
 
 func executeScenarioTeardown(scenario api.ScenarioSpec, ctx api.ExecutionContext) {
 	if scenario.AfterAll != nil {
 		ctx.Listener.OnMessagef(scenario.ID(), "running 'afterAll' command %v...", scenario.AfterAll.Cmd)
-		reportIfError(ctx.Executor.Execute(scenario.AfterAll, scenario.WorkingDirectory, scenario.Env), scenario.ID(), ctx)
+		reportIfError(ctx.Executor.ExecuteFn(scenario.AfterAll, scenario.WorkingDirectory, scenario.Env)(), scenario.ID(), ctx)
 	}
 }
 
@@ -73,18 +73,21 @@ func executeScenarioCommand(scenario api.ScenarioSpec, execIndex int, totalExec 
 	ctx.Listener.OnMessagef(scenario.ID(), "run %d of %d", execIndex, totalExec)
 	if scenario.BeforeEach != nil {
 		ctx.Listener.OnMessagef(scenario.ID(), "running 'beforeEach' command %v", scenario.BeforeEach.Cmd)
-		reportIfError(ctx.Executor.Execute(scenario.BeforeEach, scenario.WorkingDirectory, scenario.Env), scenario.ID(), ctx)
+		reportIfError(ctx.Executor.ExecuteFn(scenario.BeforeEach, scenario.WorkingDirectory, scenario.Env)(), scenario.ID(), ctx)
 	}
 
 	ctx.Listener.OnMessagef(scenario.ID(), "running benchmark command %v", scenario.Command.Cmd)
+	executeFn := ctx.Executor.ExecuteFn(scenario.Command, scenario.WorkingDirectory, scenario.Env)
+
 	endTrace := ctx.Tracer.Start(scenario)
-	err := ctx.Executor.Execute(scenario.Command, scenario.WorkingDirectory, scenario.Env)
-	reportIfError(err, scenario.ID(), ctx)
+	err := executeFn()
 	endTrace(err)
+
+	reportIfError(err, scenario.ID(), ctx)
 
 	if scenario.AfterEach != nil {
 		ctx.Listener.OnMessagef(scenario.ID(), "running 'afterEach' command %v", scenario.AfterEach.Cmd)
-		reportIfError(ctx.Executor.Execute(scenario.AfterEach, scenario.WorkingDirectory, scenario.Env), scenario.ID(), ctx)
+		reportIfError(ctx.Executor.ExecuteFn(scenario.AfterEach, scenario.WorkingDirectory, scenario.Env)(), scenario.ID(), ctx)
 	}
 }
 

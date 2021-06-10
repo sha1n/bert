@@ -20,7 +20,7 @@ func TestExecuteReturnsErrorOnCommandFailure(t *testing.T) {
 	exec := NewCommandExecutor(true, true)
 	cmdSpec := aCommandSpec(aNonExistingCommand(), "")
 
-	err := exec.Execute(cmdSpec, defaultWorkingDir, env)
+	err := exec.ExecuteFn(cmdSpec, defaultWorkingDir, env)()
 
 	assert.Error(t, err)
 }

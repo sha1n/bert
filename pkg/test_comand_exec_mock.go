@@ -15,11 +15,11 @@ type RecordedExecutionParams struct {
 }
 
 // Execute records execution parameters and stores them in order
-func (ce *CmdRecordingExecutor) Execute(
+func (ce *CmdRecordingExecutor) ExecuteFn(
 	cmdSpec *api.CommandSpec,
 	defaultWorkingDir string,
 	env map[string]string,
-) (exitError error) {
+) func() error {
 
 	ce.RecordedCommandSeq = append(ce.RecordedCommandSeq, &RecordedExecutionParams{
 		Spec:              cmdSpec,
@@ -27,5 +27,5 @@ func (ce *CmdRecordingExecutor) Execute(
 		Env:               env,
 	})
 
-	return nil
+	return func() error { return nil }
 }
