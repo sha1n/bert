@@ -43,6 +43,7 @@ type ProgressView struct {
 	spinner              termite.Spinner
 	cursor               termite.Cursor
 	cancelHandlers       []context.CancelFunc
+	startTime            time.Time
 	started              bool
 	ended                bool
 }
@@ -68,7 +69,7 @@ func NewProgressView(spec api.BenchmarkSpec, termWidthFn func() int, ioc api.IOC
 
 	for i, scenario := range spec.Scenarios {
 		formatter := newProgressBarFormatter()
-		pBar := termite.NewProgressBar(rows[progressBarIndex], spec.Executions, termWidth, 40, formatter)
+		pBar := termite.NewProgressBar(rows[progressBarIndex], spec.Executions, termWidth, 56, formatter)
 		rows[progressBarIndex-1].Update(yellow.Sprint("- " + scenario.Name))
 		progressBarIndex += 3
 
@@ -97,6 +98,7 @@ func (l *ProgressView) OnBenchmarkStart() {
 	}
 
 	l.started = true
+	l.startTime = time.Now()
 	restoreLogs := shutOffLogs()
 	restoreCursor := l.hideCursor()
 
