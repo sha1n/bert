@@ -2,8 +2,8 @@ package report
 
 import (
 	"fmt"
-	"math"
 	"sort"
+	"time"
 
 	"github.com/sha1n/benchy/api"
 )
@@ -45,11 +45,11 @@ func GetSortedScenarioIds(summary api.Summary) []api.ID {
 	return sortedIds
 }
 
-// FormatReportFloatPrecision3 formats floats for report rendering with 3 digit precision
-func FormatReportFloatPrecision3(f func() (float64, error)) string {
+// FormatReportDurationPlainNanos formats floats for report rendering with 3 digit precision
+func FormatReportDurationPlainNanos(f func() (time.Duration, error)) string {
 	value, err := f()
 	if err == nil {
-		return fmt.Sprintf("%.3f", value)
+		return fmt.Sprint(value.Nanoseconds())
 	}
 
 	return ReportErrorValue
@@ -65,11 +65,27 @@ func FormatReportInt64(f func() (int64, error)) string {
 	return ReportErrorValue
 }
 
-// FormatReportNanosAsSecPrecision3 formats nano-seconds float as seconds with 3 digits precision for report rendering
-func FormatReportNanosAsSecPrecision3(f func() (float64, error)) string {
+// FormatReportDuration formats nano-seconds float as seconds with 3 digits precision for report rendering
+func FormatReportDuration(f func() (time.Duration, error)) string {
 	value, err := f()
 	if err == nil {
-		return fmt.Sprintf("%.3fs", value/math.Pow(10, 9))
+		if value.Hours() >= 1 {
+			return fmt.Sprintf("%.1fh", value.Hours())
+		}
+		if value.Minutes() >= 1 {
+			return fmt.Sprintf("%.1fm", value.Minutes())
+		}
+		if value.Seconds() >= 1 {
+			return fmt.Sprintf("%.1fs", value.Seconds())
+		}
+		if value.Milliseconds() >= 1 {
+			return fmt.Sprintf("%.1fms", float32(value.Microseconds())/1000)
+		}
+		if value.Microseconds() >= 1 {
+			return fmt.Sprintf("%.1fµs", float32(value.Nanoseconds())/1000)
+		}
+
+		return fmt.Sprintf("%dns", value.Nanoseconds())
 	}
 
 	return ReportErrorValue

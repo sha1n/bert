@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	"time"
 
 	"encoding/csv"
 
@@ -44,12 +45,12 @@ func (rw csvReportWriter) Write(summary api.Summary, config api.BenchmarkSpec, c
 			id,
 			fmt.Sprintf("%d", stats.Count()),
 			strings.Join(ctx.Labels, ","),
-			FormatReportFloatPrecision3(stats.Min),
-			FormatReportFloatPrecision3(stats.Max),
-			FormatReportFloatPrecision3(stats.Mean),
-			FormatReportFloatPrecision3(stats.Median),
-			FormatReportFloatPrecision3(func() (float64, error) { return stats.Percentile(90) }),
-			FormatReportFloatPrecision3(stats.StdDev),
+			FormatReportDurationPlainNanos(stats.Min),
+			FormatReportDurationPlainNanos(stats.Max),
+			FormatReportDurationPlainNanos(stats.Mean),
+			FormatReportDurationPlainNanos(stats.Median),
+			FormatReportDurationPlainNanos(func() (time.Duration, error) { return stats.Percentile(90) }),
+			FormatReportDurationPlainNanos(stats.StdDev),
 			FormatReportFloatAsRateInPercents(stats.ErrorRate),
 		}); err != nil {
 			return err
