@@ -96,46 +96,70 @@ benchy -c benchmark-config.yml -f csv -o benchamrk-report.csv
 ```
 
 ### Text Example
-<img src="docs/images/txt_report.png" width="100%">
+```
+ BENCHMARK SUMMARY
+     labels: example-label
+       date: Jun 10 2021
+       time: 16:24:14+03:00
+  scenarios: 2
+ executions: 10
+  alternate: true
+
+------------------------------------------------------------
+
+   SCENARIO: scenario A
+        min: 1.0s       mean: 1.0s     stddev: 1.3ms
+        max: 1.0s     median: 1.0s        p90: 1.0s
+     errors: 0%
+
+------------------------------------------------------------
+
+   SCENARIO: scenario B
+        min: 1.6ms       mean: 1.7ms     stddev: 94.8µs
+        max: 1.9ms     median: 1.7ms        p90: 1.8ms
+     errors: 0%
+
+------------------------------------------------------------
+```
 
 ### CSV Example
 ```csv
-Timestamp,Scenario,Labels,Min,Max,Mean,Median,Percentile 90,StdDev,Errors
-2021-05-18T23:38:49+03:00,scenario A,example-label,1003508458.000,1009577781.000,1006281483.700,1006164208.500,1008256954.000,2122427.909,0
-2021-05-18T23:38:49+03:00,scenario B,example-label,2953009.000,4218971.000,3818925.400,3854585.000,4048263.000,317884.931,0
+Timestamp,Scenario,Samples,Labels,Min,Max,Mean,Median,Percentile 90,StdDev,Errors
+2021-06-10T16:23:00+03:00,scenario A,10,example-label,1002473555,1006631000,1004841316,1004925820,1006234538,1263756,0%
+2021-06-10T16:23:00+03:00,scenario B,10,example-label,1387363,1903073,1680485,1681815,1755130,121962,0%
 ```
 
 ### Markdown Example
 ```
 |Timestamp|Scenario|Samples|Labels|Min|Max|Mean|Median|Percentile 90|StdDev|Errors|
 |----|----|----|----|----|----|----|----|----|----|----|
-|2021-05-21T16:21:13+03:00|scenario A|10|example-label|1.004s|1.010s|1.007s|1.008s|1.008s|0.002s|0%|
-|2021-05-21T16:21:13+03:00|scenario B|10|example-label|0.001s|0.005s|0.004s|0.004s|0.004s|0.001s|0%|
+|2021-06-10T16:22:26+03:00|scenario A|10|example-label|1.0s|1.0s|1.0s|1.0s|1.0s|1.0ms|0%|
+|2021-06-10T16:22:26+03:00|scenario B|10|example-label|1.4ms|1.8ms|1.6ms|1.6ms|1.7ms|119.5µs|0%|
 ```
 
 ### Raw CSV Example
 ```csv
 Timestamp,Scenario,Labels,Duration,Error
-2021-05-21T00:58:37+03:00,scenario A,example-label,1008861268,false
-2021-05-21T00:58:37+03:00,scenario B,example-label,4021420,false
-2021-05-21T00:58:38+03:00,scenario A,example-label,1006453206,false
-2021-05-21T00:58:38+03:00,scenario B,example-label,3753389,false
-2021-05-21T00:58:39+03:00,scenario A,example-label,1004680188,false
-2021-05-21T00:58:39+03:00,scenario B,example-label,3780530,false
-2021-05-21T00:58:40+03:00,scenario A,example-label,1005864471,false
-2021-05-21T00:58:40+03:00,scenario B,example-label,3812982,false
-2021-05-21T00:58:41+03:00,scenario A,example-label,1006431680,false
-2021-05-21T00:58:41+03:00,scenario B,example-label,5208588,false
-2021-05-21T00:58:42+03:00,scenario A,example-label,1005159913,false
-2021-05-21T00:58:42+03:00,scenario B,example-label,3708653,false
-2021-05-21T00:58:43+03:00,scenario A,example-label,1006895996,false
-2021-05-21T00:58:43+03:00,scenario B,example-label,3261679,false
-2021-05-21T00:58:44+03:00,scenario A,example-label,1008155810,false
-2021-05-21T00:58:44+03:00,scenario B,example-label,3846961,false
-2021-05-21T00:58:45+03:00,scenario A,example-label,1007275165,false
-2021-05-21T00:58:45+03:00,scenario B,example-label,4039325,false
-2021-05-21T00:58:46+03:00,scenario A,example-label,1003687652,false
-2021-05-21T00:58:46+03:00,scenario B,example-label,3981022,false
+2021-06-10T16:23:35+03:00,scenario A,example-label,1004649721,false
+2021-06-10T16:23:35+03:00,scenario B,example-label,1435355,false
+2021-06-10T16:23:36+03:00,scenario A,example-label,1005821367,false
+2021-06-10T16:23:36+03:00,scenario B,example-label,1408095,false
+2021-06-10T16:23:37+03:00,scenario A,example-label,1005883260,false
+2021-06-10T16:23:37+03:00,scenario B,example-label,1450118,false
+2021-06-10T16:23:38+03:00,scenario A,example-label,1003183088,false
+2021-06-10T16:23:38+03:00,scenario B,example-label,1493344,false
+2021-06-10T16:23:39+03:00,scenario A,example-label,1006013983,false
+2021-06-10T16:23:39+03:00,scenario B,example-label,1809823,false
+2021-06-10T16:23:40+03:00,scenario A,example-label,1005611960,false
+2021-06-10T16:23:40+03:00,scenario B,example-label,1651744,false
+2021-06-10T16:23:41+03:00,scenario A,example-label,1004485805,false
+2021-06-10T16:23:41+03:00,scenario B,example-label,1619021,false
+2021-06-10T16:23:42+03:00,scenario A,example-label,1004949755,false
+2021-06-10T16:23:42+03:00,scenario B,example-label,1420214,false
+2021-06-10T16:23:43+03:00,scenario A,example-label,1003371958,false
+2021-06-10T16:23:43+03:00,scenario B,example-label,1747274,false
+2021-06-10T16:23:44+03:00,scenario A,example-label,1004888034,false
+2021-06-10T16:23:44+03:00,scenario B,example-label,1342145,false
 ```
 
 

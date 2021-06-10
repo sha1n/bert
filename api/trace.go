@@ -31,12 +31,12 @@ type Trace interface {
 
 // Stats provides access to statistics. Statistics are not necessarily cached and might be calculated on call.
 type Stats interface {
-	Min() (float64, error)
-	Max() (float64, error)
-	Mean() (float64, error)
-	Median() (float64, error)
-	Percentile(percent float64) (float64, error)
-	StdDev() (float64, error)
+	Min() (time.Duration, error)
+	Max() (time.Duration, error)
+	Mean() (time.Duration, error)
+	Median() (time.Duration, error)
+	Percentile(percent float64) (time.Duration, error)
+	StdDev() (time.Duration, error)
 	ErrorRate() float64
 	Count() int
 }
