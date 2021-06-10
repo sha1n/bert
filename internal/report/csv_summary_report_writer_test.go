@@ -80,12 +80,12 @@ func assertRecord(t *testing.T, scenario api.Identifiable, summary api.Summary, 
 	assert.Equal(t, scenario.ID(), actualRecord[1])
 	assert.Equal(t, expectedIntFormat(func() int { return summary.Get(scenario.ID()).Count() }), actualRecord[2])
 	assert.Equal(t, expectedLabels, actualRecord[3])
-	assert.Equal(t, expectedFloatFormat(stats1.Min), actualRecord[4])
-	assert.Equal(t, expectedFloatFormat(stats1.Max), actualRecord[5])
-	assert.Equal(t, expectedFloatFormat(stats1.Mean), actualRecord[6])
-	assert.Equal(t, expectedFloatFormat(stats1.Median), actualRecord[7])
-	assert.Equal(t, expectedFloatFormat(func() (float64, error) { return stats1.Percentile(90) }), actualRecord[8])
-	assert.Equal(t, expectedFloatFormat(stats1.StdDev), actualRecord[9])
+	assert.Equal(t, FormatReportFloatPrecision3(stats1.Min), actualRecord[4])
+	assert.Equal(t, FormatReportFloatPrecision3(stats1.Max), actualRecord[5])
+	assert.Equal(t, FormatReportFloatPrecision3(stats1.Mean), actualRecord[6])
+	assert.Equal(t, FormatReportFloatPrecision3(stats1.Median), actualRecord[7])
+	assert.Equal(t, FormatReportFloatPrecision3(func() (float64, error) { return stats1.Percentile(90) }), actualRecord[8])
+	assert.Equal(t, FormatReportFloatPrecision3(stats1.StdDev), actualRecord[9])
 	assert.Equal(t, expectedRateFormat(stats1.ErrorRate), actualRecord[10])
 }
 
@@ -98,11 +98,6 @@ func expectedRateFormat(f func() float64) string {
 
 	return fmt.Sprintf("%d%%", errorRate)
 
-}
-
-func expectedFloatFormat(f func() (float64, error)) string {
-	v, _ := f()
-	return fmt.Sprintf("%.3f", v)
 }
 
 func writeCsvReport(t *testing.T, summary api.Summary, includeHeaders bool) [][]string {

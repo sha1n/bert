@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"math"
 	"strings"
 	"time"
 
@@ -12,8 +11,6 @@ import (
 	"github.com/sha1n/benchy/api"
 	log "github.com/sirupsen/logrus"
 )
-
-type format = func(string, ...interface{}) string
 
 // textReportWriter a simple human readable test report writer
 type textReportWriter struct {
@@ -75,9 +72,9 @@ func (trw textReportWriter) Write(summary api.Summary, config api.BenchmarkSpec,
 	trw.writeLabels(ctx.Labels)
 	trw.writeDate(summary.Time())
 	trw.writeTime(summary.Time())
-	trw.writeInt64Stat("scenarios", func() (int64, error) { return int64(len(config.Scenarios)), nil })
-	trw.writeInt64Stat("executions", func() (int64, error) { return int64(config.Executions), nil })
-	trw.writeBoolProperty("alternate", config.Alternate)
+	trw.writeInt64StatLine("scenarios", func() (int64, error) { return int64(len(config.Scenarios)), nil })
+	trw.writeInt64StatLine("executions", func() (int64, error) { return int64(config.Executions), nil })
+	trw.writePropertyLine("alternate", config.Alternate)
 
 	trw.writeSeperator()
 
@@ -87,13 +84,13 @@ func (trw textReportWriter) Write(summary api.Summary, config api.BenchmarkSpec,
 		stats := summary.Get(id)
 
 		trw.writeScenarioTitle(id)
-		trw.writeStatNano2Sec("min", trw.green, stats.Min)
-		trw.writeStatNano2Sec("mean", trw.cyan, stats.Mean)
-		trw.writeStatNano2Sec("stddev", trw.blue, stats.StdDev)
+		trw.writePropertySec("min", trw.green, stats.Min)
+		trw.writePropertySec("mean", trw.cyan, stats.Mean)
+		trw.writePropertySec("stddev", trw.blue, stats.StdDev)
 		trw.writeNewLine()
-		trw.writeStatNano2Sec("max", trw.magenta, stats.Max)
-		trw.writeStatNano2Sec("median", trw.yellow, stats.Median)
-		trw.writeStatNano2Sec("p90", trw.red, func() (float64, error) { return stats.Percentile(90) })
+		trw.writePropertySec("max", trw.magenta, stats.Max)
+		trw.writePropertySec("median", trw.yellow, stats.Median)
+		trw.writePropertySec("p90", trw.red, func() (float64, error) { return stats.Percentile(90) })
 		trw.writeNewLine()
 		trw.writeErrorRateStat("errors", stats.ErrorRate)
 
@@ -112,7 +109,7 @@ func (trw textReportWriter) writeSeperator() {
 }
 
 func (trw textReportWriter) writeScenarioTitle(name string) {
-	trw.writeString(fmt.Sprintf("%11s: %s\n", "SCENARIO", trw.yellow.Sprint(name)))
+	trw.writePropertyLine("SCENARIO", trw.yellow.Sprint(name))
 }
 
 func (trw textReportWriter) writeTitle(title string) {
@@ -120,27 +117,19 @@ func (trw textReportWriter) writeTitle(title string) {
 }
 
 func (trw textReportWriter) writeLabels(labels []string) {
-	trw.writeString(fmt.Sprintf("%11s: %s\n", "labels", strings.Join(labels, ",")))
+	trw.writePropertyLine("labels", strings.Join(labels, ","))
 }
 
 func (trw textReportWriter) writeDate(time time.Time) {
-	timeStr := time.Format("Jan 02 2006")
-	trw.writeString(fmt.Sprintf("%11s: %s\n", "date", timeStr))
+	trw.writePropertyLine("date", time.Format("Jan 02 2006"))
 }
 
 func (trw textReportWriter) writeTime(time time.Time) {
-	timeStr := time.Format("15:04:05Z07:00")
-	trw.writeString(fmt.Sprintf("%11s: %s\n", "time", timeStr))
+	trw.writePropertyLine("time", time.Format("15:04:05Z07:00"))
 }
 
-func (trw textReportWriter) writeStatNano2Sec(name string, c *color.Color, f func() (float64, error)) {
-	value, err := f()
-	if err == nil {
-		trw.writeString(c.Sprintf("%11s: ", name))
-		trw.writeString(fmt.Sprintf("%.3fs", value/math.Pow(10, 9)))
-	} else {
-		trw.writeStatError(name)
-	}
+func (trw textReportWriter) writePropertySec(name string, c *color.Color, f func() (float64, error)) {
+	trw.writeProperty(name, FormatReportNanosAsSecPrecision3(f), c)
 }
 
 func (trw textReportWriter) writeErrorRateStat(name string, f func() float64) {
@@ -153,22 +142,22 @@ func (trw textReportWriter) writeErrorRateStat(name string, f func() float64) {
 	}
 }
 
-func (trw textReportWriter) writeInt64Stat(name string, f func() (int64, error)) {
-	value, err := f()
-	if err == nil {
-		trw.writeString(fmt.Sprintf("%11s: %d\n", name, value))
+func (trw textReportWriter) writeInt64StatLine(name string, f func() (int64, error)) {
+	trw.writePropertyLine(name, FormatReportInt64(f))
+}
+
+func (trw textReportWriter) writePropertyLine(name string, value interface{}) {
+	trw.writeProperty(name, value, nil)
+	trw.writeNewLine()
+}
+
+func (trw textReportWriter) writeProperty(name string, value interface{}, c *color.Color) {
+	if c == nil {
+		trw.writeString(fmt.Sprintf("%11s: %v", name, value))
 	} else {
-		trw.writeStatError(name)
+		trw.writeString(c.Sprintf("%11s: ", name))
+		trw.writeString(fmt.Sprintf("%v", value))
 	}
-}
-
-func (trw textReportWriter) writeBoolProperty(name string, value bool) {
-	trw.writeString(fmt.Sprintf("%11s: %v\n", name, value))
-}
-
-func (trw textReportWriter) writeStatError(name string) {
-	trw.writeString(trw.bold.Sprintf("%11s: ", name))
-	trw.writeString(trw.red.Sprintf("%s", "ERROR"))
 }
 
 func (trw textReportWriter) writeString(str string) {

@@ -44,13 +44,13 @@ func (rw csvReportWriter) Write(summary api.Summary, config api.BenchmarkSpec, c
 			id,
 			fmt.Sprintf("%d", stats.Count()),
 			strings.Join(ctx.Labels, ","),
-			FormatReportFloat3(stats.Min),
-			FormatReportFloat3(stats.Max),
-			FormatReportFloat3(stats.Mean),
-			FormatReportFloat3(stats.Median),
-			FormatReportFloat3(func() (float64, error) { return stats.Percentile(90) }),
-			FormatReportFloat3(stats.StdDev),
-			FormatReportFloatAsRate(stats.ErrorRate),
+			FormatReportFloatPrecision3(stats.Min),
+			FormatReportFloatPrecision3(stats.Max),
+			FormatReportFloatPrecision3(stats.Mean),
+			FormatReportFloatPrecision3(stats.Median),
+			FormatReportFloatPrecision3(func() (float64, error) { return stats.Percentile(90) }),
+			FormatReportFloatPrecision3(stats.StdDev),
+			FormatReportFloatAsRateInPercents(stats.ErrorRate),
 		}); err != nil {
 			return err
 		}
