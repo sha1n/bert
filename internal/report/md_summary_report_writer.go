@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	"time"
 
 	"github.com/sha1n/benchy/api"
 )
@@ -38,12 +39,12 @@ func (rw mdReportWriter) Write(summary api.Summary, spec api.BenchmarkSpec, ctx 
 				id,
 				fmt.Sprint(stats.Count()),
 				strings.Join(ctx.Labels, ","),
-				FormatReportNanosAsSecPrecision3(stats.Min),
-				FormatReportNanosAsSecPrecision3(stats.Max),
-				FormatReportNanosAsSecPrecision3(stats.Mean),
-				FormatReportNanosAsSecPrecision3(stats.Median),
-				FormatReportNanosAsSecPrecision3(func() (float64, error) { return stats.Percentile(90) }),
-				FormatReportNanosAsSecPrecision3(stats.StdDev),
+				FormatReportDuration(stats.Min),
+				FormatReportDuration(stats.Max),
+				FormatReportDuration(stats.Mean),
+				FormatReportDuration(stats.Median),
+				FormatReportDuration(func() (time.Duration, error) { return stats.Percentile(90) }),
+				FormatReportDuration(stats.StdDev),
 				FormatReportFloatAsRateInPercents(stats.ErrorRate),
 			})
 		}

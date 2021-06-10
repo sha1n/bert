@@ -22,17 +22,6 @@ func TestTxtSanityWithColors(t *testing.T) {
 	testTxtSanity(t, true)
 }
 
-// func TestWriteStatError(t *testing.T) {
-// 	buf := new(bytes.Buffer)
-// 	bufWriter := bufio.NewWriter(buf)
-// 	writer := textReportWriter{bufWriter, color.New(), color.New(), color.New(), color.New(), color.New(), color.New(), color.New()}
-
-// 	name := test.RandomString()
-// 	writer.writeStatError(name)
-// 	bufWriter.Flush()
-// 	assert.Equal(t, name+": ERROR", buf.String())
-// }
-
 func testTxtSanity(t *testing.T, colorsOn bool) {
 	spec := aTwoScenarioSpec()
 	var scenario1, scenario2 = scenario{id: "1-id"}, scenario{id: "2-id"}
@@ -58,20 +47,20 @@ func testTxtSanity(t *testing.T, colorsOn bool) {
 	assert.Contains(t, lines, fmt.Sprintf("alternate: %v", spec.Alternate))
 	assert.Contains(t, lines, fmt.Sprintf("labels: %v", strings.Join(randomLabels, ",")))
 
-	assert.Equal(t, 1, strings.Count(text, "min: 1.000s"))
-	assert.Equal(t, 1, strings.Count(text, "min: 2.000s"))
+	assert.Equal(t, 1, strings.Count(text, "min: 1.0s"))
+	assert.Equal(t, 1, strings.Count(text, "min: 2.0s"))
 
-	assert.Equal(t, 1, strings.Count(text, "max: 1.000s"))
-	assert.Equal(t, 1, strings.Count(text, "max: 2.000s"))
+	assert.Equal(t, 1, strings.Count(text, "max: 1.0s"))
+	assert.Equal(t, 1, strings.Count(text, "max: 2.0s"))
 
-	assert.Equal(t, 1, strings.Count(text, "median: 1.000s"))
-	assert.Equal(t, 1, strings.Count(text, "median: 2.000s"))
+	assert.Equal(t, 1, strings.Count(text, "median: 1.0s"))
+	assert.Equal(t, 1, strings.Count(text, "median: 2.0s"))
 
-	assert.Equal(t, 1, strings.Count(text, "p90: 1.000s"))
-	assert.Equal(t, 1, strings.Count(text, "p90: 2.000s"))
+	assert.Equal(t, 1, strings.Count(text, "p90: 1.0s"))
+	assert.Equal(t, 1, strings.Count(text, "p90: 2.0s"))
 
-	assert.Equal(t, 1, strings.Count(text, "mean: 1.000s"))
-	assert.Equal(t, 1, strings.Count(text, "mean: 2.000s"))
+	assert.Equal(t, 1, strings.Count(text, "mean: 1.0s"))
+	assert.Equal(t, 1, strings.Count(text, "mean: 2.0s"))
 
 	assert.Equal(t, 1, strings.Count(text, "errors: 0%"))
 	assert.Equal(t, 1, strings.Count(text, "errors: 100%"))

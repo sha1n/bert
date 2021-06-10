@@ -80,12 +80,12 @@ func assertRecord(t *testing.T, scenario api.Identifiable, summary api.Summary, 
 	assert.Equal(t, scenario.ID(), actualRecord[1])
 	assert.Equal(t, expectedIntFormat(func() int { return summary.Get(scenario.ID()).Count() }), actualRecord[2])
 	assert.Equal(t, expectedLabels, actualRecord[3])
-	assert.Equal(t, FormatReportFloatPrecision3(stats1.Min), actualRecord[4])
-	assert.Equal(t, FormatReportFloatPrecision3(stats1.Max), actualRecord[5])
-	assert.Equal(t, FormatReportFloatPrecision3(stats1.Mean), actualRecord[6])
-	assert.Equal(t, FormatReportFloatPrecision3(stats1.Median), actualRecord[7])
-	assert.Equal(t, FormatReportFloatPrecision3(func() (float64, error) { return stats1.Percentile(90) }), actualRecord[8])
-	assert.Equal(t, FormatReportFloatPrecision3(stats1.StdDev), actualRecord[9])
+	assert.Equal(t, FormatReportDurationPlainNanos(stats1.Min), actualRecord[4])
+	assert.Equal(t, FormatReportDurationPlainNanos(stats1.Max), actualRecord[5])
+	assert.Equal(t, FormatReportDurationPlainNanos(stats1.Mean), actualRecord[6])
+	assert.Equal(t, FormatReportDurationPlainNanos(stats1.Median), actualRecord[7])
+	assert.Equal(t, FormatReportDurationPlainNanos(func() (time.Duration, error) { return stats1.Percentile(90) }), actualRecord[8])
+	assert.Equal(t, FormatReportDurationPlainNanos(stats1.StdDev), actualRecord[9])
 	assert.Equal(t, expectedRateFormat(stats1.ErrorRate), actualRecord[10])
 }
 

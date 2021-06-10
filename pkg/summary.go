@@ -35,32 +35,34 @@ func NewSummary(tracesByID map[api.ID][]api.Trace) api.Summary {
 }
 
 type _stats struct {
-	float64Samples []float64
+	float64Samples stats.Float64Data
 	errorRate      float64
 }
 
-func (s *_stats) Min() (float64, error) {
-	return stats.Min(s.float64Samples)
+func (s *_stats) Min() (duration time.Duration, err error) {
+	return s.nanosStat(stats.Min)
 }
 
-func (s *_stats) Max() (float64, error) {
-	return stats.Max(s.float64Samples)
+func (s *_stats) Max() (duration time.Duration, err error) {
+	return s.nanosStat(stats.Max)
 }
 
-func (s *_stats) Mean() (float64, error) {
-	return stats.Mean(s.float64Samples)
+func (s *_stats) Mean() (duration time.Duration, err error) {
+	return s.nanosStat(stats.Mean)
 }
 
-func (s *_stats) StdDev() (float64, error) {
-	return stats.StandardDeviation(s.float64Samples)
+func (s *_stats) StdDev() (duration time.Duration, err error) {
+	return s.nanosStat(stats.StandardDeviation)
 }
 
-func (s *_stats) Median() (float64, error) {
-	return stats.Median(s.float64Samples)
+func (s *_stats) Median() (duration time.Duration, err error) {
+	return s.nanosStat(stats.Median)
 }
 
-func (s *_stats) Percentile(percent float64) (float64, error) {
-	return stats.Percentile(s.float64Samples, percent)
+func (s *_stats) Percentile(percent float64) (duration time.Duration, err error) {
+	return s.nanosStat(func(data stats.Float64Data) (float64, error) {
+		return stats.Percentile(data, percent)
+	})
 }
 
 func (s *_stats) ErrorRate() float64 {
@@ -69,6 +71,14 @@ func (s *_stats) ErrorRate() float64 {
 
 func (s *_stats) Count() int {
 	return len(s.float64Samples)
+}
+
+func (s *_stats) nanosStat(f func(stats.Float64Data) (float64, error)) (duration time.Duration, err error) {
+	var nanos float64
+	if nanos, err = f(s.float64Samples); err == nil {
+		duration = time.Duration(nanos) * time.Nanosecond
+	}
+	return
 }
 
 type _summary struct {

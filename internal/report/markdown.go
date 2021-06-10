@@ -80,7 +80,9 @@ func (t *MarkdownTable) SetInt(row, col int, data int) *MarkdownTable {
 
 // SetFloat64 ...
 func (t *MarkdownTable) SetFloat64(row, col int, data float64) *MarkdownTable {
-	return t.setStringData(row, col, FormatReportFloatPrecision3(func() (float64, error) { return data, nil }))
+	return t.setStringData(
+		row, col, fmt.Sprintf("%.3f", data),
+	)
 }
 
 func (t *MarkdownTable) Write(writer io.Writer) {

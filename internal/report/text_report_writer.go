@@ -90,7 +90,7 @@ func (trw textReportWriter) Write(summary api.Summary, config api.BenchmarkSpec,
 		trw.writeNewLine()
 		trw.writePropertySec("max", trw.magenta, stats.Max)
 		trw.writePropertySec("median", trw.yellow, stats.Median)
-		trw.writePropertySec("p90", trw.red, func() (float64, error) { return stats.Percentile(90) })
+		trw.writePropertySec("p90", trw.red, func() (time.Duration, error) { return stats.Percentile(90) })
 		trw.writeNewLine()
 		trw.writeErrorRateStat("errors", stats.ErrorRate)
 
@@ -128,8 +128,8 @@ func (trw textReportWriter) writeTime(time time.Time) {
 	trw.writePropertyLine("time", time.Format("15:04:05Z07:00"))
 }
 
-func (trw textReportWriter) writePropertySec(name string, c *color.Color, f func() (float64, error)) {
-	trw.writeProperty(name, FormatReportNanosAsSecPrecision3(f), c)
+func (trw textReportWriter) writePropertySec(name string, c *color.Color, f func() (time.Duration, error)) {
+	trw.writeProperty(name, FormatReportDuration(f), c)
 }
 
 func (trw textReportWriter) writeErrorRateStat(name string, f func() float64) {
