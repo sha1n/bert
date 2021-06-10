@@ -1,8 +1,8 @@
 package report
 
 import (
-	"bufio"
 	"fmt"
+	"io"
 	"strings"
 	"time"
 
@@ -20,7 +20,7 @@ type CsvStreamReportWriter struct {
 }
 
 // NewCsvStreamReportWriter returns a streaming CSV report writer.
-func NewCsvStreamReportWriter(writer *bufio.Writer, ctx api.ReportContext) RawDataHandler {
+func NewCsvStreamReportWriter(writer io.Writer, ctx api.ReportContext) RawDataHandler {
 	w := CsvStreamReportWriter{
 		writer: csv.NewWriter(writer),
 		ctx:    ctx,

@@ -12,6 +12,7 @@
 
 
 - [Benchy](#benchy)
+  - [Overview](#overview)
   - [Main Features](#main-features)
   - [Installation](#installation)
     - [Download A Pre-Built Release](#download-a-pre-built-release)
@@ -19,18 +20,31 @@
   - [Usage](#usage)
   - [Configuration](#configuration)
   - [Report Formats](#report-formats)
+    - [Text Example](#text-example)
+    - [CSV Example](#csv-example)
+    - [Markdown Example](#markdown-example)
+    - [Raw CSV Example](#raw-csv-example)
   - [Output Control](#output-control)
-    - [Terminal Detection](#terminal-detection)
+  - [Alternatives](#alternatives)
+
+
+## Overview
+`benchy` is designed with focus on benchamrk environment control and flexibility in mind. It was originally built to:
+- Benchamrk complex, relatively long running commands such as build and test commands used on software development environments.
+- Benchmark the exact same set of command scenarios on different machines or environments in order to compare them later.
+- Collect raw metrics and use external analysis toos to process them.
 
 ## Main Features
 - Benchmark any number of commands
+- Rerun the exact same benchmark again and again on diffeent machines or environments, accumulte results and compare them later
 - Set the number of times every scenario is executed
 - Choose between alternate executions and sequential execution of the same command
-- Choose between `txt`, `csv`, `csv/raw`, `md` and `md/raw` output formats
-- Set your working directory per scenario and/or command 
-- Set optional custom environment variables per scenario
-- Set optional setup/teardown commands per scenario
-- Set optional before/after commands for each run
+- Save results in `txt`, `csv`, `csv/raw`, `md` and `md/raw` formats
+- Control your benchmark environment
+  - Set your working directory per scenario and/or command 
+  - Set optional custom environment variables per scenario
+  - Set optional setup/teardown commands per scenario
+  - Set optional before/after commands for each run
 
 ## Installation
 ### Download A Pre-Built Release
@@ -67,23 +81,31 @@ More about configuration [here](configuration.md).
 
 
 ## Report Formats
-There are three supported report formats, two of them support `raw` mode as follows. The formats are `txt`, `csv`, `csv/raw`, `md` and `md/raw`. `txt` is the default format and is primarily designed to be used in a terminal. `csv` is especially useful when you want to accumulate stats from multiple benchmarks in a CSV file. In which case you can combine the `csv` format with `-o` and possibly `--header=false`. 
+There are three supported report formats, two of them support `raw` mode as follows. The formats are `txt`, `csv`, `csv/raw`, `md` and `md/raw`. `txt` is the default format and is primarily designed to be used in a terminal. `csv` is especially useful when you want to accumulate stats from multiple benchmarks in a standard convenient format. In which case you can combine the `csv` format with `-o` and possibly `--header=false` if you want to accumulate data from separate runs in one file. 
 `csv/raw` is streaming raw trace events as CSV records and is useful if you want to load that data into a spreadsheet or other tools for further analysis.
 `md` and `md/raw` and similar to `csv` and `csv/raw` respectively, but write in Markdown table format.
 
-Run `benchy --help` for more details.
+**Selecting Report Format:**
+```bash
+# The following command will generate a report in CSV format and save it into a file 
+# named 'benchamrk-report.csv' in the current directory.
+benchy --config benchmark-config.yml --format csv --out-file benchamrk-report.csv
 
-**TXT Example:**
+# Here is an equivalent command that uses shorthand flag names.
+benchy -c benchmark-config.yml -f csv -o benchamrk-report.csv
+```
+
+### Text Example
 <img src="docs/images/txt_report.png" width="100%">
 
-**Equivalent CSV Example:**
+### CSV Example
 ```csv
 Timestamp,Scenario,Labels,Min,Max,Mean,Median,Percentile 90,StdDev,Errors
 2021-05-18T23:38:49+03:00,scenario A,example-label,1003508458.000,1009577781.000,1006281483.700,1006164208.500,1008256954.000,2122427.909,0
 2021-05-18T23:38:49+03:00,scenario B,example-label,2953009.000,4218971.000,3818925.400,3854585.000,4048263.000,317884.931,0
 ```
 
-**Equivalent Markdown Example:**
+### Markdown Example
 ```
 |Timestamp|Scenario|Samples|Labels|Min|Max|Mean|Median|Percentile 90|StdDev|Errors|
 |----|----|----|----|----|----|----|----|----|----|----|
@@ -91,7 +113,7 @@ Timestamp,Scenario,Labels,Min,Max,Mean,Median,Percentile 90,StdDev,Errors
 |2021-05-21T16:21:13+03:00|scenario B|10|example-label|0.001s|0.005s|0.004s|0.004s|0.004s|0.001s|0%|
 ```
 
-**Raw CSV Example:**
+### Raw CSV Example
 ```csv
 Timestamp,Scenario,Labels,Duration,Error
 2021-05-21T00:58:37+03:00,scenario A,example-label,1008861268,false
@@ -114,7 +136,6 @@ Timestamp,Scenario,Labels,Duration,Error
 2021-05-21T00:58:45+03:00,scenario B,example-label,4039325,false
 2021-05-21T00:58:46+03:00,scenario A,example-label,1003687652,false
 2021-05-21T00:58:46+03:00,scenario B,example-label,3981022,false
-
 ```
 
 
@@ -126,5 +147,7 @@ However, there are several ways you can control what is logged and in what level
 - `--silent` or `-s` - sets the logging level to the lowest level possible, which includes only fatal errors. That is a softer version of `2>/dev/null` and should be preferred in general.
 - `--debug` or `-d` - sets the logging level to the highest possible level, for troubleshooting.
 
-### Terminal Detection
-To make `benchy` scripting friendly, when standard outputs are not attached to a terminal, for example when redirects or pipes are used, logs and reports are written as plain text with no colors or other terminal effects.
+## Alternatives
+Before devloping `benchy` I looked into the following tools. Both target similar use-cases, but with different focus. If you need to quickly compare two commands, I would recommend looking into these.
+- [hyperfine](https://github.com/sharkdp/hyperfine) 
+- [bench](https://github.com/Gabriel439/bench) 

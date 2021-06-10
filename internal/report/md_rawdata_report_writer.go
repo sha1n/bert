@@ -1,8 +1,8 @@
 package report
 
 import (
-	"bufio"
 	"fmt"
+	"io"
 	"strings"
 	"time"
 
@@ -18,7 +18,7 @@ type MarkdownStreamReportWriter struct {
 }
 
 // NewMarkdownStreamReportWriter returns a streaming CSV report writer.
-func NewMarkdownStreamReportWriter(writer *bufio.Writer, ctx api.ReportContext) RawDataHandler {
+func NewMarkdownStreamReportWriter(writer io.Writer, ctx api.ReportContext) RawDataHandler {
 	w := MarkdownStreamReportWriter{
 		writer: NewMarkdownTableWriter(writer),
 		ctx:    ctx,

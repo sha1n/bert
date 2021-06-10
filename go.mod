@@ -9,7 +9,7 @@ require (
 	github.com/go-playground/validator/v10 v10.6.1
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/montanaflynn/stats v0.6.6
-	github.com/sha1n/clib v0.0.6
+	github.com/sha1n/clib v0.0.7
 	github.com/sha1n/termite v0.0.14
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.1.3

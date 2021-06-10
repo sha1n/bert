@@ -1,7 +1,6 @@
 package report
 
 import (
-	"bufio"
 	"bytes"
 	"errors"
 	"strings"
@@ -51,7 +50,7 @@ func TestCreateMarkdownTableFromWithNoHeaders(t *testing.T) {
 
 func generateTestMdReport(t *testing.T, includeHeaders bool) ([]string, api.Summary) {
 	buf := new(bytes.Buffer)
-	writer := bufio.NewWriter(buf)
+	writer := buf
 
 	spec := aTwoScenarioSpec()
 	t1 := pkg.NewFakeTrace(spec.Scenarios[0].ID(), 1, nil)
