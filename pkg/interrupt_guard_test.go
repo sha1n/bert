@@ -10,7 +10,7 @@ import (
 
 func TestRegisterInterruptGuard(t *testing.T) {
 	call := make(chan bool)
-	_, c := registerInterruptGuard(func(s os.Signal) {
+	_, c := RegisterInterruptGuard(func(s os.Signal) {
 		call <- true
 	})
 
@@ -19,7 +19,7 @@ func TestRegisterInterruptGuard(t *testing.T) {
 }
 
 func TestRegisterInterruptGuardCancellation(t *testing.T) {
-	cancel, c := registerInterruptGuard(func(s os.Signal) {})
+	cancel, c := RegisterInterruptGuard(func(s os.Signal) {})
 	cancel()
 
 	assert.Panics(t, func() {
