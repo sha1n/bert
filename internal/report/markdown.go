@@ -3,6 +3,7 @@ package report
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"strings"
 )
 
@@ -17,14 +18,15 @@ type MarkdownTableWriter struct {
 }
 
 // NewMarkdownTableWriter creates a new markdown table writer with the specified buffered writer.
-func NewMarkdownTableWriter(writer *bufio.Writer) MarkdownTableWriter {
+func NewMarkdownTableWriter(writer io.Writer) MarkdownTableWriter {
 	return MarkdownTableWriter{
-		writer: writer,
+		writer: bufio.NewWriter(writer),
 	}
 }
 
 // WriteHeaders writes table headers line
 func (tw MarkdownTableWriter) WriteHeaders(headers []string) (err error) {
+	defer tw.writer.Flush()
 	if err = tw.WriteRow(headers); err == nil {
 		err = tw.writeString(fmt.Sprintf("%s|\r\n", strings.Repeat("|----", len(headers))))
 	}
@@ -35,13 +37,13 @@ func (tw MarkdownTableWriter) WriteHeaders(headers []string) (err error) {
 // WriteRow writes a row line
 func (tw MarkdownTableWriter) WriteRow(row []string) (err error) {
 	// TODO theoretically we need to escape '|' chars
+	defer tw.writer.Flush()
 	return tw.writeString(fmt.Sprintf("|%s|\r\n", strings.Join(row, "|")))
 }
 
-func (tw MarkdownTableWriter) writeString(str string) error {
-	defer tw.writer.Flush()
-	_, err := tw.writer.WriteString(str)
-	return err
+func (tw MarkdownTableWriter) writeString(str string) (err error) {
+	_, err = tw.writer.WriteString(str)
+	return
 }
 
 // NewMarkdownTable creates a new markdown table instance
@@ -81,17 +83,15 @@ func (t *MarkdownTable) SetFloat64(row, col int, data float64) *MarkdownTable {
 	return t.setStringData(row, col, fmt.Sprintf("%.3f", data))
 }
 
-func (t *MarkdownTable) Write(writer *bufio.Writer) {
+func (t *MarkdownTable) Write(writer io.Writer) {
 	for _, row := range t.data {
-		_, _ = writer.WriteString("|")
+		_, _ = io.WriteString(writer, "|")
 		for _, col := range row {
-			_, _ = writer.WriteString(col)
-			_, _ = writer.WriteString("|")
+			_, _ = io.WriteString(writer, col)
+			_, _ = io.WriteString(writer, "|")
 		}
-		_, _ = writer.WriteString("\n")
+		_, _ = io.WriteString(writer, "\n")
 	}
-
-	writer.Flush()
 }
 
 func (t *MarkdownTable) setStringData(row, col int, data string) *MarkdownTable {

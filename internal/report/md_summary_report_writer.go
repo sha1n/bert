@@ -1,8 +1,8 @@
 package report
 
 import (
-	"bufio"
 	"fmt"
+	"io"
 	"strings"
 
 	"github.com/sha1n/benchy/api"
@@ -14,7 +14,7 @@ type mdReportWriter struct {
 }
 
 // NewMarkdownSummaryReportWriter returns a Markdown report write handler.
-func NewMarkdownSummaryReportWriter(writer *bufio.Writer) api.WriteSummaryReportFn {
+func NewMarkdownSummaryReportWriter(writer io.Writer) api.WriteSummaryReportFn {
 	w := mdReportWriter{
 		tableWriter: NewMarkdownTableWriter(writer),
 	}

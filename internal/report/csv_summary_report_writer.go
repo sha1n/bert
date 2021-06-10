@@ -1,8 +1,8 @@
 package report
 
 import (
-	"bufio"
 	"fmt"
+	"io"
 	"strings"
 
 	"encoding/csv"
@@ -16,7 +16,7 @@ type csvReportWriter struct {
 }
 
 // NewCsvReportWriter returns a CSV report write handler.
-func NewCsvReportWriter(writer *bufio.Writer) api.WriteSummaryReportFn {
+func NewCsvReportWriter(writer io.Writer) api.WriteSummaryReportFn {
 	w := csvReportWriter{
 		writer: csv.NewWriter(writer),
 	}

@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"bufio"
 	"fmt"
 	"io"
 	"os"
@@ -115,7 +114,7 @@ func loadSpec(cmd *cobra.Command) (spec api.BenchmarkSpec, err error) {
 func resolveReportHandler(cmd *cobra.Command, spec api.BenchmarkSpec, ctx api.IOContext) (handler api.ReportHandler, closer io.Closer, err error) {
 	reportCtx := resolveReportContext(cmd)
 	writeCloser := ResolveOutputArg(cmd, ArgNameOutputFile, ctx)
-	writer := bufio.NewWriter(writeCloser) // TODO should already be buffered, this is probably redundant.
+	writer := writeCloser
 
 	switch reportFormat := GetString(cmd, ArgNameFormat); reportFormat {
 	case ArgValueReportFormatMarkdownRaw:

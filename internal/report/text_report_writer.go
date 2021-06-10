@@ -3,6 +3,7 @@ package report
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"math"
 	"strings"
 	"time"
@@ -27,7 +28,7 @@ type textReportWriter struct {
 }
 
 // NewTextReportWriter returns a text report write handler.
-func NewTextReportWriter(writer *bufio.Writer, colorsOn bool) api.WriteSummaryReportFn {
+func NewTextReportWriter(writer io.Writer, colorsOn bool) api.WriteSummaryReportFn {
 	var red, green, yellow, cyan, magenta, blue, bold *color.Color
 
 	if colorsOn {
@@ -53,7 +54,7 @@ func NewTextReportWriter(writer *bufio.Writer, colorsOn bool) api.WriteSummaryRe
 	}
 
 	w := textReportWriter{
-		writer:  writer,
+		writer:  bufio.NewWriter(writer),
 		red:     red,
 		green:   green,
 		yellow:  yellow,
@@ -67,6 +68,8 @@ func NewTextReportWriter(writer *bufio.Writer, colorsOn bool) api.WriteSummaryRe
 }
 
 func (trw textReportWriter) Write(summary api.Summary, config api.BenchmarkSpec, ctx api.ReportContext) (err error) {
+	defer trw.writer.Flush()
+
 	trw.writeNewLine()
 	trw.writeTitle(" BENCHMARK SUMMARY")
 	trw.writeLabels(ctx.Labels)
@@ -95,7 +98,6 @@ func (trw textReportWriter) Write(summary api.Summary, config api.BenchmarkSpec,
 		trw.writeErrorRateStat("errors", stats.ErrorRate)
 
 		trw.writeSeperator()
-		trw.writer.Flush()
 	}
 
 	return nil

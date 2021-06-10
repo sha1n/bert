@@ -1,7 +1,6 @@
 package report
 
 import (
-	"bufio"
 	"bytes"
 	"encoding/csv"
 	"errors"
@@ -109,7 +108,7 @@ func expectedFloatFormat(f func() (float64, error)) string {
 func writeCsvReport(t *testing.T, summary api.Summary, includeHeaders bool) [][]string {
 	buf := new(bytes.Buffer)
 
-	csvWriter := NewCsvReportWriter(bufio.NewWriter(buf))
+	csvWriter := NewCsvReportWriter(buf)
 	assert.NoError(t,
 		csvWriter(
 			summary,

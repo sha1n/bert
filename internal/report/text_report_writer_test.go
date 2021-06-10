@@ -33,7 +33,6 @@ func TestWriteStatError(t *testing.T) {
 	name := test.RandomString()
 	writer.writeStatError(name)
 	bufWriter.Flush()
-
 	assert.Equal(t, name+": ERROR", buf.String())
 }
 
@@ -102,7 +101,7 @@ func expectedTitleFor(id api.Identifiable) string {
 func writeTxtReport(t *testing.T, summary api.Summary, spec api.BenchmarkSpec, colorsOn bool) (string, []string) {
 	buf := new(bytes.Buffer)
 
-	txtWriter := NewTextReportWriter(bufio.NewWriter(buf), colorsOn)
+	txtWriter := NewTextReportWriter(buf, colorsOn)
 	assert.NoError(t,
 		txtWriter(
 			summary,

@@ -1,7 +1,6 @@
 package report
 
 import (
-	"bufio"
 	"bytes"
 	"fmt"
 	"io"
@@ -17,7 +16,7 @@ import (
 var randomLabels = append(clibtest.RandomStrings(), clibtest.RandomString()) // ensure at least one label
 
 // GetRawDataHandler a provider for a RawDataHandler instance
-type GetRawDataHandler = func(*bufio.Writer, api.ReportContext) RawDataHandler
+type GetRawDataHandler = func(io.Writer, api.ReportContext) RawDataHandler
 
 // ParseRecords parses report records from a reader
 type ParseRecords = func(io.Reader) ([][]string, error)
@@ -40,7 +39,7 @@ func writeRawReport(t *testing.T, getHandler GetRawDataHandler, parseRecords Par
 		IncludeHeaders: includeHeaders,
 	}
 
-	handler := getHandler(bufio.NewWriter(buf), ctx)
+	handler := getHandler(buf, ctx)
 
 	for _, trace := range traces {
 		assert.NoError(t, handler.Handle(trace))
