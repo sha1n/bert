@@ -1,7 +1,6 @@
 package report
 
 import (
-	"bufio"
 	"bytes"
 	"testing"
 
@@ -19,7 +18,7 @@ func TestMarkdownTable(t *testing.T) {
 
 	buf := new(bytes.Buffer)
 
-	table.Write(bufio.NewWriter(buf))
+	table.Write(buf)
 	mdText := buf.String()
 
 	assert.Equal(t, expectedTableText(), mdText)

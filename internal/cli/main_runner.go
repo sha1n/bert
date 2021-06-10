@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"bufio"
 	"fmt"
 	"io"
 	"os"
@@ -96,10 +95,10 @@ func runFn(ctx api.IOContext) func(*cobra.Command, []string) {
 func loadSpec(cmd *cobra.Command) (spec api.BenchmarkSpec, err error) {
 	var filePath string
 	filePath = GetString(cmd, ArgNameConfig)
-	filePath, err = filepath.Abs(expandPath(filePath))
+	filePath, err = filepath.Abs(pkg.ExpandUserPath(filePath))
 
 	if err == nil {
-		_, err = os.Stat(expandPath(filePath))
+		_, err = os.Stat(pkg.ExpandUserPath(filePath))
 		exists := !os.IsNotExist(err)
 
 		if err == nil && exists {
@@ -115,7 +114,7 @@ func loadSpec(cmd *cobra.Command) (spec api.BenchmarkSpec, err error) {
 func resolveReportHandler(cmd *cobra.Command, spec api.BenchmarkSpec, ctx api.IOContext) (handler api.ReportHandler, closer io.Closer, err error) {
 	reportCtx := resolveReportContext(cmd)
 	writeCloser := ResolveOutputArg(cmd, ArgNameOutputFile, ctx)
-	writer := bufio.NewWriter(writeCloser) // TODO should already be buffered, this is probably redundant.
+	writer := writeCloser
 
 	switch reportFormat := GetString(cmd, ArgNameFormat); reportFormat {
 	case ArgValueReportFormatMarkdownRaw:

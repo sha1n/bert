@@ -9,25 +9,29 @@ import (
 )
 
 // TabularReportDateFormat ...
-var TabularReportDateFormat = "2006-01-02T15:04:05Z07:00"
+const TabularReportDateFormat = "2006-01-02T15:04:05Z07:00"
 
-// RawDataReportHeaders ...
-var RawDataReportHeaders = []string{"Timestamp", "Scenario", "Labels", "Duration", "Error"}
+const ReportErrorValue = "ERR"
 
-// SummaryReportHeaders ...
-var SummaryReportHeaders = []string{
-	"Timestamp",
-	"Scenario",
-	"Samples",
-	"Labels",
-	"Min",
-	"Max",
-	"Mean",
-	"Median",
-	"Percentile 90",
-	"StdDev",
-	"Errors",
-}
+var (
+	// RawDataReportHeaders ...
+	RawDataReportHeaders = []string{"Timestamp", "Scenario", "Labels", "Duration", "Error"}
+
+	// SummaryReportHeaders ...
+	SummaryReportHeaders = []string{
+		"Timestamp",
+		"Scenario",
+		"Samples",
+		"Labels",
+		"Min",
+		"Max",
+		"Mean",
+		"Median",
+		"Percentile 90",
+		"StdDev",
+		"Errors",
+	}
+)
 
 // GetSortedScenarioIds returns a sorted array of scenario IDs for the specified api.Summary
 func GetSortedScenarioIds(summary api.Summary) []api.ID {
@@ -41,28 +45,38 @@ func GetSortedScenarioIds(summary api.Summary) []api.ID {
 	return sortedIds
 }
 
-// FormatReportFloat3 formats floats for report rendering with 3 digit precision
-func FormatReportFloat3(f func() (float64, error)) string {
+// FormatReportFloatPrecision3 formats floats for report rendering with 3 digit precision
+func FormatReportFloatPrecision3(f func() (float64, error)) string {
 	value, err := f()
 	if err == nil {
 		return fmt.Sprintf("%.3f", value)
 	}
 
-	return "ERROR"
+	return ReportErrorValue
 }
 
-// FormatReportNanosAsSec3 formats nano-seconds float as seconds with 3 digits precision for report rendering
-func FormatReportNanosAsSec3(f func() (float64, error)) string {
+// FormatReportInt64 formats int64 values for report rendering
+func FormatReportInt64(f func() (int64, error)) string {
+	value, err := f()
+	if err == nil {
+		return fmt.Sprintf("%d", value)
+	}
+
+	return ReportErrorValue
+}
+
+// FormatReportNanosAsSecPrecision3 formats nano-seconds float as seconds with 3 digits precision for report rendering
+func FormatReportNanosAsSecPrecision3(f func() (float64, error)) string {
 	value, err := f()
 	if err == nil {
 		return fmt.Sprintf("%.3fs", value/math.Pow(10, 9))
 	}
 
-	return "ERROR"
+	return ReportErrorValue
 }
 
-// FormatReportFloatAsRate formats a float as rate with percent sign, for report rendering
-func FormatReportFloatAsRate(f func() float64) string {
+// FormatReportFloatAsRateInPercents formats a float as rate with percent sign, for report rendering
+func FormatReportFloatAsRateInPercents(f func() float64) string {
 	value := f()
 	errorRate := int(value * 100)
 

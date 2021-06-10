@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/sha1n/benchy/api"
+	"github.com/sha1n/benchy/pkg"
 )
 
 // IsValidFn validates the input string and returns true if valid otherwise false.
@@ -73,7 +74,7 @@ func requestOptionalExistingDirectory(prompt string, defaultVal string, ctx api.
 			if path == "" {
 				return true
 			}
-			expandedPath := expandPath(path)
+			expandedPath := pkg.ExpandUserPath(path)
 			_, err := os.Stat(expandedPath)
 			exists := !os.IsNotExist(err)
 			if !exists {

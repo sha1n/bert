@@ -1,8 +1,8 @@
 package report
 
 import (
-	"bufio"
 	"fmt"
+	"io"
 	"strings"
 
 	"encoding/csv"
@@ -16,7 +16,7 @@ type csvReportWriter struct {
 }
 
 // NewCsvReportWriter returns a CSV report write handler.
-func NewCsvReportWriter(writer *bufio.Writer) api.WriteSummaryReportFn {
+func NewCsvReportWriter(writer io.Writer) api.WriteSummaryReportFn {
 	w := csvReportWriter{
 		writer: csv.NewWriter(writer),
 	}
@@ -44,13 +44,13 @@ func (rw csvReportWriter) Write(summary api.Summary, config api.BenchmarkSpec, c
 			id,
 			fmt.Sprintf("%d", stats.Count()),
 			strings.Join(ctx.Labels, ","),
-			FormatReportFloat3(stats.Min),
-			FormatReportFloat3(stats.Max),
-			FormatReportFloat3(stats.Mean),
-			FormatReportFloat3(stats.Median),
-			FormatReportFloat3(func() (float64, error) { return stats.Percentile(90) }),
-			FormatReportFloat3(stats.StdDev),
-			FormatReportFloatAsRate(stats.ErrorRate),
+			FormatReportFloatPrecision3(stats.Min),
+			FormatReportFloatPrecision3(stats.Max),
+			FormatReportFloatPrecision3(stats.Mean),
+			FormatReportFloatPrecision3(stats.Median),
+			FormatReportFloatPrecision3(func() (float64, error) { return stats.Percentile(90) }),
+			FormatReportFloatPrecision3(stats.StdDev),
+			FormatReportFloatAsRateInPercents(stats.ErrorRate),
 		}); err != nil {
 			return err
 		}
