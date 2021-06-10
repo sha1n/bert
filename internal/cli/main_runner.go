@@ -96,10 +96,10 @@ func runFn(ctx api.IOContext) func(*cobra.Command, []string) {
 func loadSpec(cmd *cobra.Command) (spec api.BenchmarkSpec, err error) {
 	var filePath string
 	filePath = GetString(cmd, ArgNameConfig)
-	filePath, err = filepath.Abs(expandPath(filePath))
+	filePath, err = filepath.Abs(pkg.ExpandUserPath(filePath))
 
 	if err == nil {
-		_, err = os.Stat(expandPath(filePath))
+		_, err = os.Stat(pkg.ExpandUserPath(filePath))
 		exists := !os.IsNotExist(err)
 
 		if err == nil && exists {

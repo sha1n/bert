@@ -3,11 +3,9 @@ package cli
 import (
 	"io"
 	"os"
-	"path/filepath"
-	"strings"
 
 	"github.com/sha1n/benchy/api"
-	log "github.com/sirupsen/logrus"
+	"github.com/sha1n/benchy/pkg"
 
 	"github.com/spf13/cobra"
 )
@@ -61,7 +59,7 @@ func ResolveOutputArg(cmd *cobra.Command, name string, ctx api.IOContext) io.Wri
 	var err error = nil
 
 	if outputFilePath := GetString(cmd, name); outputFilePath != "" {
-		resolvedfilePath := expandPath(outputFilePath)
+		resolvedfilePath := pkg.ExpandUserPath(outputFilePath)
 		outputFile, err = os.OpenFile(resolvedfilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	}
 	CheckBenchmarkInitFatal(err)
@@ -108,18 +106,6 @@ func IsExperimentEnabled(cmd *cobra.Command, name string) bool {
 	}
 
 	return false
-}
-
-// TODO this has been copied from pgk/command_exec.go. Maybe share or use an existing implementation if exists.
-func expandPath(path string) string {
-	if strings.HasPrefix(path, "~") {
-		if p, err := os.UserHomeDir(); err == nil {
-			return filepath.Join(p, path[1:])
-		}
-		log.Warnf("Failed to resolve user home for path '%s'", path)
-	}
-
-	return path
 }
 
 // stdOutNonClosingWriteCloser a wrapper around os.Stdout that implements the io.WriteCloser interface but never closes the file
