@@ -69,7 +69,7 @@ func NewProgressView(spec api.BenchmarkSpec, termWidthFn func() int, ioc api.IOC
 
 	for i, scenario := range spec.Scenarios {
 		formatter := newProgressBarFormatter()
-		pBar := termite.NewProgressBar(rows[progressBarIndex], spec.Executions, termWidth, 56, formatter)
+		pBar := termite.NewProgressBar(rows[progressBarIndex], spec.Executions, termWidth, 59, formatter)
 		rows[progressBarIndex-1].Update(yellow.Sprint("- " + scenario.Name))
 		progressBarIndex += 3
 
