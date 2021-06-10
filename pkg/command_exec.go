@@ -29,7 +29,7 @@ func (ce *commandExecutor) ExecuteFn(cmdSpec *api.CommandSpec, defaultWorkingDir
 	execCmd := exec.Command(cmdSpec.Cmd[0], cmdSpec.Cmd[1:]...)
 	ce.configureCommand(cmdSpec, execCmd, defaultWorkingDir, env)
 
-	cancel, _ := registerInterruptGuard(onShutdownSignalFn(execCmd))
+	cancel, _ := RegisterInterruptGuard(onShutdownSignalFn(execCmd))
 
 	return func() error {
 		defer cancel()

@@ -10,7 +10,7 @@ import (
 )
 
 // channel is returned for testing...
-func registerInterruptGuard(handleFn func(os.Signal)) (context.CancelFunc, chan os.Signal) {
+func RegisterInterruptGuard(handleFn func(os.Signal)) (context.CancelFunc, chan os.Signal) {
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt)
 

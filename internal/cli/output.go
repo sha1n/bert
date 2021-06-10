@@ -22,10 +22,10 @@ var (
 	sprintBold  = color.New(color.Bold).Sprint
 )
 
-func configureOutput(cmd *cobra.Command, ctx api.IOContext) {
+func configureOutput(cmd *cobra.Command, defaultLogLevel log.Level, ctx api.IOContext) {
 	silent := GetBool(cmd, ArgNameSilent)
 	debug := GetBool(cmd, ArgNameDebug)
-	var level = log.ErrorLevel
+	var level = defaultLogLevel
 
 	if silent && debug {
 		CheckUserArgFatal(errors.New("'--%s' and '--%s' are mutually exclusive"))
