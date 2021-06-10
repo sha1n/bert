@@ -10,11 +10,13 @@ import (
 	"github.com/sha1n/benchy/internal/cli"
 	"github.com/sha1n/benchy/pkg"
 	errorhandling "github.com/sha1n/clib/pkg/error_handling"
+	"github.com/sha1n/termite"
 	log "github.com/sirupsen/logrus"
 )
 
 func init() {
 	pkg.RegisterInterruptGuard(func(sig os.Signal) {
+		termite.NewCursor(os.Stdout).Show()
 		doExit(1)
 	})
 	

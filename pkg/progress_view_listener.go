@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/fatih/color"
@@ -70,7 +69,7 @@ func NewProgressView(spec api.BenchmarkSpec, termWidthFn func() int, ioc api.IOC
 	for i, scenario := range spec.Scenarios {
 		formatter := newProgressBarFormatter()
 		pBar := termite.NewProgressBar(rows[progressBarIndex], spec.Executions, termWidth, 59, formatter)
-		rows[progressBarIndex-1].Update(yellow.Sprint("- " + scenario.Name))
+		rows[progressBarIndex-1].Update(fmt.Sprintf("%11s: %s", "SCENARIO", yellow.Sprint(scenario.Name)))
 		progressBarIndex += 3
 
 		tick, cancel, _ := pBar.Start()
@@ -110,7 +109,6 @@ func (l *ProgressView) OnBenchmarkStart() {
 		cancelMatrix,
 		restoreCursor,
 		restoreLogs,
-		l.cursor.Show,
 	)
 }
 
@@ -124,7 +122,6 @@ func (l *ProgressView) OnBenchmarkEnd() {
 	}
 	l.ended = true
 
-	defer l.cursor.Show()
 	defer println()
 
 	_ = l.spinner.Stop("Benchmark finished!")
@@ -161,11 +158,7 @@ func (l *ProgressView) OnMessagef(id api.ID, format string, args ...interface{})
 
 func (l *ProgressView) hideCursor() (restore func()) {
 	l.cursor.Hide()
-	cancelCursorHook, _ := RegisterInterruptGuard(func(os.Signal) {
-		l.cursor.Show()
-	})
-
-	return func() { cancelCursorHook(); l.cursor.Show() }
+	return func() { l.cursor.Show() }
 }
 
 func shutOffLogs() (cancel func()) {

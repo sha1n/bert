@@ -29,7 +29,7 @@ func (ce *commandExecutor) ExecuteFn(cmdSpec *api.CommandSpec, defaultWorkingDir
 	execCmd := exec.Command(cmdSpec.Cmd[0], cmdSpec.Cmd[1:]...)
 	ce.configureCommand(cmdSpec, execCmd, defaultWorkingDir, env)
 
-	cancel, _ := RegisterInterruptGuard(onShutdownSignalFn(execCmd))
+	cancel, _ := RegisterInterruptGuard(onInterruptSignalFn(execCmd))
 
 	return func() error {
 		defer cancel()
@@ -72,13 +72,11 @@ func toEnvVarsArray(env map[string]string) []string {
 	return arr
 }
 
-func onShutdownSignalFn(execCmd *exec.Cmd) func(os.Signal) {
+func onInterruptSignalFn(execCmd *exec.Cmd) func(os.Signal) {
 	return func(sig os.Signal) {
 		if sig == os.Interrupt {
 			log.Debugf("Got %s signal. Forwarding to %s...", sig, execCmd.Args[0])
 			execCmd.Process.Signal(sig)
-
-			os.Exit(1)
 		}
 	}
 }
