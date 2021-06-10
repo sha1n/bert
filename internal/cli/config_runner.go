@@ -31,7 +31,7 @@ func CreateConfigCommand(ctx api.IOContext) *cobra.Command {
 // runConfigToolFn returns a function that runs the config tool with the specified IOContext
 func runConfigToolFn(ctx api.IOContext) func(*cobra.Command, []string) {
 	return func(cmd *cobra.Command, args []string) {
-		configureOutput(cmd, ctx)
+		configureOutput(cmd, log.ErrorLevel, ctx)
 
 		writeCloser := ResolveOutputArg(cmd, ArgNameOutputFile, ctx)
 		defer writeCloser.Close()

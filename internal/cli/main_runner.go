@@ -62,7 +62,7 @@ func runFn(ctx api.IOContext) func(*cobra.Command, []string) {
 	return func(cmd *cobra.Command, args []string) {
 		var err error
 		var closer io.Closer
-		configureOutput(cmd, ctx)
+		configureOutput(cmd, log.ErrorLevel, ctx)
 
 		log.Info("Starting benchy...")
 

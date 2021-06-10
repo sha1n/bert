@@ -2,16 +2,22 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"runtime/debug"
 
 	"github.com/fatih/color"
 	"github.com/sha1n/benchy/api"
 	"github.com/sha1n/benchy/internal/cli"
+	"github.com/sha1n/benchy/pkg"
 	errorhandling "github.com/sha1n/clib/pkg/error_handling"
 	log "github.com/sirupsen/logrus"
 )
 
 func init() {
+	pkg.RegisterInterruptGuard(func(sig os.Signal) {
+		doExit(1)
+	})
+	
 	log.SetFormatter(&log.TextFormatter{
 		DisableTimestamp: true,
 	})

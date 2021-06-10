@@ -161,7 +161,7 @@ func (l *ProgressView) OnMessagef(id api.ID, format string, args ...interface{})
 
 func (l *ProgressView) hideCursor() (restore func()) {
 	l.cursor.Hide()
-	cancelCursorHook, _ := registerInterruptGuard(func(os.Signal) {
+	cancelCursorHook, _ := RegisterInterruptGuard(func(os.Signal) {
 		l.cursor.Show()
 	})
 

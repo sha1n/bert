@@ -14,7 +14,7 @@ import (
 func TestDefaultLogLevel(t *testing.T) {
 	ctx := api.NewIOContext()
 	cmd := aCommandWithArgs(ctx)
-	configureOutput(cmd, ctx)
+	configureOutput(cmd, log.ErrorLevel, ctx)
 
 	assert.Equal(t, log.ErrorLevel, log.StandardLogger().Level)
 	assert.Equal(t, ctx.StderrWriter, log.StandardLogger().Out)
@@ -24,7 +24,7 @@ func TestDebugOn(t *testing.T) {
 	ctx := api.NewIOContext()
 	cmd := aCommandWithArgs(ctx, "-d")
 	cmd.Run = func(cmd *cobra.Command, args []string) {
-		configureOutput(cmd, ctx)
+		configureOutput(cmd, log.ErrorLevel, ctx)
 
 		assert.Equal(t, log.DebugLevel, log.StandardLogger().Level)
 		assert.Equal(t, ctx.StderrWriter, log.StandardLogger().Out)
@@ -37,7 +37,7 @@ func TestSilentOn(t *testing.T) {
 	ctx := api.NewIOContext()
 	cmd := aCommandWithArgs(ctx, "-s")
 	cmd.Run = func(cmd *cobra.Command, args []string) {
-		configureOutput(cmd, ctx)
+		configureOutput(cmd, log.ErrorLevel, ctx)
 
 		assert.Equal(t, log.FatalLevel, log.StandardLogger().Level)
 		assert.Equal(t, ctx.StderrWriter, log.StandardLogger().Out)
@@ -50,7 +50,7 @@ func TestTtyMode(t *testing.T) {
 	withTty(func(ctx api.IOContext) {
 		cmd := aCommandWithArgs(ctx)
 		cmd.Run = func(cmd *cobra.Command, args []string) {
-			configureOutput(cmd, ctx)
+			configureOutput(cmd,log.ErrorLevel,  ctx)
 
 			assert.Equal(t, ctx.StderrWriter, log.StandardLogger().Out)
 			assert.True(t, log.StandardLogger().Formatter.(*log.TextFormatter).DisableTimestamp)
