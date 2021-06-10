@@ -30,8 +30,8 @@
 
 ## Overview
 `benchy` is designed with focus on benchamrk environment control and flexibility in mind. It was originally built to:
-- Benchamrk complex, relatively long running commands such as build and test commands used on software development environments.
-- Benchmark the exact same set of command scenarios on different machines or environments in order to compare them later.
+- Benchamrk complex, relatively long running commands such as build and test commands used on software development and CI environments.
+- Benchmark the exact same set of command scenarios on different environments in order to compare them later.
 - Collect raw metrics and use external analysis toos to process them.
 
 ## Main Features
@@ -173,5 +173,5 @@ However, there are several ways you can control what is logged and in what level
 
 ## Alternatives
 Before devloping `benchy` I looked into the following tools. Both target similar use-cases, but with different focus. If you need to quickly compare two commands, I would recommend looking into these.
-- [hyperfine](https://github.com/sharkdp/hyperfine) 
+- [hyperfine](https://github.com/sharkdp/hyperfine) - if subsecond precision is critical to your use-case, `hyperfine`, which is implemented in [rust](http://rust-lang.org/) has a clear advantage over `benchy` which is implemented in [Go](https://golang.org).
 - [bench](https://github.com/Gabriel439/bench) 
