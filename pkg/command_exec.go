@@ -23,7 +23,7 @@ func NewCommandExecutor(pipeStdout bool, pipeStderr bool) api.CommandExecutor {
 }
 
 // Executes a single command in a subprocess based on the specified specs.
-func (ce *commandExecutor) Execute(cmdSpec *api.CommandSpec, defaultWorkingDir string, env map[string]string) (exitError error) {
+func (ce *commandExecutor) ExecuteFn(cmdSpec *api.CommandSpec, defaultWorkingDir string, env map[string]string) func() error {
 	log.Debugf("Going to execute command %v", cmdSpec.Cmd)
 
 	execCmd := exec.Command(cmdSpec.Cmd[0], cmdSpec.Cmd[1:]...)
@@ -32,7 +32,7 @@ func (ce *commandExecutor) Execute(cmdSpec *api.CommandSpec, defaultWorkingDir s
 	cancel, _ := registerInterruptGuard(onShutdownSignalFn(execCmd))
 	defer cancel()
 
-	return execCmd.Run()
+	return execCmd.Run
 }
 
 func (ce *commandExecutor) configureCommand(cmd *api.CommandSpec, execCmd *exec.Cmd, defaultWorkingDir string, env map[string]string) {
