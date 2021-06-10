@@ -105,7 +105,7 @@ func (trw textReportWriter) writeNewLine() {
 }
 
 func (trw textReportWriter) writeSeperator() {
-	trw.writeString(fmt.Sprintf("\n%s\n\n", strings.Repeat("-", 60)))
+	trw.writeString(fmt.Sprintf("\n%s\n\n", strings.Repeat("-", 63)))
 }
 
 func (trw textReportWriter) writeScenarioTitle(name string) {
@@ -153,10 +153,10 @@ func (trw textReportWriter) writePropertyLine(name string, value interface{}) {
 
 func (trw textReportWriter) writeProperty(name string, value interface{}, c *color.Color) {
 	if c == nil {
-		trw.writeString(fmt.Sprintf("%11s: %v", name, value))
+		trw.writeString(fmt.Sprintf("%11s: %-7v", name, value))
 	} else {
 		trw.writeString(c.Sprintf("%11s: ", name))
-		trw.writeString(fmt.Sprintf("%v", value))
+		trw.writeString(fmt.Sprintf("%-7v", value))
 	}
 }
 
