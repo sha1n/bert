@@ -19,7 +19,7 @@ func init() {
 		termite.NewCursor(os.Stdout).Show()
 		doExit(1)
 	})
-	
+
 	log.SetFormatter(&log.TextFormatter{
 		DisableTimestamp: true,
 	})

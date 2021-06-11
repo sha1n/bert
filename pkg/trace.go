@@ -1,8 +1,10 @@
 package pkg
 
 import (
-	"github.com/sha1n/benchy/api"
+	"syscall"
 	"time"
+
+	"github.com/sha1n/benchy/api"
 )
 
 type tracer struct {
@@ -10,10 +12,13 @@ type tracer struct {
 }
 
 type trace struct {
-	id      string
-	start   time.Time
-	elapsed time.Duration
-	error   error
+	id            string
+	cpuTimer      *childrenCPUTimer
+	start         time.Time
+	perceivedTime time.Duration
+	usrTime       time.Duration
+	sysTime       time.Duration
+	error         error
 }
 
 func (t trace) ID() string {
@@ -21,7 +26,15 @@ func (t trace) ID() string {
 }
 
 func (t trace) Elapsed() time.Duration {
-	return t.elapsed
+	return t.perceivedTime
+}
+
+func (t trace) System() time.Duration {
+	return t.sysTime
+}
+
+func (t trace) User() time.Duration {
+	return t.usrTime
 }
 
 func (t trace) Error() error {
@@ -30,8 +43,8 @@ func (t trace) Error() error {
 
 func newTrace(id string) trace {
 	return trace{
-		id:    id,
-		start: time.Now(),
+		id:       id,
+		cpuTimer: newChildrenCPUTimer(),
 	}
 }
 
@@ -44,13 +57,16 @@ func NewTracer(bufferSize int) api.Tracer {
 
 func (tr *tracer) Start(i api.Identifiable) api.End {
 	t := newTrace(i.ID())
+	t.cpuTimer.Start()
+	t.start = time.Now()
 
 	return tr.endFn(t)
 }
 
 func (tr *tracer) endFn(t trace) api.End {
 	return func(exitError error) {
-		t.elapsed = time.Since(t.start)
+		t.usrTime, t.sysTime = t.cpuTimer.Elapsed()
+		t.perceivedTime = time.Since(t.start)
 		t.error = exitError
 
 		tr.stream <- t
@@ -59,4 +75,38 @@ func (tr *tracer) endFn(t trace) api.End {
 
 func (tr *tracer) Stream() chan api.Trace {
 	return tr.stream
+}
+
+type childrenCPUTimer struct {
+	r            syscall.Rusage
+	sysTimeStart time.Time
+	usrTimeStart time.Time
+}
+
+func newChildrenCPUTimer() *childrenCPUTimer {
+	return &childrenCPUTimer{}
+}
+
+func (t *childrenCPUTimer) Start() func() (time.Duration, time.Duration) {
+	err := syscall.Getrusage(syscall.RUSAGE_CHILDREN, &t.r)
+	if err != nil {
+		panic(err)
+	}
+
+	t.sysTimeStart = time.Unix(t.r.Stime.Unix())
+	t.usrTimeStart = time.Unix(t.r.Utime.Unix())
+
+	return t.Elapsed
+}
+
+func (t *childrenCPUTimer) Elapsed() (usr time.Duration, sys time.Duration) {
+	err := syscall.Getrusage(syscall.RUSAGE_CHILDREN, &t.r)
+	if err != nil {
+		panic(err)
+	}
+
+	sysTimeEnd := time.Unix(t.r.Stime.Unix())
+	usrTimeEnd := time.Unix(t.r.Utime.Unix())
+
+	return usrTimeEnd.Sub(t.usrTimeStart), sysTimeEnd.Sub(t.sysTimeStart)
 }

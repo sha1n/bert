@@ -30,7 +30,7 @@ func CreateUpdateCommand(version, binaryName string, ctx api.IOContext) *cobra.C
 // currentVersion is used to determine whether a newer one is available
 func runSelfUpdateFn(currentVersion, binaryName string, ctx api.IOContext) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
-		configureOutput(cmd,log.InfoLevel, ctx)
+		configureOutput(cmd, log.InfoLevel, ctx)
 
 		CheckFatal(clibcmd.RunSelfUpdate(gitHusRepoOwner, gitHusRepoName, currentVersion, binaryName, os.Executable, clibcmd.GetLatestRelease))
 

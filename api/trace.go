@@ -26,6 +26,8 @@ type Tracer interface {
 type Trace interface {
 	ID() string
 	Elapsed() time.Duration
+	System() time.Duration
+	User() time.Duration
 	Error() error
 }
 
@@ -41,9 +43,11 @@ type Stats interface {
 	Count() int
 }
 
-// Summary provides access a cpollection of identifiable statistics.
+// Summary provides access a collection of identifiable statistics.
 type Summary interface {
-	Get(ID) Stats
-	All() map[ID]Stats
+	PerceivedTimeStats(ID) Stats
+	SystemTimeStats(ID) Stats
+	UserTimeStats(ID) Stats
+	IDs() []ID
 	Time() time.Time
 }

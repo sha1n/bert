@@ -55,8 +55,18 @@ func writeCsvRawReport(t *testing.T, includeHeaders bool, traces ...api.Trace) [
 }
 
 func twoRandomTraceEvents() (api.Trace, api.Trace) {
-	t1 := pkg.NewFakeTrace(clibtest.RandomString(), time.Duration(clibtest.RandomUint()), nil)
-	t2 := pkg.NewFakeTrace(clibtest.RandomString(), time.Duration(clibtest.RandomUint()), errors.New(clibtest.RandomString()))
-
-	return t1, t2
+	return pkg.NewFakeTrace(
+			clibtest.RandomString(),
+			time.Duration(clibtest.RandomUint()),
+			time.Duration(clibtest.RandomUint()),
+			time.Duration(clibtest.RandomUint()),
+			nil,
+		),
+		pkg.NewFakeTrace(
+			clibtest.RandomString(),
+			time.Duration(clibtest.RandomUint()),
+			time.Duration(clibtest.RandomUint()),
+			time.Duration(clibtest.RandomUint()),
+			errors.New(clibtest.RandomString()),
+		)
 }

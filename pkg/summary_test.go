@@ -15,21 +15,26 @@ const SingleErrScenarioID = "err"
 func TestErrorRateStat(t *testing.T) {
 	summary, _ := generateExampleSummary()
 
-	zeroErrStats := summary.Get(ZeroErrScenarioID)
+	zeroErrStats := summary.PerceivedTimeStats(ZeroErrScenarioID)
 	assert.Equal(t, 0.0, zeroErrStats.ErrorRate())
 
-	singleErrStats := summary.Get(SingleErrScenarioID)
+	singleErrStats := summary.PerceivedTimeStats(SingleErrScenarioID)
 	assert.Equal(t, 0.1, singleErrStats.ErrorRate())
 }
 
 func TestCount(t *testing.T) {
-	summary, size := generateExampleSummary()
+	summary, expectedCount := generateExampleSummary()
 
-	zeroErrStats := summary.Get(ZeroErrScenarioID)
-	assert.Equal(t, size, zeroErrStats.Count())
+	assertCount := func(stats api.Stats) {
+		assert.Equal(t, expectedCount, stats.Count())
+	}
 
-	singleErrStats := summary.Get(SingleErrScenarioID)
-	assert.Equal(t, size, singleErrStats.Count())
+	assertCount(summary.PerceivedTimeStats(ZeroErrScenarioID))
+	assertCount(summary.UserTimeStats(ZeroErrScenarioID))
+	assertCount(summary.SystemTimeStats(ZeroErrScenarioID))
+	assertCount(summary.PerceivedTimeStats(SingleErrScenarioID))
+	assertCount(summary.UserTimeStats(SingleErrScenarioID))
+	assertCount(summary.SystemTimeStats(SingleErrScenarioID))
 }
 
 func generateExampleSummary() (api.Summary, int) {
@@ -50,8 +55,8 @@ func generateExampleSummary() (api.Summary, int) {
 
 func aTraceWith(id string, dur int, err error) api.Trace {
 	return &trace{
-		id:      id,
-		elapsed: time.Duration(dur),
-		error:   err,
+		id:            id,
+		perceivedTime: time.Duration(dur),
+		error:         err,
 	}
 }

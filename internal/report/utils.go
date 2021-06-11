@@ -11,6 +11,7 @@ import (
 // TabularReportDateFormat ...
 const TabularReportDateFormat = "2006-01-02T15:04:05Z07:00"
 
+// ReportErrorValue ...
 const ReportErrorValue = "ERR"
 
 var (
@@ -35,14 +36,10 @@ var (
 
 // GetSortedScenarioIds returns a sorted array of scenario IDs for the specified api.Summary
 func GetSortedScenarioIds(summary api.Summary) []api.ID {
-	statsMap := summary.All()
-	sortedIds := make([]api.ID, 0, len(statsMap))
-	for k := range statsMap {
-		sortedIds = append(sortedIds, k)
-	}
-	sort.Strings(sortedIds)
+	sortedIDs := summary.IDs()
+	sort.Strings(sortedIDs)
 
-	return sortedIds
+	return sortedIDs
 }
 
 // FormatReportDurationPlainNanos formats floats for report rendering with 3 digit precision
