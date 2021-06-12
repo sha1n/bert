@@ -1,7 +1,6 @@
 package pkg
 
 import (
-	"syscall"
 	"time"
 
 	"github.com/sha1n/benchy/api"
@@ -13,7 +12,7 @@ type tracer struct {
 
 type trace struct {
 	id            string
-	cpuTimer      *childrenCPUTimer
+	cpuTimer      CPUTimer
 	start         time.Time
 	perceivedTime time.Duration
 	usrTime       time.Duration
@@ -77,36 +76,31 @@ func (tr *tracer) Stream() chan api.Trace {
 	return tr.stream
 }
 
-type childrenCPUTimer struct {
-	r            syscall.Rusage
-	sysTimeStart time.Time
-	usrTimeStart time.Time
+// CPUTimer an abstraction for a platform system CPU timer
+type CPUTimer interface {
+	Start() func() (time.Duration, time.Duration)
+	Elapsed() (usr time.Duration, sys time.Duration)
 }
 
-func newChildrenCPUTimer() *childrenCPUTimer {
-	return &childrenCPUTimer{}
-}
+// func newChildrenCPUTimer() CPUTimer {
+// 	switch runtime.GOOS {
+// 	case "windows":
+// 		return NoopCPUTimer{}
+// 	default:
 
-func (t *childrenCPUTimer) Start() func() (time.Duration, time.Duration) {
-	err := syscall.Getrusage(syscall.RUSAGE_CHILDREN, &t.r)
-	if err != nil {
-		panic(err)
-	}
+// 		return newUnixChildrenCPUTimer()
+// 	}
+// }
 
-	t.sysTimeStart = time.Unix(t.r.Stime.Unix())
-	t.usrTimeStart = time.Unix(t.r.Utime.Unix())
+// // NoopCPUTimer NOOP implementation of CPUTimer
+// type NoopCPUTimer struct{}
 
-	return t.Elapsed
-}
+// // Start ...
+// func (t NoopCPUTimer) Start() func() (time.Duration, time.Duration) {
+// 	return t.Elapsed
+// }
 
-func (t *childrenCPUTimer) Elapsed() (usr time.Duration, sys time.Duration) {
-	err := syscall.Getrusage(syscall.RUSAGE_CHILDREN, &t.r)
-	if err != nil {
-		panic(err)
-	}
-
-	sysTimeEnd := time.Unix(t.r.Stime.Unix())
-	usrTimeEnd := time.Unix(t.r.Utime.Unix())
-
-	return usrTimeEnd.Sub(t.usrTimeStart), sysTimeEnd.Sub(t.sysTimeStart)
-}
+// // Elapsed return 0, 0
+// func (t NoopCPUTimer) Elapsed() (usr time.Duration, sys time.Duration) {
+// 	return time.Nanosecond * 0, time.Nanosecond * 0
+// }
