@@ -10,24 +10,38 @@ import (
 // NewSummary create a new TracerSummary with the specified data.
 func NewSummary(tracesByID map[api.ID][]api.Trace) api.Summary {
 	summary := &_summary{
-		samples: make(map[api.ID]api.Stats),
-		time:    time.Now(),
+		perceivedTimeStats: make(map[api.ID]api.Stats, len(tracesByID)),
+		sysCPUTimeStats:    make(map[api.ID]api.Stats, len(tracesByID)),
+		userCPUTimeStats:   make(map[api.ID]api.Stats, len(tracesByID)),
+		time:               time.Now(),
 	}
 
 	for id, traces := range tracesByID {
-		float64Samples := []float64{}
+		perceivedSamples := make([]float64, len(traces))
+		systemSamples := make([]float64, len(traces))
+		userSamples := make([]float64, len(traces))
 		errorCount := 0
 
 		for ti := range traces {
-			float64Samples = append(float64Samples, float64(traces[ti].Elapsed().Nanoseconds()))
+			perceivedSamples[ti] = float64(traces[ti].Elapsed().Nanoseconds())
+			systemSamples[ti] = float64(traces[ti].System().Nanoseconds())
+			userSamples[ti] = float64(traces[ti].User().Nanoseconds())
 			if traces[ti].Error() != nil {
 				errorCount++
 			}
 		}
 
-		summary.samples[id] = &_stats{
-			float64Samples: float64Samples,
+		summary.perceivedTimeStats[id] = &_stats{
+			float64Samples: perceivedSamples,
 			errorRate:      float64(errorCount) / float64(len(traces)),
+		}
+		summary.userCPUTimeStats[id] = &_stats{
+			float64Samples: userSamples,
+			errorRate:      0,
+		}
+		summary.sysCPUTimeStats[id] = &_stats{
+			float64Samples: systemSamples,
+			errorRate:      0,
 		}
 	}
 
@@ -82,16 +96,31 @@ func (s *_stats) nanosStat(f func(stats.Float64Data) (float64, error)) (duration
 }
 
 type _summary struct {
-	samples map[api.ID]api.Stats
-	time    time.Time
+	perceivedTimeStats map[api.ID]api.Stats
+	sysCPUTimeStats    map[api.ID]api.Stats
+	userCPUTimeStats   map[api.ID]api.Stats
+	time               time.Time
 }
 
-func (summary *_summary) Get(id api.ID) api.Stats {
-	return summary.samples[id]
+func (summary *_summary) PerceivedTimeStats(id api.ID) api.Stats {
+	return summary.perceivedTimeStats[id]
 }
 
-func (summary *_summary) All() map[api.ID]api.Stats {
-	return summary.samples
+func (summary *_summary) SystemTimeStats(id api.ID) api.Stats {
+	return summary.sysCPUTimeStats[id]
+}
+
+func (summary *_summary) UserTimeStats(id api.ID) api.Stats {
+	return summary.userCPUTimeStats[id]
+}
+
+func (summary *_summary) IDs() []api.ID {
+	ids := make([]api.ID, 0, len(summary.perceivedTimeStats))
+	for k := range summary.perceivedTimeStats {
+		ids = append(ids, k)
+	}
+
+	return ids
 }
 
 func (summary *_summary) Time() time.Time {

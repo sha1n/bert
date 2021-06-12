@@ -19,15 +19,19 @@ func TestWrite(t *testing.T) {
 	var scenario1, scenario2 = scenario{id: "1-id"}, scenario{id: "2-id"}
 	summary := aFakeSummaryFor(
 		struct {
-			id       api.Identifiable
-			duration time.Duration
-			error    bool
-		}{scenario1, time.Second, false},
+			id            api.Identifiable
+			perceivedTime time.Duration
+			userTime      time.Duration
+			sysTime       time.Duration
+			error         bool
+		}{scenario1, time.Second, time.Second, time.Second, false},
 		struct {
-			id       api.Identifiable
-			duration time.Duration
-			error    bool
-		}{scenario2, time.Second, true},
+			id            api.Identifiable
+			perceivedTime time.Duration
+			userTime      time.Duration
+			sysTime       time.Duration
+			error         bool
+		}{scenario2, time.Second, time.Second, time.Second, true},
 	)
 
 	allRecords := writeCsvReport(t, summary, true)
@@ -51,15 +55,19 @@ func TestWriteWithNoHeaders(t *testing.T) {
 	var scenario1, scenario2 = scenario{id: "1-id"}, scenario{id: "2-id"}
 	summary := aFakeSummaryFor(
 		struct {
-			id       api.Identifiable
-			duration time.Duration
-			error    bool
-		}{scenario1, time.Second, false},
+			id            api.Identifiable
+			perceivedTime time.Duration
+			userTime      time.Duration
+			sysTime       time.Duration
+			error         bool
+		}{scenario1, time.Second, time.Second, time.Second, false},
 		struct {
-			id       api.Identifiable
-			duration time.Duration
-			error    bool
-		}{scenario2, time.Second, true},
+			id            api.Identifiable
+			perceivedTime time.Duration
+			userTime      time.Duration
+			sysTime       time.Duration
+			error         bool
+		}{scenario2, time.Second, time.Second, time.Second, true},
 	)
 
 	allRecords := writeCsvReport(t, summary, false)
@@ -73,12 +81,12 @@ func TestWriteWithNoHeaders(t *testing.T) {
 }
 
 func assertRecord(t *testing.T, scenario api.Identifiable, summary api.Summary, expectedTimestamp string, actualRecord []string) {
-	stats1 := summary.Get(scenario.ID())
+	stats1 := summary.PerceivedTimeStats(scenario.ID())
 	expectedLabels := strings.Join(randomLabels, ",")
 
 	assert.Equal(t, expectedTimestamp, actualRecord[0])
 	assert.Equal(t, scenario.ID(), actualRecord[1])
-	assert.Equal(t, expectedIntFormat(func() int { return summary.Get(scenario.ID()).Count() }), actualRecord[2])
+	assert.Equal(t, expectedIntFormat(func() int { return summary.PerceivedTimeStats(scenario.ID()).Count() }), actualRecord[2])
 	assert.Equal(t, expectedLabels, actualRecord[3])
 	assert.Equal(t, FormatReportDurationPlainNanos(stats1.Min), actualRecord[4])
 	assert.Equal(t, FormatReportDurationPlainNanos(stats1.Max), actualRecord[5])
@@ -123,16 +131,18 @@ func writeCsvReport(t *testing.T, summary api.Summary, includeHeaders bool) [][]
 }
 
 func aFakeSummaryFor(specs ...struct {
-	id       api.Identifiable
-	duration time.Duration
-	error    bool
+	id            api.Identifiable
+	perceivedTime time.Duration
+	userTime      time.Duration
+	sysTime       time.Duration
+	error         bool
 }) api.Summary {
 	traces := []api.Trace{}
 	for _, spec := range specs {
 		if spec.error {
-			traces = append(traces, pkg.NewFakeTrace(spec.id.ID(), spec.duration, errors.New(clibtest.RandomString())))
+			traces = append(traces, pkg.NewFakeTrace(spec.id.ID(), spec.perceivedTime, spec.userTime, spec.sysTime, errors.New(clibtest.RandomString())))
 		} else {
-			traces = append(traces, pkg.NewFakeTrace(spec.id.ID(), spec.duration, nil))
+			traces = append(traces, pkg.NewFakeTrace(spec.id.ID(), spec.perceivedTime, spec.userTime, spec.sysTime, nil))
 		}
 	}
 

@@ -50,7 +50,7 @@ func TestTtyMode(t *testing.T) {
 	withTty(func(ctx api.IOContext) {
 		cmd := aCommandWithArgs(ctx)
 		cmd.Run = func(cmd *cobra.Command, args []string) {
-			configureOutput(cmd,log.ErrorLevel,  ctx)
+			configureOutput(cmd, log.ErrorLevel, ctx)
 
 			assert.Equal(t, ctx.StderrWriter, log.StandardLogger().Out)
 			assert.True(t, log.StandardLogger().Formatter.(*log.TextFormatter).DisableTimestamp)

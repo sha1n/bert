@@ -7,11 +7,13 @@ import (
 )
 
 // NewFakeTrace creates a fake trace with the specified data
-func NewFakeTrace(id string, elapsed time.Duration, err error) api.Trace {
+func NewFakeTrace(id string, elapsed, userTime, sysTime time.Duration, err error) api.Trace {
 	return &trace{
-		id:      id,
-		elapsed: elapsed,
-		error:   err,
+		id:            id,
+		perceivedTime: elapsed,
+		usrTime:       userTime,
+		sysTime:       sysTime,
+		error:         err,
 	}
 }
 

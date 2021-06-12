@@ -53,8 +53,8 @@ func generateTestMdReport(t *testing.T, includeHeaders bool) ([]string, api.Summ
 	writer := buf
 
 	spec := aTwoScenarioSpec()
-	t1 := pkg.NewFakeTrace(spec.Scenarios[0].ID(), 1, nil)
-	t2 := pkg.NewFakeTrace(spec.Scenarios[1].ID(), 2, errors.New("err2"))
+	t1 := pkg.NewFakeTrace(spec.Scenarios[0].ID(), 1, 1, 1, nil)
+	t2 := pkg.NewFakeTrace(spec.Scenarios[1].ID(), 2, 2, 2, errors.New("err2"))
 
 	summary := pkg.NewFakeSummary(t1, t2)
 	ctx := api.ReportContext{

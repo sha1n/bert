@@ -32,7 +32,7 @@ func (rw mdReportWriter) Write(summary api.Summary, spec api.BenchmarkSpec, ctx 
 		timeStr := summary.Time().Format("2006-01-02T15:04:05Z07:00")
 		sortedIds := GetSortedScenarioIds(summary)
 		for _, id := range sortedIds {
-			stats := summary.Get(id)
+			stats := summary.PerceivedTimeStats(id)
 
 			err = rw.tableWriter.WriteRow([]string{
 				timeStr,
