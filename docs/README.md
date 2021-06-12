@@ -10,6 +10,8 @@
 # Benchy
 `benchy` is a CLI benchmarking tool that allows you to easily compare performance metrics of different CLI commands. I developed this tool to benchmark and compare development tools and configurations on different environment setups and machine over time. It is designed to support complex scenarios that require high level of control and consistency.
 
+<img src="images/demo_800.gif" width="100%">
+
 
 - [Benchy](#benchy)
   - [Overview](#overview)
@@ -29,14 +31,15 @@
 
 
 ## Overview
-`benchy` is designed with focus on benchamrk environment control and flexibility in mind. It was originally built to:
-- Benchamrk complex, relatively long running commands such as build and test commands used on software development environments.
+`benchy` is designed with focus on benchmark environment control and flexibility in mind. It was originally built to:
+- Benchmark complex, relatively long running commands such as build and test commands used on software development environments.
 - Benchmark the exact same set of command scenarios on different machines or environments in order to compare them later.
-- Collect raw metrics and use external analysis toos to process them.
+- Collect raw metrics and use external analysis tools to process them.
 
 ## Main Features
 - Benchmark any number of commands
-- Rerun the exact same benchmark again and again on diffeent machines or environments, accumulte results and compare them later
+- Perceived time measurements and low level user/system CPU time measurement
+- Rerun the exact same benchmark again and again on different machines or environments, accumulate results and compare them later
 - Set the number of times every scenario is executed
 - Choose between alternate executions and sequential execution of the same command
 - Save results in `txt`, `csv`, `csv/raw`, `md` and `md/raw` formats
@@ -45,6 +48,7 @@
   - Set optional custom environment variables per scenario
   - Set optional setup/teardown commands per scenario
   - Set optional before/after commands for each run
+- Constant progress indication
 
 ## Installation
 ### Download A Pre-Built Release
@@ -88,41 +92,42 @@ There are three supported report formats, two of them support `raw` mode as foll
 **Selecting Report Format:**
 ```bash
 # The following command will generate a report in CSV format and save it into a file 
-# named 'benchamrk-report.csv' in the current directory.
-benchy --config benchmark-config.yml --format csv --out-file benchamrk-report.csv
+# named 'benchmark-report.csv' in the current directory.
+benchy --config benchmark-config.yml --format csv --out-file benchmark-report.csv
 
 # Here is an equivalent command that uses shorthand flag names.
-benchy -c benchmark-config.yml -f csv -o benchamrk-report.csv
+benchy -c benchmark-config.yml -f csv -o benchmark-report.csv
 ```
 
 ### Text Example
 ```
  BENCHMARK SUMMARY
      labels: example-label
-       date: Jun 10 2021
-       time: 16:24:14+03:00
+       date: Jun 12 2021
+       time: 18:07:11+03:00
   scenarios: 2
  executions: 10
   alternate: true
 
-------------------------------------------------------------
+---------------------------------------------------------------
 
    SCENARIO: scenario A
-        min: 1.0s       mean: 1.0s     stddev: 1.3ms
-        max: 1.0s     median: 1.0s        p90: 1.0s
-     errors: 0%
+        min: 1.0s          mean: 1.0s        median: 1.0s
+        max: 1.0s        stddev: 1.5ms          p90: 1.0s
+       user: 538.5µs     system: 1.2ms       errors: 0%
 
-------------------------------------------------------------
+---------------------------------------------------------------
 
    SCENARIO: scenario B
-        min: 1.6ms       mean: 1.7ms     stddev: 94.8µs
-        max: 1.9ms     median: 1.7ms        p90: 1.8ms
-     errors: 0%
+        min: 3.4ms         mean: 3.7ms       median: 3.6ms
+        max: 4.3ms       stddev: 243.9µs        p90: 3.8ms
+       user: 539.9µs     system: 1.2ms       errors: 0%
 
-------------------------------------------------------------
+---------------------------------------------------------------
 ```
 
 ### CSV Example
+
 ```csv
 Timestamp,Scenario,Samples,Labels,Min,Max,Mean,Median,Percentile 90,StdDev,Errors
 2021-06-10T16:23:00+03:00,scenario A,10,example-label,1002473555,1006631000,1004841316,1004925820,1006234538,1263756,0%
@@ -131,10 +136,10 @@ Timestamp,Scenario,Samples,Labels,Min,Max,Mean,Median,Percentile 90,StdDev,Error
 
 ### Markdown Example
 ```
-|Timestamp|Scenario|Samples|Labels|Min|Max|Mean|Median|Percentile 90|StdDev|Errors|
-|----|----|----|----|----|----|----|----|----|----|----|
-|2021-06-10T16:22:26+03:00|scenario A|10|example-label|1.0s|1.0s|1.0s|1.0s|1.0s|1.0ms|0%|
-|2021-06-10T16:22:26+03:00|scenario B|10|example-label|1.4ms|1.8ms|1.6ms|1.6ms|1.7ms|119.5µs|0%|
+| Timestamp                 | Scenario   | Samples | Labels        | Min   | Max   | Mean  | Median | Percentile 90 | StdDev  | Errors |
+| ------------------------- | ---------- | ------- | ------------- | ----- | ----- | ----- | ------ | ------------- | ------- | ------ |
+| 2021-06-10T16:22:26+03:00 | scenario A | 10      | example-label | 1.0s  | 1.0s  | 1.0s  | 1.0s   | 1.0s          | 1.0ms   | 0%     |
+| 2021-06-10T16:22:26+03:00 | scenario B | 10      | example-label | 1.4ms | 1.8ms | 1.6ms | 1.6ms  | 1.7ms         | 119.5µs | 0%     |
 ```
 
 ### Raw CSV Example
@@ -172,6 +177,6 @@ However, there are several ways you can control what is logged and in what level
 - `--debug` or `-d` - sets the logging level to the highest possible level, for troubleshooting.
 
 ## Alternatives
-Before devloping `benchy` I looked into the following tools. Both target similar use-cases, but with different focus. If you need to quickly compare two commands, I would recommend looking into these.
+Before developing `benchy` I looked into the following tools. Both target similar use-cases, but with different focus. If you need to quickly compare two commands, I would recommend looking into these.
 - [hyperfine](https://github.com/sharkdp/hyperfine) 
 - [bench](https://github.com/Gabriel439/bench) 
