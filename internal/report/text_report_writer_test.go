@@ -27,15 +27,19 @@ func testTxtSanity(t *testing.T, colorsOn bool) {
 	var scenario1, scenario2 = scenario{id: "1-id"}, scenario{id: "2-id"}
 	summary := aFakeSummaryFor(
 		struct {
-			id       api.Identifiable
-			duration time.Duration
-			error    bool
-		}{scenario1, time.Second, false},
+			id            api.Identifiable
+			perceivedTime time.Duration
+			userTime      time.Duration
+			sysTime       time.Duration
+			error         bool
+		}{scenario1, time.Second, time.Second, time.Second, false},
 		struct {
-			id       api.Identifiable
-			duration time.Duration
-			error    bool
-		}{scenario2, time.Second * 2, true},
+			id            api.Identifiable
+			perceivedTime time.Duration
+			userTime      time.Duration
+			sysTime       time.Duration
+			error         bool
+		}{scenario2, time.Second * 2, time.Second * 2, time.Second * 2, true},
 	)
 
 	text, lines := writeTxtReport(t, summary, spec, colorsOn)
@@ -64,6 +68,11 @@ func testTxtSanity(t *testing.T, colorsOn bool) {
 
 	assert.Equal(t, 1, strings.Count(text, "errors: 0%"))
 	assert.Equal(t, 1, strings.Count(text, "errors: 100%"))
+
+	assert.Equal(t, 1, strings.Count(text, "system: 1"))
+	assert.Equal(t, 1, strings.Count(text, "system: 2"))
+	assert.Equal(t, 1, strings.Count(text, "user: 1"))
+	assert.Equal(t, 1, strings.Count(text, "user: 2"))
 
 	assert.Equal(t, 2, strings.Count(text, "stddev: 0"))
 

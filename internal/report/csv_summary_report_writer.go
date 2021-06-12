@@ -38,7 +38,7 @@ func (rw csvReportWriter) Write(summary api.Summary, config api.BenchmarkSpec, c
 	sortedIds := GetSortedScenarioIds(summary)
 
 	for _, id := range sortedIds {
-		stats := summary.Get(id)
+		stats := summary.PerceivedTimeStats(id)
 
 		if err = rw.writer.Write([]string{
 			timeStr,

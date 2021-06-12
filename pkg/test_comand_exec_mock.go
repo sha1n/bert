@@ -14,7 +14,7 @@ type RecordedExecutionParams struct {
 	Env               map[string]string
 }
 
-// Execute records execution parameters and stores them in order
+// ExecuteFn records execution parameters and stores them in order
 func (ce *CmdRecordingExecutor) ExecuteFn(
 	cmdSpec *api.CommandSpec,
 	defaultWorkingDir string,

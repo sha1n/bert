@@ -21,12 +21,13 @@ type textReportWriter struct {
 	cyan    *color.Color
 	magenta *color.Color
 	blue    *color.Color
+	hiblue  *color.Color
 	bold    *color.Color
 }
 
 // NewTextReportWriter returns a text report write handler.
 func NewTextReportWriter(writer io.Writer, colorsOn bool) api.WriteSummaryReportFn {
-	var red, green, yellow, cyan, magenta, blue, bold *color.Color
+	var red, green, yellow, cyan, magenta, blue, hiblue, bold *color.Color
 
 	if colorsOn {
 		red = color.New(color.FgRed)
@@ -35,13 +36,15 @@ func NewTextReportWriter(writer io.Writer, colorsOn bool) api.WriteSummaryReport
 		cyan = color.New(color.FgCyan)
 		magenta = color.New(color.FgMagenta)
 		blue = color.New(color.FgBlue)
+		hiblue = color.New(color.FgHiBlue)
 		bold = color.New(color.Bold)
 	} else {
 		red,
 			green,
 			yellow,
-			cyan, magenta, blue,
+			cyan, magenta, blue, hiblue,
 			bold = color.New(),
+			color.New(),
 			color.New(),
 			color.New(),
 			color.New(),
@@ -58,6 +61,7 @@ func NewTextReportWriter(writer io.Writer, colorsOn bool) api.WriteSummaryReport
 		cyan:    cyan,
 		magenta: magenta,
 		blue:    blue,
+		hiblue:  hiblue,
 		bold:    bold,
 	}
 
@@ -81,18 +85,26 @@ func (trw textReportWriter) Write(summary api.Summary, config api.BenchmarkSpec,
 	sortedIds := GetSortedScenarioIds(summary)
 
 	for _, id := range sortedIds {
-		stats := summary.Get(id)
+		stats := summary.PerceivedTimeStats(id)
+		userStats := summary.UserTimeStats(id)
+		sysStats := summary.SystemTimeStats(id)
 
 		trw.writeScenarioTitle(id)
-		trw.writePropertySec("min", trw.green, stats.Min)
-		trw.writePropertySec("mean", trw.cyan, stats.Mean)
-		trw.writePropertySec("stddev", trw.blue, stats.StdDev)
+		trw.writeDurationProperty("min", trw.green, stats.Min)
+		trw.writeDurationProperty("mean", trw.cyan, stats.Mean)
+		trw.writeDurationProperty("median", trw.yellow, stats.Median)
 		trw.writeNewLine()
-		trw.writePropertySec("max", trw.magenta, stats.Max)
-		trw.writePropertySec("median", trw.yellow, stats.Median)
-		trw.writePropertySec("p90", trw.red, func() (time.Duration, error) { return stats.Percentile(90) })
+
+		trw.writeDurationProperty("max", trw.magenta, stats.Max)
+		trw.writeDurationProperty("stddev", trw.blue, stats.StdDev)
+		trw.writeDurationProperty("p90", trw.red, func() (time.Duration, error) { return stats.Percentile(90) })
 		trw.writeNewLine()
+
+		trw.writeDurationProperty("user", trw.hiblue, userStats.Mean)
+		trw.writeDurationProperty("system", trw.hiblue, sysStats.Mean)
 		trw.writeErrorRateStat("errors", stats.ErrorRate)
+
+		trw.writeNewLine()
 
 		trw.writeSeperator()
 	}
@@ -128,7 +140,7 @@ func (trw textReportWriter) writeTime(time time.Time) {
 	trw.writePropertyLine("time", time.Format("15:04:05Z07:00"))
 }
 
-func (trw textReportWriter) writePropertySec(name string, c *color.Color, f func() (time.Duration, error)) {
+func (trw textReportWriter) writeDurationProperty(name string, c *color.Color, f func() (time.Duration, error)) {
 	trw.writeProperty(name, FormatReportDuration(f), c)
 }
 
@@ -136,9 +148,9 @@ func (trw textReportWriter) writeErrorRateStat(name string, f func() float64) {
 	value := f()
 	errorRate := int(value * 100)
 	if errorRate > 0 {
-		trw.writeString(trw.yellow.Sprintf("%11s: %d%%\n", name, errorRate))
+		trw.writeString(trw.yellow.Sprintf("%11s: %d%%", name, errorRate))
 	} else {
-		trw.writeString(fmt.Sprintf("%11s: %d%%\n", name, errorRate))
+		trw.writeString(fmt.Sprintf("%11s: %d%%", name, errorRate))
 	}
 }
 

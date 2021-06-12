@@ -19,27 +19,33 @@ func TestProgressViewOutput(t *testing.T) {
 	ctx.Tty = true
 	ctx.StdoutWriter = new(bytes.Buffer)
 	ctx.StderrWriter = new(bytes.Buffer)
-	spec := aBasicSpecWith(true, 1)
+	spec := aBasicSpecWith(true, 2)
 	scenarioID := spec.Scenarios[0].ID()
 
-	message1, message2, errorMessage := clibtest.RandomString(), clibtest.RandomString(), clibtest.RandomString()
+	errorMessage := clibtest.RandomString()
 
-	progView := NewProgressView(spec, fakeTermWidth, ctx)
+	progView := NewProgressView(spec, fakeTermWidth, ctx).(*ProgressView)
+
 	progView.OnBenchmarkStart()
 
+	// round one
 	progView.OnScenarioStart(scenarioID)
-	stdoutEventuallyContains(t, scenarioID, ctx)
-
-	progView.OnMessage(scenarioID, message1)
-	stdoutEventuallyContains(t, message1, ctx)
-
-	progView.OnMessagef(scenarioID, "%s", message2)
-	stdoutEventuallyContains(t, message2, ctx)
-
 	progView.OnError(scenarioID, errors.New(errorMessage))
 	stdoutEventuallyContains(t, errorMessage, ctx)
 
+	time.Sleep(time.Nanosecond) // make sure mean is not zero
+
 	progView.OnScenarioEnd(scenarioID)
+	assert.True(t, progView.progressInfoByID[scenarioID].mean != 0)
+
+	// round two
+	progView.OnScenarioStart(scenarioID)
+	assert.Equal(t, 1, progView.progressInfoByID[scenarioID].executions)
+
+	progView.OnScenarioEnd(scenarioID)
+	assert.False(t, progView.progressInfoByID[scenarioID].tick(""), "progress bar is expected to finish")
+	assert.True(t, progView.progressInfoByID[scenarioID].mean != 0)
+
 	progView.OnBenchmarkEnd()
 }
 
@@ -78,6 +84,65 @@ func TestProgressViewEndNotStartedStateContract(t *testing.T) {
 	assert.Panics(t, func() {
 		progView.OnBenchmarkEnd()
 	})
+}
+
+func Test_progressInfo_calculateNewApproxMean(t *testing.T) {
+	type fields struct {
+		executions         int
+		expectedExecutions int
+		mean               time.Duration
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		elapsed time.Duration
+		want    time.Duration
+	}{
+		{name: "no executions", fields: fields{executions: 0, expectedExecutions: 10, mean: 0}, elapsed: time.Millisecond * 1, want: time.Millisecond * 1},
+		{name: "2 out of 10", fields: fields{executions: 1, expectedExecutions: 10, mean: time.Millisecond * 1}, elapsed: time.Millisecond * 3, want: time.Millisecond * 2},
+		{name: "10 out of 10 - DONE!", fields: fields{executions: 10, expectedExecutions: 10, mean: time.Millisecond * 1}, elapsed: time.Millisecond * 100, want: time.Millisecond * 1},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			pi := progressInfo{
+				executions:         tt.fields.executions,
+				expectedExecutions: tt.fields.expectedExecutions,
+				mean:               tt.fields.mean,
+			}
+			if got := pi.calculateNewApproxMean(tt.elapsed); got != tt.want {
+				t.Errorf("progressInfo.calculateNewApproxMean() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_progressInfo_calculateETA(t *testing.T) {
+	type fields struct {
+		executions         int
+		expectedExecutions int
+		mean               time.Duration
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   time.Duration
+	}{
+		{name: "no executions", fields: fields{executions: 0, expectedExecutions: 10, mean: 0}, want: 0},
+		{name: "10% done", fields: fields{executions: 1, expectedExecutions: 10, mean: time.Millisecond * 1}, want: time.Millisecond * 9},
+		{name: "done", fields: fields{executions: 10, expectedExecutions: 10, mean: time.Millisecond * 1}, want: 0},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			pi := progressInfo{
+				executions:         tt.fields.executions,
+				expectedExecutions: tt.fields.expectedExecutions,
+				mean:               tt.fields.mean,
+			}
+			if got := pi.calculateETA(); got != tt.want {
+				t.Errorf("progressInfo.calculateETA() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }
 
 func stdoutEventuallyContains(t *testing.T, want string, ctx api.IOContext) {

@@ -37,7 +37,7 @@ func testSummaryReportHandlerFinalizeWith(t *testing.T, expectedError error) {
 
 	assert.Equal(t, expectedSpec, interceptor.capturedSpec)
 	assert.Equal(t, expectedCtx, interceptor.capturedCtx)
-	assert.Equal(t, 1, len(interceptor.capturedSummary.All()))
+	assert.Equal(t, 1, len(interceptor.capturedSummary.IDs()))
 }
 
 type writeReportInterceptor struct {
