@@ -60,7 +60,7 @@ func NewProgressView(spec api.BenchmarkSpec, termDimensionsFn func() (int, int),
 			2, // ETA + space
 	)
 
-	_, termHeight := termDimensionsFn()	
+	_, termHeight := termDimensionsFn()
 	termWidthFn := func() int {
 		w, _ := termDimensionsFn()
 		return w
