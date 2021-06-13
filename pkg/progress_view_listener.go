@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io"
 	"time"
 
 	"github.com/fatih/color"
@@ -52,7 +51,7 @@ type ProgressView struct {
 }
 
 // NewProgressView creates a new ProgressView for the specified benchmark spec
-func NewProgressView(spec api.BenchmarkSpec, termWidthFn func() int, ioc api.IOContext) api.Listener {
+func NewProgressView(spec api.BenchmarkSpec, termDimensionsFn func() (int, int), ioc api.IOContext) api.Listener {
 	scenarioCount := len(spec.Scenarios)
 	matrix := termite.NewMatrix(ioc.StdoutWriter, time.Hour)
 
@@ -61,9 +60,15 @@ func NewProgressView(spec api.BenchmarkSpec, termWidthFn func() int, ioc api.IOC
 			2, // ETA + space
 	)
 
-	progressHandlersByID := make(map[api.ID]*progressInfo, scenarioCount)
+	termWidth, termHeight := termDimensionsFn()
+	if len(rows) + 1 > termHeight {
+		yellow.Printf("Your terminal window is too small to dispaly full progress information...\n\n")
+		return NewMinimalProgressView(spec, termDimensionsFn, ioc)
+	}
+
+	progressInfoByID := make(map[api.ID]*progressInfo, scenarioCount)
 	cancelHandlers := make([]context.CancelFunc, scenarioCount)
-	termWidth := termWidthFn()
+
 	nextProgressBarRowIndex := 2
 
 	for i, scenario := range spec.Scenarios {
@@ -75,11 +80,13 @@ func NewProgressView(spec api.BenchmarkSpec, termWidthFn func() int, ioc api.IOC
 
 		tick, cancel, _ := pBar.Start()
 
-		progressHandlersByID[scenario.ID()] = &progressInfo{
-			notificationWriter: rows[notificationsRowIndex],
-			expectedExecutions: spec.Executions,
-			tick:               tick,
-			formatter:          formatter,
+		progressInfoByID[scenario.ID()] = &progressInfo{
+			minimalProgressInfo: minimalProgressInfo{
+				notificationWriter: rows[notificationsRowIndex],
+				expectedExecutions: spec.Executions,
+			},
+			tick:      tick,
+			formatter: formatter,
 		}
 		cancelHandlers[i] = cancel
 	}
@@ -87,7 +94,7 @@ func NewProgressView(spec api.BenchmarkSpec, termWidthFn func() int, ioc api.IOC
 	return &ProgressView{
 		matrix:           matrix,
 		eta:              newEtaInfo(rows[len(rows)-1], spec.Alternate),
-		progressInfoByID: progressHandlersByID,
+		progressInfoByID: progressInfoByID,
 		cancelHandlers:   cancelHandlers,
 		cursor:           termite.NewCursor(ioc.StdoutWriter),
 	}
@@ -149,7 +156,7 @@ func (l *ProgressView) OnScenarioEnd(id api.ID) {
 
 	progressInfo.tick(fmt.Sprintf("%-9s", formatDuration(progressInfo.mean)))
 
-	l.eta.update(l.calculateETA())
+	l.eta.update(l.calculateETA(), id)
 }
 
 // OnError prints a corresponding error message in the progress info area
@@ -165,14 +172,6 @@ func (l *ProgressView) OnMessage(id api.ID, message string) {}
 
 // OnMessagef prints a corresponding message in the progress info area
 func (l *ProgressView) OnMessagef(id api.ID, format string, args ...interface{}) {}
-
-// func (l *ProgressView) updateETAValue(formattedValue string) {
-// 	l.eta..Update(bold.Sprintf("%11s: %s", "---> ETA", formattedValue))
-// }
-
-// func (l *ProgressView) updateETA() {
-// 	l.updateETAValue(formatDuration(l.calculateETA()))
-// }
 
 func (l *ProgressView) calculateETA() time.Duration {
 	var eta time.Duration
@@ -230,70 +229,11 @@ func (f *progressBarFormatter) MessageAreaWidth() int {
 	return 12
 }
 
-type etaInfo struct {
-	writer    io.StringWriter
-	alternate bool
-}
-
-func newEtaInfo(writer io.StringWriter, alternate bool) (eta etaInfo) {
-	eta = etaInfo{
-		writer:    writer,
-		alternate: alternate,
-	}
-
-	defer eta.updateString("pending...")
-
-	return eta
-}
-
-func (eta etaInfo) update(dur time.Duration) {
-	eta.updateString(formatDuration(dur))
-}
-
-func (eta etaInfo) clear() {
-	eta.writer.WriteString(termite.TermControlEraseLine)
-}
-
-func (eta etaInfo) updateString(formattedValue string) {
-	var hint string
-	if eta.alternate {
-		hint = "global"
-	} else {
-		hint = "scenario"
-	}
-
-	eta.writer.WriteString(bold.Sprintf("%11s: %s (%s)", "---> ETA", formattedValue, hint))
-}
-
 type progressInfo struct {
-	notificationWriter io.Writer
-	lastStartTime      time.Time
-	executions         int
-	expectedExecutions int
-	mean               time.Duration
-	tick               termite.TickMessageFn
-	formatter          *progressBarFormatter
-}
+	minimalProgressInfo
 
-func (pi progressInfo) writeNotification(msg string) {
-	io.WriteString(pi.notificationWriter, fmt.Sprintf("%11s  %s", "", msg))
-}
-
-func (pi progressInfo) calculateETA() time.Duration {
-	return time.Duration(int64(pi.expectedExecutions-pi.executions) * int64(pi.mean))
-}
-
-func (pi progressInfo) calculateNewApproxMean(elapsed time.Duration) time.Duration {
-	if pi.executions == 0 {
-		return elapsed
-	}
-	if pi.executions == pi.expectedExecutions {
-		return pi.mean
-	}
-
-	meanInNanoseconds := (float64(pi.mean.Nanoseconds())*float64(pi.executions) + float64(elapsed.Nanoseconds())) / float64(pi.executions+1)
-	return time.Duration(meanInNanoseconds) * time.Nanosecond
-
+	tick      termite.TickMessageFn
+	formatter *progressBarFormatter
 }
 
 func formatDuration(value time.Duration) string {

@@ -24,7 +24,7 @@ func TestProgressViewOutput(t *testing.T) {
 
 	errorMessage := clibtest.RandomString()
 
-	progView := NewProgressView(spec, fakeTermWidth, ctx).(*ProgressView)
+	progView := NewProgressView(spec, fakeTermDimensions, ctx).(*ProgressView)
 
 	progView.OnBenchmarkStart()
 
@@ -36,7 +36,7 @@ func TestProgressViewOutput(t *testing.T) {
 	time.Sleep(time.Nanosecond) // make sure mean is not zero
 
 	progView.OnScenarioEnd(scenarioID)
-	assert.True(t, progView.progressInfoByID[scenarioID].mean != 0)
+	assert.True(t, progView.progressInfoByID[scenarioID].mean > 0)
 
 	// round two
 	progView.OnScenarioStart(scenarioID)
@@ -44,46 +44,37 @@ func TestProgressViewOutput(t *testing.T) {
 
 	progView.OnScenarioEnd(scenarioID)
 	assert.False(t, progView.progressInfoByID[scenarioID].tick(""), "progress bar is expected to finish")
-	assert.True(t, progView.progressInfoByID[scenarioID].mean != 0)
+	assert.True(t, progView.progressInfoByID[scenarioID].mean > 0)
 
 	progView.OnBenchmarkEnd()
 }
 
 func TestProgressViewStartStateContract(t *testing.T) {
-	progView := NewProgressView(aBasicSpecWith(true, 1), fakeTermWidth, api.NewIOContext())
-
-	progView.OnBenchmarkStart()
-	assert.Panics(t, func() {
-		progView.OnBenchmarkStart()
-	})
+	testProgressViewStartStateContract(
+		t,
+		NewProgressView(aBasicSpecWith(true, 1), fakeTermDimensions, api.NewIOContext()),
+	)
 }
 
 func TestProgressViewStartAlreadyEndedStateContract(t *testing.T) {
-	progView := NewProgressView(aBasicSpecWith(true, 1), fakeTermWidth, api.NewIOContext())
-	progView.OnBenchmarkStart()
-	progView.OnBenchmarkEnd()
-
-	assert.Panics(t, func() {
-		progView.OnBenchmarkStart()
-	})
+	testProgressViewStartAlreadyEndedStateContract(
+		t,
+		NewProgressView(aBasicSpecWith(true, 1), fakeTermDimensions, api.NewIOContext()),
+	)
 }
 
 func TestProgressViewEndStateContract(t *testing.T) {
-	progView := NewProgressView(aBasicSpecWith(true, 1), fakeTermWidth, api.NewIOContext())
-	progView.OnBenchmarkStart()
-	progView.OnBenchmarkEnd()
-
-	assert.Panics(t, func() {
-		progView.OnBenchmarkEnd()
-	})
+	testProgressViewEndStateContract(
+		t,
+		NewProgressView(aBasicSpecWith(true, 1), fakeTermDimensions, api.NewIOContext()),
+	)
 }
 
 func TestProgressViewEndNotStartedStateContract(t *testing.T) {
-	progView := NewProgressView(aBasicSpecWith(true, 1), fakeTermWidth, api.NewIOContext())
-
-	assert.Panics(t, func() {
-		progView.OnBenchmarkEnd()
-	})
+	testProgressViewEndNotStartedStateContract(
+		t,
+		NewProgressView(aBasicSpecWith(true, 1), fakeTermDimensions, api.NewIOContext()),
+	)
 }
 
 func Test_progressInfo_calculateNewApproxMean(t *testing.T) {
@@ -105,9 +96,11 @@ func Test_progressInfo_calculateNewApproxMean(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			pi := progressInfo{
-				executions:         tt.fields.executions,
-				expectedExecutions: tt.fields.expectedExecutions,
-				mean:               tt.fields.mean,
+				minimalProgressInfo: minimalProgressInfo{
+					executions:         tt.fields.executions,
+					expectedExecutions: tt.fields.expectedExecutions,
+					mean:               tt.fields.mean,
+				},
 			}
 			if got := pi.calculateNewApproxMean(tt.elapsed); got != tt.want {
 				t.Errorf("progressInfo.calculateNewApproxMean() = %v, want %v", got, tt.want)
@@ -134,9 +127,11 @@ func Test_progressInfo_calculateETA(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			pi := progressInfo{
-				executions:         tt.fields.executions,
-				expectedExecutions: tt.fields.expectedExecutions,
-				mean:               tt.fields.mean,
+				minimalProgressInfo: minimalProgressInfo{
+					executions:         tt.fields.executions,
+					expectedExecutions: tt.fields.expectedExecutions,
+					mean:               tt.fields.mean,
+				},
 			}
 			if got := pi.calculateETA(); got != tt.want {
 				t.Errorf("progressInfo.calculateETA() = %v, want %v", got, tt.want)
@@ -155,6 +150,6 @@ func stdoutContainsFn(ctx api.IOContext, want string) func() bool {
 	}
 }
 
-func fakeTermWidth() int {
-	return 100
+func fakeTermDimensions() (int, int) {
+	return 100, 100
 }
