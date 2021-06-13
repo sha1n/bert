@@ -60,8 +60,12 @@ func NewProgressView(spec api.BenchmarkSpec, termDimensionsFn func() (int, int),
 			2, // ETA + space
 	)
 
-	termWidth, termHeight := termDimensionsFn()
-	if len(rows) + 1 > termHeight {
+	_, termHeight := termDimensionsFn()	
+	termWidthFn := func() int {
+		w, _ := termDimensionsFn()
+		return w
+	}
+	if len(rows)+1 > termHeight {
 		yellow.Printf("Your terminal window is too small to dispaly full progress information...\n\n")
 		return NewMinimalProgressView(spec, termDimensionsFn, ioc)
 	}
@@ -73,7 +77,7 @@ func NewProgressView(spec api.BenchmarkSpec, termDimensionsFn func() (int, int),
 
 	for i, scenario := range spec.Scenarios {
 		formatter := newProgressBarFormatter()
-		pBar := termite.NewProgressBar(rows[nextProgressBarRowIndex], spec.Executions, termWidth, 59, formatter)
+		pBar := termite.NewProgressBar(rows[nextProgressBarRowIndex], spec.Executions, termWidthFn, 59, formatter)
 		rows[nextProgressBarRowIndex-1].Update(fmt.Sprintf("%11s: %s", "SCENARIO", yellow.Sprint(scenario.Name)))
 		notificationsRowIndex := nextProgressBarRowIndex + 1
 		nextProgressBarRowIndex += 4
