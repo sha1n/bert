@@ -6,38 +6,56 @@ package pkg
 import (
 	"syscall"
 	"time"
+
+	"github.com/sha1n/benchy/api"
 )
 
 type unixChildrenCPUTimer struct {
-	r            syscall.Rusage
-	sysTimeStart time.Time
-	usrTimeStart time.Time
+	r                  syscall.Rusage
+	who                int
+	perceivedStartTime time.Time
+	sysTimeStart       time.Time
+	usrTimeStart       time.Time
 }
 
-func newChildrenCPUTimer() CPUTimer {
-	return &unixChildrenCPUTimer{}
+// NewChildrenCPUTimer returns a new CPUTimer that measures sub-processes CPU time using system calls.
+func NewChildrenCPUTimer() api.CPUTimer {
+	return newCPUTimer(syscall.RUSAGE_CHILDREN)
 }
 
-func (t *unixChildrenCPUTimer) Start() func() (time.Duration, time.Duration) {
-	err := syscall.Getrusage(syscall.RUSAGE_CHILDREN, &t.r)
+// NewSelfCPUTimer returns a new CPUTimer that measures this process' CPU time using system calls.
+func NewSelfCPUTimer() api.CPUTimer {
+	return newCPUTimer(syscall.RUSAGE_SELF)
+}
+
+func newCPUTimer(who int) api.CPUTimer {
+	return &unixChildrenCPUTimer{
+		who: who,
+	}
+}
+
+func (t *unixChildrenCPUTimer) Start() api.ElapsedCPUTimeFn {
+	err := syscall.Getrusage(t.who, &t.r)
 	if err != nil {
 		panic(err)
 	}
 
-	t.sysTimeStart = time.Unix(t.r.Stime.Unix())
+	t.perceivedStartTime = time.Now()
 	t.usrTimeStart = time.Unix(t.r.Utime.Unix())
+	t.sysTimeStart = time.Unix(t.r.Stime.Unix())
 
 	return t.Elapsed
 }
 
-func (t *unixChildrenCPUTimer) Elapsed() (usr time.Duration, sys time.Duration) {
-	err := syscall.Getrusage(syscall.RUSAGE_CHILDREN, &t.r)
+func (t *unixChildrenCPUTimer) Elapsed() (perceived time.Duration, usr time.Duration, sys time.Duration) {
+	err := syscall.Getrusage(t.who, &t.r)
 	if err != nil {
 		panic(err)
 	}
 
-	sysTimeEnd := time.Unix(t.r.Stime.Unix())
-	usrTimeEnd := time.Unix(t.r.Utime.Unix())
+	perceivedTime := time.Now().Sub(t.perceivedStartTime)
+	usrTime := time.Unix(t.r.Utime.Unix()).Sub(t.usrTimeStart)
+	sysTime := time.Unix(t.r.Stime.Unix()).Sub(t.sysTimeStart)
 
-	return usrTimeEnd.Sub(t.usrTimeStart), sysTimeEnd.Sub(t.sysTimeStart)
+	return perceivedTime, usrTime, sysTime
 }

@@ -12,8 +12,7 @@ type tracer struct {
 
 type trace struct {
 	id            string
-	cpuTimer      CPUTimer
-	start         time.Time
+	cpuTimer      api.CPUTimer
 	perceivedTime time.Duration
 	usrTime       time.Duration
 	sysTime       time.Duration
@@ -43,7 +42,7 @@ func (t trace) Error() error {
 func newTrace(id string) trace {
 	return trace{
 		id:       id,
-		cpuTimer: newChildrenCPUTimer(),
+		cpuTimer: NewChildrenCPUTimer(),
 	}
 }
 
@@ -57,15 +56,13 @@ func NewTracer(bufferSize int) api.Tracer {
 func (tr *tracer) Start(i api.Identifiable) api.End {
 	t := newTrace(i.ID())
 	t.cpuTimer.Start()
-	t.start = time.Now()
 
 	return tr.endFn(t)
 }
 
 func (tr *tracer) endFn(t trace) api.End {
 	return func(exitError error) {
-		t.usrTime, t.sysTime = t.cpuTimer.Elapsed()
-		t.perceivedTime = time.Since(t.start)
+		t.perceivedTime, t.usrTime, t.sysTime = t.cpuTimer.Elapsed()
 		t.error = exitError
 
 		tr.stream <- t
@@ -75,32 +72,3 @@ func (tr *tracer) endFn(t trace) api.End {
 func (tr *tracer) Stream() chan api.Trace {
 	return tr.stream
 }
-
-// CPUTimer an abstraction for a platform system CPU timer
-type CPUTimer interface {
-	Start() func() (time.Duration, time.Duration)
-	Elapsed() (usr time.Duration, sys time.Duration)
-}
-
-// func newChildrenCPUTimer() CPUTimer {
-// 	switch runtime.GOOS {
-// 	case "windows":
-// 		return NoopCPUTimer{}
-// 	default:
-
-// 		return newUnixChildrenCPUTimer()
-// 	}
-// }
-
-// // NoopCPUTimer NOOP implementation of CPUTimer
-// type NoopCPUTimer struct{}
-
-// // Start ...
-// func (t NoopCPUTimer) Start() func() (time.Duration, time.Duration) {
-// 	return t.Elapsed
-// }
-
-// // Elapsed return 0, 0
-// func (t NoopCPUTimer) Elapsed() (usr time.Duration, sys time.Duration) {
-// 	return time.Nanosecond * 0, time.Nanosecond * 0
-// }
