@@ -173,8 +173,8 @@ github.com/ryanuber/columnize v0.0.0-20160712163229-9b3edd62028f/go.mod h1:sm1tb
 github.com/sean-/seed v0.0.0-20170313163322-e2103e2c3529/go.mod h1:DxrIzT+xaE7yg65j358z/aeFdxmN0P9QXhEzd20vsDc=
 github.com/sha1n/clib v0.0.7 h1:TdmHcf5aJoIeZAMkxUYfN6IoIWgqklTFEI+dMnsU84Y=
 github.com/sha1n/clib v0.0.7/go.mod h1:V6sTAFNf6NtF8y6G6AD4NzGmXoRi0ybMVS7TbRIaEQ0=
-github.com/sha1n/termite v0.0.16 h1:SG1jKvO6m0LgCd6rRlPjezmuZe83HK0DdPdZqcP+6QA=
-github.com/sha1n/termite v0.0.16/go.mod h1:NVltlCkIrHs6qxBeXsh2Kf050nEdIBKNU7eEJVtrKZs=
+github.com/sha1n/termite v0.0.17 h1:MU5BqPTzosPmzC1AfHGHwkG6gggSHoayFAey0hJQyJQ=
+github.com/sha1n/termite v0.0.17/go.mod h1:NVltlCkIrHs6qxBeXsh2Kf050nEdIBKNU7eEJVtrKZs=
 github.com/shurcooL/sanitized_anchor_name v1.0.0/go.mod h1:1NzhyTcUVG4SuEtjjoZeVRXNmyL/1OwPU0+IJeTBvfc=
 github.com/sirupsen/logrus v1.2.0/go.mod h1:LxeOpSwHxABJmUn/MG1IvRgCAasNZTLOkJPxbbu5VWo=
 github.com/sirupsen/logrus v1.8.1 h1:dJKuHgqk1NNQlqoA6BTlM1Wf9DOH3NBjQyu0h9+AZZE=

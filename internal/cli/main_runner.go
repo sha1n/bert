@@ -166,7 +166,7 @@ func resolveExecutionContext(cmd *cobra.Command, spec api.BenchmarkSpec, ctx api
 
 func resolveExecutionListener(cmd *cobra.Command, spec api.BenchmarkSpec, ctx api.IOContext) api.Listener {
 	if enableTerminalGUI(cmd, ctx) {
-		return pkg.NewProgressView(spec, terminalWidthOrFake, ctx)
+		return pkg.NewProgressView(spec, terminalDimensionsOrFake, ctx)
 	}
 
 	return pkg.NewLoggingProgressListener()
@@ -183,10 +183,10 @@ func enableTerminalGUI(cmd *cobra.Command, ctx api.IOContext) bool {
 	return ctx.Tty && enableRichOut && !(silentMode || debugMode || pipeOutputsMode)
 }
 
-func terminalWidthOrFake() int {
-	if w, _, err := termite.GetTerminalDimensions(); err == nil {
-		return w
+func terminalDimensionsOrFake() (int, int) {
+	if w, h, err := termite.GetTerminalDimensions(); err == nil {
+		return w, h
 	}
-	return 0
+	return 0, 0
 
 }
