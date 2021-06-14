@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/sha1n/benchy/api"
 	"github.com/sha1n/benchy/internal/report"
@@ -17,38 +18,46 @@ import (
 // NewRootCommand creates the main command parse
 func NewRootCommand(programName, version, build string, ctx api.IOContext) *cobra.Command {
 	var rootCmd = &cobra.Command{
+
 		Use: programName,
 		Version: fmt.Sprintf(`Version: %s
 Build label: %s`, version, build),
-		Example:      fmt.Sprintf("%s --%s <config file path>", programName, ArgNameConfig),
+		Example: fmt.Sprintf(`
+	%s --%s <config file path>
+	%s 'command -optA' 'command -optB' --%s 100`, programName, ArgNameConfig, programName, ArgNameExecutions),
+
 		SilenceUsage: false,
+		Args:         validatePositionalArgs,
 		Run:          runFn(ctx),
 	}
 
 	rootCmd.Flags().StringP(ArgNameConfig, "c", "", `config file path. '~' will be expanded.`)
+	rootCmd.Flags().Int(ArgNameExecutions, 0, `the number of executions per scenario.
+required when no configuration file is provided. 
+when specified with a configuration file, this argument has priority.`)
 
 	// Reporting
 	rootCmd.Flags().StringP(ArgNameOutputFile, "o", "", `output file path. Optional. Writes to stdout by default.`)
 	rootCmd.Flags().StringP(ArgNameFormat, "f", "txt", `summary format. One of: 'txt', 'md', 'md/raw', 'csv', 'csv/raw'
-txt     - plain text. designed to be used in your terminal
-md      - markdown table. similar to CSV but writes in markdown table format
+txt     - plain text. designed to be used in your terminal.
+md      - markdown table. similar to CSV but writes in markdown table format.
 md/raw  - markdown table in which each row represents a raw trace event.
-csv     - CSV in which each row represents a scenario and contains calculated stats for that scenario
-csv/raw - CSV in which each row represents a raw trace event. useful if you want to import to a spreadsheet for further analysis`,
+csv     - CSV in which each row represents a scenario and contains calculated stats for that scenario.
+csv/raw - CSV in which each row represents a raw trace event. useful if you want to import to a spreadsheet for further analysis.`,
 	)
-	rootCmd.Flags().StringSliceP(ArgNameLabel, "l", []string{}, `labels to attach to be included in the benchmark report`)
-	rootCmd.Flags().Bool(ArgNameHeaders, true, `in tabular formats, whether to include headers in the report`)
+	rootCmd.Flags().StringSliceP(ArgNameLabel, "l", []string{}, `labels to attach to be included in the benchmark report.`)
+	rootCmd.Flags().Bool(ArgNameHeaders, true, `in tabular formats, whether to include headers in the report.`)
 
 	// Stdout
-	rootCmd.Flags().BoolP(ArgNamePipeStdout, "", false, `pipes external commands standard out to benchy's standard out`)
-	rootCmd.Flags().BoolP(ArgNamePipeStderr, "", false, `pipes external commands standard error to benchy's standard error`)
+	rootCmd.Flags().BoolP(ArgNamePipeStdout, "", false, `pipes external commands standard out to benchy's standard out.`)
+	rootCmd.Flags().BoolP(ArgNamePipeStderr, "", false, `pipes external commands standard error to benchy's standard error.`)
 
-	rootCmd.PersistentFlags().BoolP(ArgNameDebug, "d", false, `logs extra debug information`)
-	rootCmd.PersistentFlags().BoolP(ArgNameSilent, "s", false, `logs only fatal errors`)
+	rootCmd.PersistentFlags().BoolP(ArgNameDebug, "d", false, `runs the program in debug mode.`)
+	rootCmd.PersistentFlags().BoolP(ArgNameSilent, "s", false, `logs only fatal errors.`)
 
-	rootCmd.PersistentFlags().StringSlice(ArgNameExperimental, []string{}, `enables a named experimental features`)
+	rootCmd.PersistentFlags().StringSlice(ArgNameExperimental, []string{}, `enables a named experimental features.`)
 
-	_ = rootCmd.MarkFlagRequired(ArgNameConfig)
+	// _ = rootCmd.MarkFlagRequired(ArgNameConfig)
 	_ = rootCmd.MarkFlagFilename(ArgNameConfig, "yml", "yaml", "json")
 	_ = rootCmd.MarkFlagFilename(ArgNameOutputFile, "txt", "csv", "md")
 
@@ -67,7 +76,7 @@ func runFn(ctx api.IOContext) func(*cobra.Command, []string) {
 		log.Info("Starting benchy...")
 
 		var spec api.BenchmarkSpec
-		spec, err = loadSpec(cmd)
+		spec, err = loadSpec(cmd, args)
 		CheckBenchmarkInitFatal(err)
 
 		var reportHandler api.ReportHandler
@@ -92,20 +101,41 @@ func runFn(ctx api.IOContext) func(*cobra.Command, []string) {
 
 }
 
-func loadSpec(cmd *cobra.Command) (spec api.BenchmarkSpec, err error) {
-	var filePath string
-	filePath = GetString(cmd, ArgNameConfig)
-	filePath, err = filepath.Abs(pkg.ExpandUserPath(filePath))
+func loadSpec(cmd *cobra.Command, args []string) (spec api.BenchmarkSpec, err error) {
+	executions := GetInt(cmd, ArgNameExecutions)
 
-	if err == nil {
-		_, err = os.Stat(pkg.ExpandUserPath(filePath))
-		exists := !os.IsNotExist(err)
-
-		if err == nil && exists {
-			return pkg.LoadSpec(filePath)
+	if len(args) > 0 { // positional args are used for ad-hoc config
+		commands := []api.CommandSpec{}
+		for i := range args {
+			commands = append(commands, api.CommandSpec{
+				Cmd: parseCommand(strings.Trim(args[i], "'\"")),
+			})
 		}
+		spec, err = pkg.CreateSpecFrom(executions, false, commands...)
 
-		err = fmt.Errorf("the file '%s' does not exist, or is not accessible", filePath)
+	} else {
+		var filePath string
+		filePath = GetString(cmd, ArgNameConfig)
+		filePath, err = filepath.Abs(pkg.ExpandUserPath(filePath))
+
+		if err == nil {
+			_, err = os.Stat(pkg.ExpandUserPath(filePath))
+			exists := !os.IsNotExist(err)
+
+			if err != nil || !exists {
+				err = fmt.Errorf("the file '%s' does not exist, or is not accessible", filePath)
+				return
+			}
+
+			if spec, err = pkg.LoadSpec(filePath); err != nil {
+				return
+			}
+		}
+	}
+
+	// Override executions if specified
+	if executions > 0 {
+		spec.Executions = executions
 	}
 
 	return spec, err
@@ -189,4 +219,18 @@ func terminalDimensionsOrFake() (int, int) {
 	}
 	return 0, 0
 
+}
+
+func validatePositionalArgs(cmd *cobra.Command, args []string) error {
+	if len(args) > 0 {
+		executions := GetInt(cmd, ArgNameExecutions)
+		if executions < 1 {
+			return fmt.Errorf("--%s is required", ArgNameExecutions)
+		}
+	} else {
+		if outputFilePath := GetString(cmd, ArgNameConfig); outputFilePath == "" {
+			return fmt.Errorf("either specify a configuration file with '--%s', or inline commands to benchmark", ArgNameConfig)
+		}
+	}
+	return nil
 }

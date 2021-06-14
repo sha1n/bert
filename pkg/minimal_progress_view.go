@@ -41,7 +41,7 @@ func NewMinimalProgressView(spec api.BenchmarkSpec, termDimensionsFn func() (int
 	return &MinimalProgressView{
 		matrix:           matrix,
 		progressInfoByID: progressInfoByID,
-		eta:              newEtaInfo(etaRow, spec.Alternate),
+		eta:              newEtaInfo(etaRow, spec.Alternate, termDimensionsFn),
 		cursor:           termite.NewCursor(ioc.StdoutWriter),
 		alternate:        spec.Alternate,
 		cancelHandlers:   cancelHandlers,
@@ -123,14 +123,16 @@ func (l *MinimalProgressView) hideCursor() (restore func()) {
 }
 
 type etaInfo struct {
-	writer    io.Writer
-	alternate bool
+	writer           io.Writer
+	alternate        bool
+	termDimensionsFn func() (int, int)
 }
 
-func newEtaInfo(writer io.Writer, alternate bool) (eta etaInfo) {
+func newEtaInfo(writer io.Writer, alternate bool, termDimensionsFn func() (int, int)) (eta etaInfo) {
 	eta = etaInfo{
-		writer:    writer,
-		alternate: alternate,
+		writer:           writer,
+		alternate:        alternate,
+		termDimensionsFn: termDimensionsFn,
 	}
 
 	defer eta.updateString("pending...")
@@ -139,11 +141,12 @@ func newEtaInfo(writer io.Writer, alternate bool) (eta etaInfo) {
 }
 
 func (eta etaInfo) update(dur time.Duration, id api.ID) {
+	termWidth, _ := eta.termDimensionsFn()
 	if eta.alternate {
 		eta.updateStringRaw("%11s: %-9s", "---> ETA", formatDuration(dur))
 	} else {
-		scenarioName := termite.TruncateString(id, 20)
-		eta.updateStringRaw("%11s: %-9s %s: %s", "---> ETA", formatDuration(dur), "> SCENARIO", yellow.Sprint(scenarioName))
+		terminalScaledScenarioName := termite.TruncateString(id, termWidth-36)
+		eta.updateStringRaw("%11s: %-9s %s: %s", "---> ETA", formatDuration(dur), "> SCENARIO", yellow.Sprint(terminalScaledScenarioName))
 	}
 }
 
