@@ -82,7 +82,7 @@ csv/raw - CSV in which each row represents a raw trace event. useful if you want
 	_ = rootCmd.MarkFlagFilename(ArgNameOutputFile, "txt", "csv", "md")
 
 	rootCmd.SetVersionTemplate(`{{printf "%s" .Version}}`)
-	rootCmd.SetHelpTemplate(rootCmd.HelpTemplate() + bert)
+	rootCmd.SetUsageTemplate(rootCmd.UsageTemplate() + bert)
 
 	return rootCmd
 }
