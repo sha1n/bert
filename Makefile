@@ -130,6 +130,8 @@ run-linux-dockerized-tests:
 	docker run --rm -ti sha1n/benchy /benchy/bin/benchy-linux-amd64 -c /benchy/test/data/spec_test_load.yaml --pipe-stdout
 	@echo "  >  Running with experimental UI + piped stderr..."
 	docker run --rm -ti sha1n/benchy /benchy/bin/benchy-linux-amd64 -c /benchy/test/data/spec_test_load.yaml --pipe-stderr
+	@echo "  >  Running with ad-hoc commands..."
+	docker run --rm -ti sha1n/benchy /benchy/bin/benchy-linux-amd64 'ls' 'ls -laH' --executions 10
 
 
 .PHONY: help
