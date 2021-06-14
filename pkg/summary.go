@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/montanaflynn/stats"
-	"github.com/sha1n/benchy/api"
+	"github.com/sha1n/bert/api"
 )
 
 // NewSummary create a new TracerSummary with the specified data.

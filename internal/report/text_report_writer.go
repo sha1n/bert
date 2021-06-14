@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/fatih/color"
-	"github.com/sha1n/benchy/api"
+	"github.com/sha1n/bert/api"
 	log "github.com/sirupsen/logrus"
 )
 

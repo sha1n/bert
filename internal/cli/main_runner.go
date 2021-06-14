@@ -7,9 +7,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/sha1n/benchy/api"
-	"github.com/sha1n/benchy/internal/report"
-	"github.com/sha1n/benchy/pkg"
+	"github.com/sha1n/bert/api"
+	"github.com/sha1n/bert/internal/report"
+	"github.com/sha1n/bert/pkg"
 	"github.com/sha1n/termite"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -49,8 +49,8 @@ csv/raw - CSV in which each row represents a raw trace event. useful if you want
 	rootCmd.Flags().Bool(ArgNameHeaders, true, `in tabular formats, whether to include headers in the report.`)
 
 	// Stdout
-	rootCmd.Flags().BoolP(ArgNamePipeStdout, "", false, `pipes external commands standard out to benchy's standard out.`)
-	rootCmd.Flags().BoolP(ArgNamePipeStderr, "", false, `pipes external commands standard error to benchy's standard error.`)
+	rootCmd.Flags().BoolP(ArgNamePipeStdout, "", false, `pipes external commands standard out to bert's standard out.`)
+	rootCmd.Flags().BoolP(ArgNamePipeStderr, "", false, `pipes external commands standard error to bert's standard error.`)
 
 	rootCmd.PersistentFlags().BoolP(ArgNameDebug, "d", false, `runs the program in debug mode.`)
 	rootCmd.PersistentFlags().BoolP(ArgNameSilent, "s", false, `logs only fatal errors.`)
@@ -73,7 +73,7 @@ func runFn(ctx api.IOContext) func(*cobra.Command, []string) {
 		var closer io.Closer
 		configureOutput(cmd, log.ErrorLevel, ctx)
 
-		log.Info("Starting benchy...")
+		log.Info("Starting bert...")
 
 		var spec api.BenchmarkSpec
 		spec, err = loadSpec(cmd, args)

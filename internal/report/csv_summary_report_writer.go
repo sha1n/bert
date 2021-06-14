@@ -8,7 +8,7 @@ import (
 
 	"encoding/csv"
 
-	"github.com/sha1n/benchy/api"
+	"github.com/sha1n/bert/api"
 )
 
 // csvReportWriter a simple human readable test report writer

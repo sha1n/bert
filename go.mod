@@ -1,4 +1,4 @@
-module github.com/sha1n/benchy
+module github.com/sha1n/bert
 
 go 1.16
 

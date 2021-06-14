@@ -1,16 +1,16 @@
-[![Go](https://github.com/sha1n/benchy/actions/workflows/go.yml/badge.svg)](https://github.com/sha1n/benchy/actions/workflows/go.yml)
-![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/sha1n/benchy)
-[![Go Report Card](https://goreportcard.com/badge/sha1n/benchy)](https://goreportcard.com/report/sha1n/benchy) 
-[![Coverage Status](https://coveralls.io/repos/github/sha1n/benchy/badge.svg)](https://coveralls.io/github/sha1n/benchy?branch=master)
-[![Release](https://img.shields.io/github/release/sha1n/benchy.svg?style=flat-square)](https://github.com/sha1n/benchy/releases)
-[![Release Drafter](https://github.com/sha1n/benchy/actions/workflows/release-drafter.yml/badge.svg)](https://github.com/sha1n/benchy/actions/workflows/release-drafter.yml)
+[![Go](https://github.com/sha1n/bert/actions/workflows/go.yml/badge.svg)](https://github.com/sha1n/bert/actions/workflows/go.yml)
+![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/sha1n/bert)
+[![Go Report Card](https://goreportcard.com/badge/sha1n/bert)](https://goreportcard.com/report/sha1n/bert) 
+[![Coverage Status](https://coveralls.io/repos/github/sha1n/bert/badge.svg)](https://coveralls.io/github/sha1n/bert?branch=master)
+[![Release](https://img.shields.io/github/release/sha1n/bert.svg?style=flat-square)](https://github.com/sha1n/bert/releases)
+[![Release Drafter](https://github.com/sha1n/bert/actions/workflows/release-drafter.yml/badge.svg)](https://github.com/sha1n/bert/actions/workflows/release-drafter.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-# Benchy 
+# bert 
 
 <img src="images/demo_800.gif" width="100%">
 
-- [Benchy](#benchy)
+- [bert](#bert)
   - [Overview](#overview)
   - [Installation](#installation)
     - [Download A Pre-Built Release](#download-a-pre-built-release)
@@ -32,7 +32,7 @@
 
 
 ## Overview
-`benchy` is a fully-featured CLI benchmarking tool that can handle anything from the simplest ad-hoc A/B command benchmarks to multi-command scenarios with custom environment variables, working directories and more. Benchy can report results in several [formats](#report-formats) and forms. Reports from different runs can be marked with labels and accumulated into the same report file for later analysis. This can come handy when you want to compare different environment factors like wired network and WiFi, different disks, different software versions etc.
+`bert` is a fully-featured CLI benchmarking tool that can handle anything from the simplest ad-hoc A/B command benchmarks to multi-command scenarios with custom environment variables, working directories and more. bert can report results in several [formats](#report-formats) and forms. Reports from different runs can be marked with labels and accumulated into the same report file for later analysis. This can come handy when you want to compare different environment factors like wired network and WiFi, different disks, different software versions etc.
 
 **Key Features**
 - Benchmark any number of commands
@@ -56,20 +56,20 @@ Download the appropriate binary and put it in your `PATH`.
 
 ```bash
 # macOS Example (assuming that '$HOME/.local/bin' is in your PATH):
-curl -sSL https://github.com/sha1n/benchy/releases/latest/download/benchy-darwin-amd64 -o "$HOME/.local/bin/benchy"
+curl -sSL https://github.com/sha1n/bert/releases/latest/download/bert-darwin-amd64 -o "$HOME/.local/bin/bert"
 
 # once you have it, you can update using the update command
-benchy update
+bert update
 ```
 
 ### Build From Sources
 If you are a Go developer or have the tools required to build Go programs, you should be able to do so by following these commands.
 ```bash
 # macOS Example (assuming that '$HOME/.local/bin' is in your PATH):
-git clone git@github.com:sha1n/benchy.git
-cd benchy
+git clone git@github.com:sha1n/bert.git
+cd bert
 make 
-cp ./bin/benchy-darwin-amd64 ~/.local/bin/benchy
+cp ./bin/bert-darwin-amd64 ~/.local/bin/bert
 ```
 
 ## Usage
@@ -78,14 +78,14 @@ Use this form if you want to quickly measure the execution time of a command or 
 
 ```bash
 # One command 
-benchy 'command -opt' --executions 100
+bert 'command -opt' --executions 100
 
 # Multiple commands
-benchy 'command -optA' 'command -optB' 'anotherCommand' --executions 100
+bert 'command -optA' 'command -optB' 'anotherCommand' --executions 100
 ```
 
 ### Using a Configuration File
-In order to gain full control over benchmark configuration `benchy` uses a configuration file. The configuration file can be either in YAML or JSON format. `benchy` treats files with the `.json` extension as JSON, otherwise it assumes YAML. You may create a configuration file manually or use the `config` command to interactively generate your configuration.
+In order to gain full control over benchmark configuration `bert` uses a configuration file. The configuration file can be either in YAML or JSON format. `bert` treats files with the `.json` extension as JSON, otherwise it assumes YAML. You may create a configuration file manually or use the `config` command to interactively generate your configuration.
 
 **Why use a config files?**
 
@@ -95,10 +95,10 @@ In order to gain full control over benchmark configuration `benchy` uses a confi
 More about configuration [here](configuration.md).
 
 ```bash
-benchy --config benchmark-config.yml
+bert --config benchmark-config.yml
 
 # Equivalent shorthand version of the above
-benchy -c benchmark-config.yml
+bert -c benchmark-config.yml
 ```
 
 ## Reports
@@ -111,17 +111,17 @@ There are three supported report formats, two of them support `raw` mode as foll
 ```bash
 # The following command will generate a report in CSV format and save it into a file 
 # named 'benchmark-report.csv' in the current directory.
-benchy --config benchmark-config.yml --format csv --out-file benchmark-report.csv
+bert --config benchmark-config.yml --format csv --out-file benchmark-report.csv
 
 # Here is an equivalent command that uses shorthand flag names.
-benchy -c benchmark-config.yml -f csv -o benchmark-report.csv
+bert -c benchmark-config.yml -f csv -o benchmark-report.csv
 ```
 
 ### Accumulating Data
-When an output file is specified, `benchy` *appends* data to the specified report file. If you are using one of the tabular report formats and want to accumulate data from different runs into the same report, you can specify `--headers=false` starting from the second run, to indicate that you don't want table headers.
+When an output file is specified, `bert` *appends* data to the specified report file. If you are using one of the tabular report formats and want to accumulate data from different runs into the same report, you can specify `--headers=false` starting from the second run, to indicate that you don't want table headers.
 
 ### Labelling Data
-Sometimes what you really want to measure is the impact of environmental changes on your commands and not the command themselves. In such cases, it is sometimes easier to run the exact same benchmark configuration several times, with different machine configuration. For example, WiFi vs wired network, different disks, different software versions etc. In such situations, it is helpful to label your reports in a way that allows you to easily identify each run. `benchy` provides the optional `--label` or `-l` flag just for that. When specified, the provided labels will be attached to the report results of all the commands in that run.
+Sometimes what you really want to measure is the impact of environmental changes on your commands and not the command themselves. In such cases, it is sometimes easier to run the exact same benchmark configuration several times, with different machine configuration. For example, WiFi vs wired network, different disks, different software versions etc. In such situations, it is helpful to label your reports in a way that allows you to easily identify each run. `bert` provides the optional `--label` or `-l` flag just for that. When specified, the provided labels will be attached to the report results of all the commands in that run.
 
 **Example:**
 
@@ -203,7 +203,7 @@ Timestamp,Scenario,Labels,Duration,Error
 
 
 ## Output Control
-By default `benchy` logs informative messages to standard err and report data to standard out (if no output file is specified). 
+By default `bert` logs informative messages to standard err and report data to standard out (if no output file is specified). 
 However, there are several ways you can control what is logged and in what level of details.
 
 - `--pipe-stdout` and `--pipe-stderr` - pipe the standard out and err of executed benchmark commands respectively, to standard err.
@@ -211,6 +211,6 @@ However, there are several ways you can control what is logged and in what level
 - `--debug` or `-d` - sets the logging level to the highest possible level, for troubleshooting.
 
 ## Alternatives
-Before developing `benchy` I looked into the following tools. Both target similar use-cases, but with different focus.
+Before developing `bert` I looked into the following tools. Both target similar use-cases, but with different focus.
 - [hyperfine](https://github.com/sharkdp/hyperfine) 
 - [bench](https://github.com/Gabriel439/bench) 

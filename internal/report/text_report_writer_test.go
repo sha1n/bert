@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sha1n/benchy/api"
+	"github.com/sha1n/bert/api"
 	"github.com/stretchr/testify/assert"
 )
 

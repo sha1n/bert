@@ -1,7 +1,7 @@
 package pkg
 
 import (
-	"github.com/sha1n/benchy/api"
+	"github.com/sha1n/bert/api"
 )
 
 // Execute executes a benchmark and returns an object that provides access to collected stats.

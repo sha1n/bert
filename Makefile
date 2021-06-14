@@ -1,7 +1,7 @@
 # Set VERSION to the latest version tag name. Assuming version tags are formatted 'v*'
 VERSION := $(shell git describe --always --abbrev=0 --tags --match "v*" $(git rev-list --tags --max-count=1))
 BUILD := $(shell git rev-parse $(VERSION))
-PROJECTNAME := "benchy"
+PROJECTNAME := "bert"
 # We pass that to the main module to generate the correct help text
 PROGRAMNAME := $(PROJECTNAME)
 
@@ -121,17 +121,17 @@ build-docker:
 
 run-linux-dockerized-tests:
 	@echo "  >  Running with experimental UI..."
-	docker run --rm -ti sha1n/benchy /benchy/bin/benchy-linux-amd64 -c /benchy/test/data/spec_test_load.yaml
+	docker run --rm -ti sha1n/bert /bert/bin/bert-linux-amd64 -c /bert/test/data/spec_test_load.yaml
 	@echo "  >  Running with experimental UI + debug..."
-	docker run --rm -ti sha1n/benchy /benchy/bin/benchy-linux-amd64 -c /benchy/test/data/spec_test_load.yaml -d
+	docker run --rm -ti sha1n/bert /bert/bin/bert-linux-amd64 -c /bert/test/data/spec_test_load.yaml -d
 	@echo "  >  Running with experimental UI + silent..."
-	docker run --rm -ti sha1n/benchy /benchy/bin/benchy-linux-amd64 -c /benchy/test/data/spec_test_load.yaml -s
+	docker run --rm -ti sha1n/bert /bert/bin/bert-linux-amd64 -c /bert/test/data/spec_test_load.yaml -s
 	@echo "  >  Running with experimental UI + piped stdout..."
-	docker run --rm -ti sha1n/benchy /benchy/bin/benchy-linux-amd64 -c /benchy/test/data/spec_test_load.yaml --pipe-stdout
+	docker run --rm -ti sha1n/bert /bert/bin/bert-linux-amd64 -c /bert/test/data/spec_test_load.yaml --pipe-stdout
 	@echo "  >  Running with experimental UI + piped stderr..."
-	docker run --rm -ti sha1n/benchy /benchy/bin/benchy-linux-amd64 -c /benchy/test/data/spec_test_load.yaml --pipe-stderr
+	docker run --rm -ti sha1n/bert /bert/bin/bert-linux-amd64 -c /bert/test/data/spec_test_load.yaml --pipe-stderr
 	@echo "  >  Running with ad-hoc commands..."
-	docker run --rm -ti sha1n/benchy /benchy/bin/benchy-linux-amd64 'ls' 'ls -laH' --executions 10
+	docker run --rm -ti sha1n/bert /bert/bin/bert-linux-amd64 'ls' 'ls -laH' --executions 10
 
 
 .PHONY: help
