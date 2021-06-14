@@ -6,11 +6,11 @@
 [![Release Drafter](https://github.com/sha1n/bert/actions/workflows/release-drafter.yml/badge.svg)](https://github.com/sha1n/bert/actions/workflows/release-drafter.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-# bert 
+# Bert 
 
 <img src="images/demo_800.gif" width="100%">
 
-- [bert](#bert)
+- [Bert](#bert)
   - [Overview](#overview)
   - [Installation](#installation)
     - [Download A Pre-Built Release](#download-a-pre-built-release)
