@@ -194,6 +194,6 @@ However, there are several ways you can control what is logged and in what level
 - `--debug` or `-d` - sets the logging level to the highest possible level, for troubleshooting.
 
 ## Alternatives
-Before developing `benchy` I looked into the following tools. Both target similar use-cases, but with different focus. If you need to quickly compare two commands, I would recommend looking into these.
+Before developing `benchy` I looked into the following tools. Both target similar use-cases, but with different focus.
 - [hyperfine](https://github.com/sharkdp/hyperfine) 
 - [bench](https://github.com/Gabriel439/bench) 
