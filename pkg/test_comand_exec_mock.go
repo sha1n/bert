@@ -1,6 +1,6 @@
 package pkg
 
-import "github.com/sha1n/benchy/api"
+import "github.com/sha1n/bert/api"
 
 // CmdRecordingExecutor ...
 type CmdRecordingExecutor struct {

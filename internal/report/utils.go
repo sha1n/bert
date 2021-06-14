@@ -5,7 +5,7 @@ import (
 	"sort"
 	"time"
 
-	"github.com/sha1n/benchy/api"
+	"github.com/sha1n/bert/api"
 )
 
 // TabularReportDateFormat ...

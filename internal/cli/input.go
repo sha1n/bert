@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/sha1n/benchy/api"
-	"github.com/sha1n/benchy/pkg"
+	"github.com/sha1n/bert/api"
+	"github.com/sha1n/bert/pkg"
 )
 
 // IsValidFn validates the input string and returns true if valid otherwise false.

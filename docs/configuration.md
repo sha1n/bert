@@ -9,17 +9,17 @@
   - [Alternate Execution](#alternate-execution)
 
 ## Interactive Configuration Utility
-An easy way to start playing with `benchy` configuration is to simply use an [example](#starting-with-an-example), start modifying things and see what happens. But if you are not a YAML type of person and prefer to do it interactively, you might find the [interactive config utility](#building-a-full-config-file-interactively). In any case, it is recommended that you go over the examples below and familiarize yourself with the different properties, so that you can get the most out of this utility.
+An easy way to start playing with `bert` configuration is to simply use an [example](#starting-with-an-example), start modifying things and see what happens. But if you are not a YAML type of person and prefer to do it interactively, you might find the [interactive config utility](#building-a-full-config-file-interactively). In any case, it is recommended that you go over the examples below and familiarize yourself with the different properties, so that you can get the most out of this utility.
 
 ## Starting With an Example
-Benchy can generate a documented YAML example configuration for you to help you get started with a by-example approach. Here is how you do it.
+bert can generate a documented YAML example configuration for you to help you get started with a by-example approach. Here is how you do it.
 
 ```bash
 # Writing a configuration example to the console
-$ benchy config --example
+$ bert config --example
 
 # Writing a configuration example to a file and editing it immediately using vi
-$ benchy config --example -o benchy.yml && vi benchy.yml
+$ bert config --example -o bert.yml && vi bert.yml
 ```
 **Here is what it looks like**
 ```
@@ -62,7 +62,7 @@ scenarios:                # list of scenarios
 ## Building a Full Config File Interactively
 ```bash
 # add '-o filename.yaml' to save generated config to a file.
-$ benchy config
+$ bert config
 
 --------------------------------
  BENCHMARK CONFIGURATION HELPER
@@ -73,7 +73,7 @@ This tool is going to help you go through a benchmark configuration definition.
 * annotates required input
 ? annotates optional input
 
-more here: https://github.com/sha1n/benchy/blob/master/docs/configuration.md
+more here: https://github.com/sha1n/bert/blob/master/docs/configuration.md
 
 --------------------------------
 
@@ -119,7 +119,7 @@ alternate: true
 ## Command Configuration Structure
 The following elements share the same structure: `beforeAll`, `afterAll`, `beforeEach`, `afterEach`, `command`. 
 
-`workingDir` - the `workingDir` property can be set globally for a scenario and optionally be overridden per command. If no working directory is set the default is the directory `benchy` is executed from. `~` prefix will be expanded to the current user home directory.
+`workingDir` - the `workingDir` property can be set globally for a scenario and optionally be overridden per command. If no working directory is set the default is the directory `bert` is executed from. `~` prefix will be expanded to the current user home directory.
 
 **Command structure:**
 ```yaml
@@ -131,7 +131,7 @@ The following elements share the same structure: `beforeAll`, `afterAll`, `befor
 ```
 
 ## Alternate Execution
-By default `benchy` executes scenarios in sequence and according to the number of `executions` set for your benchmark. Set the `alternate` property to `true` if you want spread the different scenarios more evenly over the time line. 
+By default `bert` executes scenarios in sequence and according to the number of `executions` set for your benchmark. Set the `alternate` property to `true` if you want spread the different scenarios more evenly over the time line. 
 Alternate execution can be helpful when:
 - your benchmark runs for a very long time and external resources tend to behave differently over time
 - you want some quiet time between executions of the same scenario to allow an external resource to cool down

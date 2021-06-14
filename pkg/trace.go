@@ -3,7 +3,7 @@ package pkg
 import (
 	"time"
 
-	"github.com/sha1n/benchy/api"
+	"github.com/sha1n/bert/api"
 )
 
 type tracer struct {

@@ -5,7 +5,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Benchy (basic)",
+      "name": "bert (basic)",
       "type": "go",
       "request": "launch",
       "mode": "auto",
@@ -16,7 +16,7 @@
       ]
     },
     {
-      "name": "Benchy (csv/raw)",
+      "name": "bert (csv/raw)",
       "type": "go",
       "request": "launch",
       "mode": "auto",
@@ -30,7 +30,7 @@
       ]
     },
     {
-      "name": "Benchy (md)",
+      "name": "bert (md)",
       "type": "go",
       "request": "launch",
       "mode": "auto",
@@ -46,7 +46,7 @@
       ]
     },
     {
-      "name": "Benchy update",
+      "name": "bert update",
       "type": "go",
       "request": "launch",
       "mode": "auto",

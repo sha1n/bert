@@ -6,9 +6,9 @@ import (
 	"runtime/debug"
 
 	"github.com/fatih/color"
-	"github.com/sha1n/benchy/api"
-	"github.com/sha1n/benchy/internal/cli"
-	"github.com/sha1n/benchy/pkg"
+	"github.com/sha1n/bert/api"
+	"github.com/sha1n/bert/internal/cli"
+	"github.com/sha1n/bert/pkg"
 	errorhandling "github.com/sha1n/clib/pkg/error_handling"
 	"github.com/sha1n/termite"
 	log "github.com/sirupsen/logrus"
@@ -62,7 +62,7 @@ func handlePanics(exitFn func(int)) {
 
 		issueURL := errorhandling.GenerateGitHubCreateNewIssueURL(
 			"sha1n",
-			"benchy",
+			"bert",
 			fmt.Sprintf("Panic Issue (%s, build: %s)", Version, Build),
 			fmt.Sprintf("**Error:** %s\n**Stacktrace:**\n```%s```", o, debug.Stack()),
 		) + "&labels=bug"

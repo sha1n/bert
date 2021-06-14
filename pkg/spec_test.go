@@ -7,7 +7,7 @@ import (
 	"path"
 	"testing"
 
-	"github.com/sha1n/benchy/api"
+	"github.com/sha1n/bert/api"
 	"github.com/sha1n/clib/pkg/test"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v2"
