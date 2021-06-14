@@ -13,6 +13,8 @@ import (
 const (
 	// ArgNameConfig : program arg name
 	ArgNameConfig = "config"
+	// ArgNameExecutions : program arg name
+	ArgNameExecutions = "executions"
 	// ArgNameOutputFile : program arg name
 	ArgNameOutputFile = "out-file"
 	// ArgNameConfigExample : program arg name
@@ -70,6 +72,14 @@ func ResolveOutputArg(cmd *cobra.Command, name string, ctx api.IOContext) io.Wri
 // GetString tries to get a user argument. Handles errors as fatal.
 func GetString(cmd *cobra.Command, name string) string {
 	v, err := cmd.Flags().GetString(name)
+	CheckUserArgFatal(err)
+
+	return v
+}
+
+// GetInt tries to get a user argument. Handles errors as fatal.
+func GetInt(cmd *cobra.Command, name string) int {
+	v, err := cmd.Flags().GetInt(name)
 	CheckUserArgFatal(err)
 
 	return v

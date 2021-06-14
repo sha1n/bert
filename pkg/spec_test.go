@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
 	"path"
 	"testing"
@@ -98,6 +99,50 @@ scenarios:
 	_, err := LoadSpecFromYamlData([]byte(example))
 
 	assert.Error(t, err)
+}
+
+func TestCreateSpecFrom(t *testing.T) {
+	type args struct {
+		executions int
+		alternate  bool
+		commands   []api.CommandSpec
+	}
+	tests := []struct {
+		name     string
+		args     args
+		wantSpec api.BenchmarkSpec
+		wantErr  bool
+	}{
+		{
+			name:     "valid alternate",
+			args:     args{executions: 1, alternate: true, commands: []api.CommandSpec{{Cmd: []string{"ls", "-l"}}}},
+			wantSpec: api.BenchmarkSpec{Executions: 1, Alternate: true, Scenarios: []api.ScenarioSpec{{Name: "[ls -l]", Command: &api.CommandSpec{Cmd: []string{"ls", "-l"}}}}},
+			wantErr:  false,
+		},
+		{
+			name:     "valid dual command",
+			args:     args{executions: 1, alternate: false, commands: []api.CommandSpec{{Cmd: []string{"ls", "-l"}}, {Cmd: []string{"ls", "-a"}}}},
+			wantSpec: api.BenchmarkSpec{Executions: 1, Alternate: false, Scenarios: []api.ScenarioSpec{{Name: "[ls -l]", Command: &api.CommandSpec{Cmd: []string{"ls", "-l"}}}, {Name: "[ls -a]", Command: &api.CommandSpec{Cmd: []string{"ls", "-a"}}}}},
+			wantErr:  false,
+		},
+		{
+			name:     "non-positive executions",
+			args:     args{executions: rand.Intn(10) * -1, alternate: false, commands: []api.CommandSpec{{Cmd: []string{"ls", "-l"}}}},
+			wantSpec: api.BenchmarkSpec{},
+			wantErr:  true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotSpec, err := CreateSpecFrom(tt.args.executions, tt.args.alternate, tt.args.commands...)
+
+			if tt.wantErr {
+				assert.Error(t, err)
+			}
+
+			assert.Equal(t, tt.wantSpec, gotSpec)
+		})
+	}
 }
 
 func testLoad(t *testing.T, filePath string) {
