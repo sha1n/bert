@@ -1,7 +1,7 @@
 FROM golang:1.16
 
-ADD . /benchy
+ADD . /bert
 
-WORKDIR /benchy
+WORKDIR /bert
 
 RUN make go-build-linux-amd64

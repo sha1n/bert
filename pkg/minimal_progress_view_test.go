@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sha1n/benchy/api"
+	"github.com/sha1n/bert/api"
 	clibtest "github.com/sha1n/clib/pkg/test"
 	"github.com/stretchr/testify/assert"
 )

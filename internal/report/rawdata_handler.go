@@ -1,6 +1,6 @@
 package report
 
-import "github.com/sha1n/benchy/api"
+import "github.com/sha1n/bert/api"
 
 // RawDataHandler an abstraction for raw data report trace event handlers.
 type RawDataHandler interface {

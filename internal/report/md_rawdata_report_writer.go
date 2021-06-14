@@ -8,7 +8,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/sha1n/benchy/api"
+	"github.com/sha1n/bert/api"
 )
 
 // MarkdownStreamReportWriter a simple human readable test report writer

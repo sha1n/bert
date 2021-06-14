@@ -5,8 +5,8 @@ import (
 	"io"
 	"strings"
 
-	"github.com/sha1n/benchy/api"
-	"github.com/sha1n/benchy/pkg"
+	"github.com/sha1n/bert/api"
+	"github.com/sha1n/bert/pkg"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -133,7 +133,7 @@ This tool is going to help you go through a benchmark configuration definition.
 %s annotates required input 
 %s annotates optional input
 
-more here: https://github.com/sha1n/benchy/blob/master/docs/configuration.md
+more here: https://github.com/sha1n/bert/blob/master/docs/configuration.md
 
 --------------------------------
 

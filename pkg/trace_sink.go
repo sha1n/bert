@@ -3,7 +3,7 @@ package pkg
 import (
 	"sync"
 
-	"github.com/sha1n/benchy/api"
+	"github.com/sha1n/bert/api"
 )
 
 // TraceSink is a Trace accumulator capable of subscribing to a TraceStream and provide access to accumulated events

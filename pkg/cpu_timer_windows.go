@@ -6,7 +6,7 @@ package pkg
 import (
 	"time"
 
-	"github.com/sha1n/benchy/api"
+	"github.com/sha1n/bert/api"
 )
 
 // NoopCPUTimer NOOP implementation of CPUTimer

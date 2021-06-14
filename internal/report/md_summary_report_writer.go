@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sha1n/benchy/api"
+	"github.com/sha1n/bert/api"
 )
 
 // mdReportWriter a simple human readable test report writer

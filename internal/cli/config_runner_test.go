@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/sha1n/benchy/api"
-	"github.com/sha1n/benchy/pkg"
+	"github.com/sha1n/bert/api"
+	"github.com/sha1n/bert/pkg"
 	clibtest "github.com/sha1n/clib/pkg/test"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"

@@ -4,8 +4,8 @@ import (
 	"io"
 	"os"
 
-	"github.com/sha1n/benchy/api"
-	"github.com/sha1n/benchy/pkg"
+	"github.com/sha1n/bert/api"
+	"github.com/sha1n/bert/pkg"
 
 	"github.com/spf13/cobra"
 )

@@ -7,7 +7,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/sha1n/benchy/api"
+	"github.com/sha1n/bert/api"
 )
 
 type unixChildrenCPUTimer struct {

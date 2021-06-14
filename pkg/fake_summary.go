@@ -3,7 +3,7 @@ package pkg
 import (
 	"time"
 
-	"github.com/sha1n/benchy/api"
+	"github.com/sha1n/bert/api"
 )
 
 // NewFakeTrace creates a fake trace with the specified data
