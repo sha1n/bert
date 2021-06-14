@@ -32,28 +32,30 @@ Build label: %s`, version, build),
 	}
 
 	rootCmd.Flags().StringP(ArgNameConfig, "c", "", `config file path. '~' will be expanded.`)
-	rootCmd.Flags().Int(ArgNameExecutions, 0, `the number of executions per scenario.`)
+	rootCmd.Flags().Int(ArgNameExecutions, 0, `the number of executions per scenario.
+required when no configuration file is provided. 
+when specified with a configuration file, this argument has priority.`)
 
 	// Reporting
 	rootCmd.Flags().StringP(ArgNameOutputFile, "o", "", `output file path. Optional. Writes to stdout by default.`)
 	rootCmd.Flags().StringP(ArgNameFormat, "f", "txt", `summary format. One of: 'txt', 'md', 'md/raw', 'csv', 'csv/raw'
-txt     - plain text. designed to be used in your terminal
-md      - markdown table. similar to CSV but writes in markdown table format
+txt     - plain text. designed to be used in your terminal.
+md      - markdown table. similar to CSV but writes in markdown table format.
 md/raw  - markdown table in which each row represents a raw trace event.
-csv     - CSV in which each row represents a scenario and contains calculated stats for that scenario
-csv/raw - CSV in which each row represents a raw trace event. useful if you want to import to a spreadsheet for further analysis`,
+csv     - CSV in which each row represents a scenario and contains calculated stats for that scenario.
+csv/raw - CSV in which each row represents a raw trace event. useful if you want to import to a spreadsheet for further analysis.`,
 	)
-	rootCmd.Flags().StringSliceP(ArgNameLabel, "l", []string{}, `labels to attach to be included in the benchmark report`)
-	rootCmd.Flags().Bool(ArgNameHeaders, true, `in tabular formats, whether to include headers in the report`)
+	rootCmd.Flags().StringSliceP(ArgNameLabel, "l", []string{}, `labels to attach to be included in the benchmark report.`)
+	rootCmd.Flags().Bool(ArgNameHeaders, true, `in tabular formats, whether to include headers in the report.`)
 
 	// Stdout
-	rootCmd.Flags().BoolP(ArgNamePipeStdout, "", false, `pipes external commands standard out to benchy's standard out`)
-	rootCmd.Flags().BoolP(ArgNamePipeStderr, "", false, `pipes external commands standard error to benchy's standard error`)
+	rootCmd.Flags().BoolP(ArgNamePipeStdout, "", false, `pipes external commands standard out to benchy's standard out.`)
+	rootCmd.Flags().BoolP(ArgNamePipeStderr, "", false, `pipes external commands standard error to benchy's standard error.`)
 
-	rootCmd.PersistentFlags().BoolP(ArgNameDebug, "d", false, `logs extra debug information`)
-	rootCmd.PersistentFlags().BoolP(ArgNameSilent, "s", false, `logs only fatal errors`)
+	rootCmd.PersistentFlags().BoolP(ArgNameDebug, "d", false, `runs the program in debug mode.`)
+	rootCmd.PersistentFlags().BoolP(ArgNameSilent, "s", false, `logs only fatal errors.`)
 
-	rootCmd.PersistentFlags().StringSlice(ArgNameExperimental, []string{}, `enables a named experimental features`)
+	rootCmd.PersistentFlags().StringSlice(ArgNameExperimental, []string{}, `enables a named experimental features.`)
 
 	// _ = rootCmd.MarkFlagRequired(ArgNameConfig)
 	_ = rootCmd.MarkFlagFilename(ArgNameConfig, "yml", "yaml", "json")
