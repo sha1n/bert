@@ -20,7 +20,8 @@
     - [Download A Pre-Built Release](#download-a-pre-built-release)
     - [Build From Sources](#build-from-sources)
   - [Usage](#usage)
-  - [Configuration](#configuration)
+    - [Quick Ad-Hoc Benchmarks](#quick-ad-hoc-benchmarks)
+    - [Using a Configuration File](#using-a-configuration-file)
   - [Report Formats](#report-formats)
     - [Text Example](#text-example)
     - [CSV Example](#csv-example)
@@ -72,17 +73,33 @@ cp ./bin/benchy-darwin-amd64 ~/.local/bin/benchy
 ```
 
 ## Usage
-```bash
-benchy --config test/data/spec_test_load.yaml
+### Quick Ad-Hoc Benchmarks
+Use this form if you want to quickly measure the execution time of a command or a set of commands.
 
-benchy --help   # for full options list
+```bash
+# One command 
+benchy 'command -opt' --executions 100
+
+# Multiple commands
+benchy 'command -optA' 'command -optB' 'anotherCommand' --executions 100
 ```
 
-## Configuration
-`benchy` reads benchmark specifications from a config file. The config file can be either in YAML or JSON format. `benchy` treats files with the `.json` extension as JSON, otherwise it assumes YAML. You may create a configuration file manually or use the `config` command to interactively generate your configuration.
+### Using a Configuration File
+In order to gain full control over benchmark configuration `benchy` uses a configuration file. The configuration file can be either in YAML or JSON format. `benchy` treats files with the `.json` extension as JSON, otherwise it assumes YAML. You may create a configuration file manually or use the `config` command to interactively generate your configuration.
+
+**Why use a config files?**
+
+- unlock advanced features such as alternate execution, custom environment variables, working directories and setup commands per scenario
+- easily share elaborate benchmark configurations, store them in VCS and reuse them on different environments and over time
 
 More about configuration [here](configuration.md).
 
+```bash
+benchy --config benchmark-config.yml
+
+# Equivalent shorthand version of the above
+benchy -c benchmark-config.yml
+```
 
 ## Report Formats
 There are three supported report formats, two of them support `raw` mode as follows. The formats are `txt`, `csv`, `csv/raw`, `md` and `md/raw`. `txt` is the default format and is primarily designed to be used in a terminal. `csv` is especially useful when you want to accumulate stats from multiple benchmarks in a standard convenient format. In which case you can combine the `csv` format with `-o` and possibly `--header=false` if you want to accumulate data from separate runs in one file. 
