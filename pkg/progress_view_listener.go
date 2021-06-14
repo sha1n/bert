@@ -78,7 +78,8 @@ func NewProgressView(spec api.BenchmarkSpec, termDimensionsFn func() (int, int),
 	for i, scenario := range spec.Scenarios {
 		formatter := newProgressBarFormatter()
 		pBar := termite.NewProgressBar(rows[nextProgressBarRowIndex], spec.Executions, termWidthFn, 59, formatter)
-		rows[nextProgressBarRowIndex-1].Update(fmt.Sprintf("%11s: %s", "SCENARIO", yellow.Sprint(scenario.Name)))
+		terminalScaledScenarioName := termite.TruncateString(scenario.Name, termWidthFn()-14)
+		rows[nextProgressBarRowIndex-1].Update(fmt.Sprintf("%11s: %s", "SCENARIO", yellow.Sprint(terminalScaledScenarioName)))
 		notificationsRowIndex := nextProgressBarRowIndex + 1
 		nextProgressBarRowIndex += 4
 
@@ -97,7 +98,7 @@ func NewProgressView(spec api.BenchmarkSpec, termDimensionsFn func() (int, int),
 
 	return &ProgressView{
 		matrix:           matrix,
-		eta:              newEtaInfo(rows[len(rows)-1], spec.Alternate),
+		eta:              newEtaInfo(rows[len(rows)-1], spec.Alternate, termDimensionsFn),
 		progressInfoByID: progressInfoByID,
 		cancelHandlers:   cancelHandlers,
 		cursor:           termite.NewCursor(ioc.StdoutWriter),

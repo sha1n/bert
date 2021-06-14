@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -33,6 +34,32 @@ func LoadSpec(path string) (api.BenchmarkSpec, error) {
 	}
 
 	return load(path, unmarshalFn)
+}
+
+// CreateSpecFrom creates a spec from the specified parameters.
+//
+// Returns an error if the specified 'executions' is non-positive.
+func CreateSpecFrom(executions int, alternate bool, commands ...api.CommandSpec) (spec api.BenchmarkSpec, err error) {
+	if executions < 1 {
+		return spec, errors.New("executions must be positive")
+	}
+
+	spec = api.BenchmarkSpec{
+		Executions: executions,
+		Alternate:  alternate,
+		Scenarios:  []api.ScenarioSpec{},
+	}
+
+	for i := range commands {
+		command := commands[i]
+		scenario := api.ScenarioSpec{
+			Name:    fmt.Sprintf("[%s]", strings.Join(command.Cmd, " ")),
+			Command: &command,
+		}
+		spec.Scenarios = append(spec.Scenarios, scenario)
+	}
+
+	return
 }
 
 // LoadSpecFromYamlData loads a spec from the specified slice of bytes, assuming YAML data.
