@@ -10,7 +10,9 @@ import (
 )
 
 // NoopCPUTimer NOOP implementation of CPUTimer
-type NoopCPUTimer struct{}
+type NoopCPUTimer struct {
+	perceivedStartTime time.Time
+}
 
 // NewChildrenCPUTimer returns a NOOP CPUTimer implementation.
 func NewChildrenCPUTimer() api.CPUTimer {
@@ -24,10 +26,14 @@ func NewSelfCPUTimer() api.CPUTimer {
 
 // Start ...
 func (t NoopCPUTimer) Start() api.ElapsedCPUTimeFn {
+	t.perceivedStartTime = time.Now()
+
 	return t.Elapsed
 }
 
 // Elapsed return 0, 0
 func (t NoopCPUTimer) Elapsed() (perceived time.Duration, usr time.Duration, sys time.Duration) {
-	return time.Nanosecond * 0, time.Nanosecond * 0, time.Nanosecond * 0
+	perceivedTime := time.Now().Sub(t.perceivedStartTime)
+
+	return perceivedTime, time.Nanosecond * 0, time.Nanosecond * 0
 }
