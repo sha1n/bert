@@ -15,10 +15,30 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const bert = `
+
+                      \WWW/
+                      /   \
+                     /wwwww\
+                   _|  o_o  |_
+                  (_   / \   _)
+                    |  \_/  |
+                    : ~~~~~ :
+                     \_____/
+                     [     ]
+                      """""
+               ____            _   
+              |  _ \          | |  
+              | |_) | ___ _ __| |_ 
+              |  _ < / _ \ '__| __|
+              | |_) |  __/ |  | |_ 
+              |____/ \___|_|   \__|
+
+`
+
 // NewRootCommand creates the main command parse
 func NewRootCommand(programName, version, build string, ctx api.IOContext) *cobra.Command {
 	var rootCmd = &cobra.Command{
-
 		Use: programName,
 		Version: fmt.Sprintf(`Version: %s
 Build label: %s`, version, build),
@@ -62,6 +82,7 @@ csv/raw - CSV in which each row represents a raw trace event. useful if you want
 	_ = rootCmd.MarkFlagFilename(ArgNameOutputFile, "txt", "csv", "md")
 
 	rootCmd.SetVersionTemplate(`{{printf "%s" .Version}}`)
+	rootCmd.SetHelpTemplate(rootCmd.HelpTemplate() + bert)
 
 	return rootCmd
 }
