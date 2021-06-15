@@ -12,14 +12,14 @@ type PerceivedTimeCPUTimer struct {
 }
 
 // Start ...
-func (t PerceivedTimeCPUTimer) Start() api.ElapsedCPUTimeFn {
+func (t *PerceivedTimeCPUTimer) Start() api.ElapsedCPUTimeFn {
 	t.perceivedStartTime = time.Now()
 
 	return t.Elapsed
 }
 
 // Elapsed return (measured perceived time, 0, 0)
-func (t PerceivedTimeCPUTimer) Elapsed() (perceived time.Duration, usr time.Duration, sys time.Duration) {
+func (t *PerceivedTimeCPUTimer) Elapsed() (perceived time.Duration, usr time.Duration, sys time.Duration) {
 	perceivedTime := time.Now().Sub(t.perceivedStartTime)
 
 	return perceivedTime, time.Nanosecond * 0, time.Nanosecond * 0
