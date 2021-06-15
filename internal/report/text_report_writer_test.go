@@ -3,6 +3,7 @@ package report
 import (
 	"bytes"
 	"fmt"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -69,10 +70,12 @@ func testTxtSanity(t *testing.T, colorsOn bool) {
 	assert.Equal(t, 1, strings.Count(text, "errors: 0%"))
 	assert.Equal(t, 1, strings.Count(text, "errors: 100%"))
 
-	assert.Equal(t, 1, strings.Count(text, "system: 1"))
-	assert.Equal(t, 1, strings.Count(text, "system: 2"))
-	assert.Equal(t, 1, strings.Count(text, "user: 1"))
-	assert.Equal(t, 1, strings.Count(text, "user: 2"))
+	if runtime.GOOS != "windows" {
+		assert.Equal(t, 1, strings.Count(text, "system: 1"))
+		assert.Equal(t, 1, strings.Count(text, "system: 2"))
+		assert.Equal(t, 1, strings.Count(text, "user: 1"))
+		assert.Equal(t, 1, strings.Count(text, "user: 2"))
+	}
 
 	assert.Equal(t, 2, strings.Count(text, "stddev: 0"))
 
