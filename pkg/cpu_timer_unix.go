@@ -1,5 +1,5 @@
 // +build linux darwin
-// +build amd64 arm64
+// +build amd64 arm64 arm
 
 package pkg
 
