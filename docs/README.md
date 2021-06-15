@@ -6,9 +6,7 @@
 [![Release Drafter](https://github.com/sha1n/bert/actions/workflows/release-drafter.yml/badge.svg)](https://github.com/sha1n/bert/actions/workflows/release-drafter.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-# Bert 
-
-<img src="images/demo_800.gif" width="100%">
+# Bert
 
 - [Bert](#bert)
   - [Overview](#overview)
@@ -22,6 +20,7 @@
     - [Report Formats](#report-formats)
     - [Accumulating Data](#accumulating-data)
     - [Labelling Data](#labelling-data)
+    - [Understanding User & System Time Measurements](#understanding-user--system-time-measurements)
     - [Examples](#examples)
       - [Text Example](#text-example)
       - [CSV Example](#csv-example)
@@ -30,6 +29,9 @@
   - [Output Control](#output-control)
   - [Alternatives](#alternatives)
 
+
+<hr>
+<img src="images/demo_800.gif" width="100%">
 
 ## Overview
 `bert` is a fully-featured CLI benchmarking tool that can handle anything from the simplest ad-hoc A/B command benchmarks to multi-command scenarios with custom environment variables, working directories and more. bert can report results in several [formats](#report-formats) and forms. Reports from different runs can be marked with labels and accumulated into the same report file for later analysis. This can come handy when you want to compare different environment factors like wired network and WiFi, different disks, different software versions etc.
@@ -131,6 +133,34 @@ Sometimes what you really want to measure is the impact of environmental changes
 | 2021-06-14T19:11:09+03:00 | curl     | 100     | vpn,wired | 3.7ms | 10.8ms | 5.2ms | 4.8ms  | 8.0ms         | 1.5ms  | 0%     |
 | 2021-06-14T19:12:37+03:00 | curl     | 100     | wired     | 0.6ms | 8.1ms  | 1.3ms | 1.1ms  | 5.9ms         | 0.8ms  | 0%     |
 
+### Understanding User & System Time Measurements
+The `user` and `system` values are the calculated *mean* of measured user and system CPU time. It is important to understand that each measurement is the *sum* of the CPU times measured on all CPU cores and therefore can measure higher than perceived time measurements (min, max, mean, median, p90). The following report shows the measurements of two `go test` commands, one executed with `-p 1` which limits concurrency to `1` and the other with automatic parallelism. Notice how close the `user` and `system` metrics are and how they compare to the other metrics.
+
+```
+ BENCHMARK SUMMARY
+     labels:
+       date: Jun 15 2021
+       time: 20:31:20+03:00
+  scenarios: 2
+ executions: 10
+  alternate: true
+
+---------------------------------------------------------------
+
+   SCENARIO: [go test -p 1]
+        min: 2.7s          mean: 2.8s        median: 2.8s
+        max: 3.0s        stddev: 102.0ms        p90: 3.0s
+       user: 2.3s        system: 1.2s        errors: 0%
+
+---------------------------------------------------------------
+
+   SCENARIO: [go test]
+        min: 1.2s          mean: 1.3s        median: 1.2s
+        max: 1.3s        stddev: 43.3ms         p90: 1.3s
+       user: 2.8s        system: 1.6s        errors: 0%
+
+---------------------------------------------------------------
+```
 
 ### Examples
 #### Text Example
