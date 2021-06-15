@@ -4,3 +4,6 @@ build
 
 sketches
 no.go
+
+.vagrant
+.vm_config.json
