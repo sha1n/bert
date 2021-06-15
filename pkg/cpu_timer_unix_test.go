@@ -44,7 +44,7 @@ func Test_SelfCPUTimer_Elapsed_Loaded(t *testing.T) {
 		func() bool {
 			perceived, usr, sys := elapsed()
 
-			return perceived > time.Nanosecond*1 && usr > time.Nanosecond*1 && sys > time.Nanosecond*1
+			return perceived > time.Millisecond*1 && usr > time.Millisecond*1 && sys > time.Millisecond*1
 		},
 		time.Second*1,
 		time.Nanosecond*1,
