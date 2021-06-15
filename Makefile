@@ -7,7 +7,6 @@ PROGRAMNAME := $(PROJECTNAME)
 
 # Go related variables.
 GOBASE := $(shell pwd)
-GOPATH := $(GOBASE)/vendor:$(GOBASE)
 GOBIN := $(GOBASE)/bin
 GOBUILD := $(GOBASE)/build
 GOFILES := $(shell find . -type f -name '*.go' -not -path './vendor/*')
@@ -34,15 +33,14 @@ MAKEFLAGS += --silent
 
 default: install lint format test compile
 
-ci-checks: lint format test
-
 install: go-get
 
 format: go-format
 
 lint: go-lint
 
-compile:
+.PHONY: build
+build:
 	@[ -d $(GOBUILD) ] || mkdir -p $(GOBUILD)
 	@-touch $(STDERR)
 	@-rm $(STDERR)
@@ -51,8 +49,6 @@ compile:
 
 
 test: install go-test
-
-cover: install go-cover
 
 clean:
 	@-rm $(GOBIN)/$(PROGRAMNAME)* 2> /dev/null
@@ -66,15 +62,11 @@ go-format:
 	@echo "  >  Formating source files..."
 	gofmt -s -w $(GOFILES)
 
-go-build: go-get go-build-linux-amd64 go-build-linux-arm64 go-build-darwin-amd64 go-build-windows-amd64 go-build-windows-arm
+go-build: go-get go-build-linux-amd64 go-build-linux-arm64 go-build-linux-arm go-build-darwin-amd64 go-build-darwin-arm64 go-build-windows-amd64 go-build-windows-arm
 
 go-test:
-	go test $(MODFLAGS) `go list $(MODFLAGS) ./...`
-
-go-cover:
-	go test $(MODFLAGS) -coverprofile=$(GOBUILD)/.coverprof `go list $(MODFLAGS) ./...`
-	go tool cover -html=$(GOBUILD)/.coverprof -o $(GOBUILD)/coverage.html
-	@open $(GOBUILD)/coverage.html
+	@echo "  >  Running Go tests..."
+	go test $(MODFLAGS) -covermode=count `go list $(MODFLAGS) ./...`
 
 go-build-linux-amd64:
 	@echo "  >  Building linux amd64 binaries..."
@@ -84,9 +76,17 @@ go-build-linux-arm64:
 	@echo "  >  Building linux arm64 binaries..."
 	@GOPATH=$(GOPATH) GOOS=$(GOOS_LINUX) GOARCH=$(GOARCH_ARM64) GOBIN=$(GOBIN) go build $(MODFLAGS) $(LDFLAGS) -o $(GOBIN)/$(PROGRAMNAME)-$(GOOS_LINUX)-$(GOARCH_ARM64) $(GOBASE)/cmd
 
+go-build-linux-arm:
+	@echo "  >  Building linux arm binaries..."
+	@GOPATH=$(GOPATH) GOOS=$(GOOS_LINUX) GOARCH=$(GOARCH_ARM) GOBIN=$(GOBIN) go build $(MODFLAGS) $(LDFLAGS) -o $(GOBIN)/$(PROGRAMNAME)-$(GOOS_LINUX)-$(GOARCH_ARM) $(GOBASE)/cmd
+
 go-build-darwin-amd64:
-	@echo "  >  Building darwin binaries..."
+	@echo "  >  Building darwin amd64 binaries..."
 	@GOPATH=$(GOPATH) GOOS=$(GOOS_DARWIN) GOARCH=$(GOARCH_AMD64) GOBIN=$(GOBIN) go build $(MODFLAGS) $(LDFLAGS) -o $(GOBIN)/$(PROGRAMNAME)-$(GOOS_DARWIN)-$(GOARCH_AMD64) $(GOBASE)/cmd
+
+go-build-darwin-arm64:
+	@echo "  >  Building darwin arm64 binaries..."
+	@GOPATH=$(GOPATH) GOOS=$(GOOS_DARWIN) GOARCH=$(GOARCH_ARM64) GOBIN=$(GOBIN) go build $(MODFLAGS) $(LDFLAGS) -o $(GOBIN)/$(PROGRAMNAME)-$(GOOS_DARWIN)-$(GOARCH_ARM64) $(GOBASE)/cmd
 
 go-build-windows-amd64:
 	@echo "  >  Building windows amd64 binaries..."

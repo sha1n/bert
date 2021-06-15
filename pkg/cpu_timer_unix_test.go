@@ -55,7 +55,7 @@ func Test_ChildrenCPUTimer_Elapsed_Loaded(t *testing.T) {
 	timer := NewChildrenCPUTimer()
 
 	elapsed := timer.Start()
-	exec.Command("go", "env").Run()
+	exec.Command("go", "list", "./...").Run()
 	perceived, usr, sys := elapsed()
 
 	assert.GreaterOrEqual(t, perceived, time.Nanosecond*1)
