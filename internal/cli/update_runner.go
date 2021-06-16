@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"os"
+	"fmt"
 
 	"github.com/sha1n/bert/api"
 	clibcmd "github.com/sha1n/clib/pkg/cmd"
@@ -10,30 +10,24 @@ import (
 )
 
 const (
-	gitHusRepoOwner = "sha1n"
-	gitHusRepoName  = "bert"
+	gitHubRepoOwner = "sha1n"
+	gitHubRepoName  = "bert"
 )
 
 // CreateUpdateCommand creates the 'config' sub command
 func CreateUpdateCommand(version, binaryName string, ctx api.IOContext) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update",
-		Long:  `Checks for a newer release on GitHub and updates if one is found (https://github.com/sha1n/bert/releases)`,
-		Short: `Checks for a newer release on GitHub and updates if one is found`,
-		Run:   runSelfUpdateFn(version, binaryName, ctx),
+		Use: "update",
+		Long: fmt.Sprintf(`Checks if a newer release is available on GitHub and updates if so (see: https://github.com/%s/%s/releases). 
+If '--tag' is specified, tries to update to the specified release tag regardless of whether it is more recent or not.`, gitHubRepoOwner, gitHubRepoName),
+		Short: fmt.Sprintf(`Checks for and attempts to update %s to the latest or requested version`, binaryName),
+		Run:   clibcmd.RunSelfUpdateFn(gitHubRepoOwner, gitHubRepoName, version, binaryName),
+		PreRun: func(cmd *cobra.Command, args []string) {
+			configureOutput(cmd, log.InfoLevel, ctx)
+		},
 	}
+
+	cmd.Flags().String("tag", "", `the version tag to update to`)
 
 	return cmd
-}
-
-// runSelfUpdateFn runs the self update command based on the current version and binary name.
-// currentVersion is used to determine whether a newer one is available
-func runSelfUpdateFn(currentVersion, binaryName string, ctx api.IOContext) func(cmd *cobra.Command, args []string) {
-	return func(cmd *cobra.Command, args []string) {
-		configureOutput(cmd, log.InfoLevel, ctx)
-
-		CheckFatal(clibcmd.RunSelfUpdate(gitHusRepoOwner, gitHusRepoName, currentVersion, binaryName, os.Executable, clibcmd.GetLatestRelease))
-
-		log.Info("Done!")
-	}
 }
