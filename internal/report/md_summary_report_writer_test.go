@@ -8,6 +8,7 @@ import (
 
 	"github.com/sha1n/bert/api"
 	"github.com/sha1n/bert/pkg"
+	"github.com/sha1n/clib/pkg/test"
 	clibtest "github.com/sha1n/clib/pkg/test"
 	"github.com/stretchr/testify/assert"
 )
@@ -74,7 +75,7 @@ func generateTestMdReport(t *testing.T, includeHeaders bool) ([]string, api.Summ
 
 func aTwoScenarioSpec() api.BenchmarkSpec {
 	return api.BenchmarkSpec{
-		Executions: 1,
+		Executions: int(test.RandomUint()),
 		Scenarios: []api.ScenarioSpec{
 			{
 				Name: clibtest.RandomString(),

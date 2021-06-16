@@ -43,6 +43,8 @@ const (
 	ArgValueReportFormatTxt = "txt"
 	// ArgValueReportFormatCsv : CSV report format arg value
 	ArgValueReportFormatCsv = "csv"
+	// ArgValueReportFormatJSON : JSON report format arg value
+	ArgValueReportFormatJSON = "json"
 	// ArgValueReportFormatCsvRaw : CSV raw data report format value
 	ArgValueReportFormatCsvRaw = "csv/raw"
 	// ArgValueReportFormatMarkdown : Markdown report format arg value
