@@ -31,7 +31,7 @@ PID := $(GOBUILD)/.$(PROJECTNAME).pid
 # Make is verbose in Linux. Make it silent.
 MAKEFLAGS += --silent
 
-default: install lint format test compile
+default: install lint format test build
 
 install: go-get
 
