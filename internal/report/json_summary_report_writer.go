@@ -81,8 +81,8 @@ type jsonSummaryReportRecord struct {
 	Mean       *int64    `json:"mean,omitempty"`
 	Stddev     *int64    `json:"stddev,omitempty"`
 	Median     *int64    `json:"median,omitempty"`
-	P90        *int64    `json:"p_90,omitempty"`
+	P90        *int64    `json:"p90,omitempty"`
 	User       *int64    `json:"user,omitempty"`
 	System     *int64    `json:"system,omitempty"`
-	ErrorRate  *float64  `json:"error_rate,omitempty"`
+	ErrorRate  *float64  `json:"errorRate,omitempty"`
 }

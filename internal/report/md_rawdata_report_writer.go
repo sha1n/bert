@@ -33,7 +33,7 @@ func NewMarkdownStreamReportWriter(writer io.Writer, ctx api.ReportContext) RawD
 
 // Handle handles a real time trace event
 func (rw MarkdownStreamReportWriter) Handle(trace api.Trace) (err error) {
-	timeStr := time.Now().Format("2006-01-02T15:04:05Z07:00")
+	timeStr := FormatDateTime(time.Now(), rw.ctx)
 	err = rw.writer.WriteRow([]string{
 		timeStr,
 		trace.ID(),
