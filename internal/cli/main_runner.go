@@ -60,10 +60,11 @@ when specified with a configuration file, this argument has priority.`)
 	rootCmd.Flags().StringP(ArgNameOutputFile, "o", "", `output file path. Optional. Writes to stdout by default.`)
 	rootCmd.Flags().StringP(ArgNameFormat, "f", "txt", `summary format. One of: 'txt', 'md', 'md/raw', 'csv', 'csv/raw'
 txt     - plain text. designed to be used in your terminal.
+json    - JSON document. each object represents a scenario and contains calculated stats for that scenario.
+csv     - CSV document. each row represents a scenario and contains calculated stats for that scenario.
+csv/raw - CSV document in which each row represents a raw trace event. useful if you want to import to a spreadsheet for further analysis.
 md      - markdown table. similar to CSV but writes in markdown table format.
-md/raw  - markdown table in which each row represents a raw trace event.
-csv     - CSV in which each row represents a scenario and contains calculated stats for that scenario.
-csv/raw - CSV in which each row represents a raw trace event. useful if you want to import to a spreadsheet for further analysis.`,
+md/raw  - markdown table in which each row represents a raw trace event.`,
 	)
 	rootCmd.Flags().StringSliceP(ArgNameLabel, "l", []string{}, `labels to attach to be included in the benchmark report.`)
 	rootCmd.Flags().Bool(ArgNameHeaders, true, `in tabular formats, whether to include headers in the report.`)
@@ -77,9 +78,8 @@ csv/raw - CSV in which each row represents a raw trace event. useful if you want
 
 	rootCmd.PersistentFlags().StringSlice(ArgNameExperimental, []string{}, `enables a named experimental features.`)
 
-	// _ = rootCmd.MarkFlagRequired(ArgNameConfig)
 	_ = rootCmd.MarkFlagFilename(ArgNameConfig, "yml", "yaml", "json")
-	_ = rootCmd.MarkFlagFilename(ArgNameOutputFile, "txt", "csv", "md")
+	_ = rootCmd.MarkFlagFilename(ArgNameOutputFile, "txt", "csv", "md", "json")
 
 	rootCmd.SetVersionTemplate(`{{printf "%s" .Version}}`)
 	rootCmd.SetUsageTemplate(rootCmd.UsageTemplate() + bert)
@@ -181,6 +181,9 @@ func resolveReportHandler(cmd *cobra.Command, spec api.BenchmarkSpec, ctx api.IO
 
 	case ArgValueReportFormatCsv:
 		handler = pkg.NewSummaryReportHandler(spec, reportCtx, report.NewCsvReportWriter(writer))
+
+	case ArgValueReportFormatJSON:
+		handler = pkg.NewSummaryReportHandler(spec, reportCtx, report.NewJSONReportWriter(writer))
 
 	case ArgValueReportFormatTxt:
 		var colorsOn = false
