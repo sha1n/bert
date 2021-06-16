@@ -23,6 +23,7 @@
     - [Understanding User & System Time Measurements](#understanding-user--system-time-measurements)
     - [Examples](#examples)
       - [Text Example](#text-example)
+      - [JSON Example](#json-example)
       - [CSV Example](#csv-example)
       - [Markdown Example](#markdown-example)
       - [Raw CSV Example](#raw-csv-example)
@@ -44,7 +45,7 @@
 - Accumulate results for different runs and compare them later
 - Set the number of times every scenario is executed
 - Choose between alternate executions and sequential execution of the same command
-- Save results in `txt`, `csv`, `csv/raw`, `md` and `md/raw` formats
+- Save results in `txt`, `json`, `csv`, `csv/raw`, `md` and `md/raw` formats
 - Control your benchmark environment
   - Set optional working directory per scenario and/or command 
   - Set optional custom environment variables per scenario
@@ -105,9 +106,12 @@ bert -c benchmark-config.yml
 
 ## Reports
 ### Report Formats
-There are three supported report formats, two of them support `raw` mode as follows. The formats are `txt`, `csv`, `csv/raw`, `md` and `md/raw`. `txt` is the default format and is primarily designed to be used in a terminal. `csv` is especially useful when you want to accumulate stats from multiple benchmarks in a standard convenient format. In which case you can combine the `csv` format with `-o` and possibly `--header=false` if you want to accumulate data from separate runs in one file. 
-`csv/raw` is streaming raw trace events as CSV records and is useful if you want to load that data into a spreadsheet or other tools for further analysis.
-`md` and `md/raw` and similar to `csv` and `csv/raw` respectively, but write in Markdown table format.
+There are three supported report formats, two of them support `raw` mode as follows. The formats are `txt`, `json`, `csv`, `csv/raw`, `md` and `md/raw`. 
+- `txt` is the default report format. It contains stats per scenario and a header section that describes the main characteristics of the benchmark. `txt` format is primarily designed to be used in a terminal.
+- `json` contains the same stats as `txt` does, minus the header section and is formatted as a JSON document. JSON is a very popular data representation format amongst programming languages and web applications particularly. This format is designed to help integrate `bert` reported data with other programs.
+- `csv` contains the same stats in CSV format. It is especially useful when you want to accumulate stats from multiple benchmarks in a standard convenient format. In which case you can combine the `csv` format with `-o` and possibly `--header=false` if you want to accumulate data from separate runs in one file. 
+- `csv/raw` is streaming raw trace events as CSV records and is useful if you want to load that data into a spreadsheet or other tools for further analysis.
+- `md` and `md/raw` and similar to `csv` and `csv/raw` respectively, but write in Markdown table format.
 
 **Selecting Report Format:**
 ```bash
@@ -188,6 +192,41 @@ The `user` and `system` values are the calculated *mean* of measured user and sy
        user: 539.9µs     system: 1.2ms       errors: 0%
 
 ---------------------------------------------------------------
+```
+
+#### JSON Example
+```json
+{
+	"records": [{
+		"timestamp": "2021-06-16T20:13:07.946273Z",
+		"name": "scenario A",
+		"executions": 10,
+		"labels": ["example-label"],
+		"min": 1003598013,
+		"max": 1008893354,
+		"mean": 1006113519,
+		"stddev": 1638733,
+		"median": 1005970135,
+		"p90": 1008442779,
+		"user": 516700,
+		"system": 1101100,
+		"errorRate": 0
+	}, {
+		"timestamp": "2021-06-16T20:13:07.946273Z",
+		"name": "scenario B",
+		"executions": 10,
+		"labels": ["example-label"],
+		"min": 3244148,
+		"max": 3907661,
+		"mean": 3717243,
+		"stddev": 190237,
+		"median": 3795931,
+		"p90": 3863124,
+		"user": 544600,
+		"system": 1188500,
+		"errorRate": 0
+	}]
+}
 ```
 
 #### CSV Example
