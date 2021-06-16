@@ -45,7 +45,7 @@ func TestWrite(t *testing.T) {
 		allRecords[0],
 	)
 
-	expectedTimestamp := summary.Time().Format("2006-01-02T15:04:05Z07:00")
+	expectedTimestamp := summary.Time().Format(time.RFC3339)
 
 	assertRecord(t, scenario1, summary, expectedTimestamp, allRecords[1])
 	assertRecord(t, scenario2, summary, expectedTimestamp, allRecords[2])
@@ -74,7 +74,7 @@ func TestWriteWithNoHeaders(t *testing.T) {
 
 	assert.Equal(t, 2, len(allRecords))
 
-	expectedTimestamp := summary.Time().Format("2006-01-02T15:04:05Z07:00")
+	expectedTimestamp := summary.Time().Format(time.RFC3339)
 
 	assertRecord(t, scenario1, summary, expectedTimestamp, allRecords[0])
 	assertRecord(t, scenario2, summary, expectedTimestamp, allRecords[1])
@@ -119,6 +119,7 @@ func writeCsvReport(t *testing.T, summary api.Summary, includeHeaders bool) [][]
 			api.ReportContext{
 				Labels:         randomLabels,
 				IncludeHeaders: includeHeaders,
+				UTCDate:        false,
 			}),
 	)
 

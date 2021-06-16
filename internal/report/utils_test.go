@@ -4,7 +4,11 @@ import (
 	"errors"
 	"testing"
 	"time"
+
+	"github.com/sha1n/bert/api"
 )
+
+var now = time.Now()
 
 func TestFormatReportFloat3(t *testing.T) {
 	tests := []struct {
@@ -60,6 +64,72 @@ func TestFormatReportNanosInSecPrecision3(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := FormatReportDuration(tt.f); got != tt.want {
 				t.Errorf("FormatReportNanosAsSec3() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestFormatDateTime(t *testing.T) {
+	type args struct {
+		t   time.Time
+		ctx api.ReportContext
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{name: "utc", args: args{t: now, ctx: api.ReportContext{UTCDate: true}}, want: now.UTC().Format(time.RFC3339)},
+		{name: "non-utc", args: args{t: now, ctx: api.ReportContext{UTCDate: false}}, want: now.Format(time.RFC3339)},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := FormatDateTime(tt.args.t, tt.args.ctx); got != tt.want {
+				t.Errorf("FormatDateTime() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestFormatDate(t *testing.T) {
+	type args struct {
+		t   time.Time
+		ctx api.ReportContext
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{name: "utc", args: args{t: now, ctx: api.ReportContext{UTCDate: true}}, want: now.UTC().Format("Jan 02 2006")},
+		{name: "non-utc", args: args{t: now, ctx: api.ReportContext{UTCDate: false}}, want: now.Format("Jan 02 2006")},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := FormatDate(tt.args.t, tt.args.ctx); got != tt.want {
+				t.Errorf("FormatDate() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestFormatTime(t *testing.T) {
+	type args struct {
+		t   time.Time
+		ctx api.ReportContext
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{name: "utc", args: args{t: now, ctx: api.ReportContext{UTCDate: true}}, want: now.UTC().Format("15:04:05")},
+		{name: "non-utc", args: args{t: now, ctx: api.ReportContext{UTCDate: false}}, want: now.Format("15:04:05")},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := FormatTime(tt.args.t, tt.args.ctx); got != tt.want {
+				t.Errorf("FormatTime() = %v, want %v", got, tt.want)
 			}
 		})
 	}

@@ -39,6 +39,8 @@ const (
 	// ArgNameHeaders : program arg name
 	ArgNameHeaders = "headers"
 
+	// ArgReportUTCDate : specifies that reports should report UTC time
+	ArgReportUTCDate = "utc-date"
 	// ArgValueReportFormatTxt : Plain text report format arg value
 	ArgValueReportFormatTxt = "txt"
 	// ArgValueReportFormatCsv : CSV report format arg value
