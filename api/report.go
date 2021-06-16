@@ -4,6 +4,7 @@ package api
 type ReportContext struct {
 	Labels         []string
 	IncludeHeaders bool
+	UTCDate        bool
 }
 
 // WriteSummaryReportFn a benchmark report handler

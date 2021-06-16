@@ -24,7 +24,7 @@ type ParseRecords = func(io.Reader) ([][]string, error)
 func assertRawTraceRecord(t *testing.T, trace api.Trace, actualRecord []string) {
 	expectedLabels := strings.Join(randomLabels, ",")
 
-	_, err := time.Parse(TabularReportDateFormat, actualRecord[0])
+	_, err := time.Parse(time.RFC3339, actualRecord[0])
 	assert.NoError(t, err)
 	assert.Equal(t, trace.ID(), actualRecord[1])
 	assert.Equal(t, expectedLabels, actualRecord[2])

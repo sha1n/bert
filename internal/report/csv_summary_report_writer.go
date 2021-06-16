@@ -34,7 +34,7 @@ func (rw csvReportWriter) Write(summary api.Summary, config api.BenchmarkSpec, c
 		}
 	}
 
-	timeStr := summary.Time().Format("2006-01-02T15:04:05Z07:00")
+	timeStr := FormatDateTime(summary.Time(), ctx)
 	sortedIds := GetSortedScenarioIds(summary)
 
 	for _, id := range sortedIds {

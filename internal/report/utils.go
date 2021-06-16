@@ -8,9 +8,6 @@ import (
 	"github.com/sha1n/bert/api"
 )
 
-// TabularReportDateFormat ...
-const TabularReportDateFormat = "2006-01-02T15:04:05Z07:00"
-
 // ReportErrorValue ...
 const ReportErrorValue = "ERR"
 
@@ -94,4 +91,31 @@ func FormatReportFloatAsRateInPercents(f func() float64) string {
 	errorRate := int(value * 100)
 
 	return fmt.Sprintf("%d%%", errorRate)
+}
+
+// FormatDateTime formats the specified time using RFC3339 format.
+func FormatDateTime(t time.Time, ctx api.ReportContext) string {
+	if ctx.UTCDate {
+		t = t.UTC()
+	}
+
+	return t.Format(time.RFC3339)
+}
+
+// FormatDate formats the specified time using RFC3339 format.
+func FormatDate(t time.Time, ctx api.ReportContext) string {
+	if ctx.UTCDate {
+		t = t.UTC()
+	}
+
+	return t.Format("Jan 02 2006")
+}
+
+// FormatTime formats the specified time using RFC3339 format.
+func FormatTime(t time.Time, ctx api.ReportContext) string {
+	if ctx.UTCDate {
+		t = t.UTC()
+	}
+
+	return t.Format("15:04:05")
 }

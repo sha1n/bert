@@ -68,10 +68,11 @@ md/raw  - markdown table in which each row represents a raw trace event.`,
 	)
 	rootCmd.Flags().StringSliceP(ArgNameLabel, "l", []string{}, `labels to attach to be included in the benchmark report.`)
 	rootCmd.Flags().Bool(ArgNameHeaders, true, `in tabular formats, whether to include headers in the report.`)
+	rootCmd.Flags().Bool(ArgReportUTCDate, false, `whether to use UTC date.`)
 
 	// Stdout
-	rootCmd.Flags().BoolP(ArgNamePipeStdout, "", false, `pipes external commands standard out to bert's standard out.`)
-	rootCmd.Flags().BoolP(ArgNamePipeStderr, "", false, `pipes external commands standard error to bert's standard error.`)
+	rootCmd.Flags().Bool(ArgNamePipeStdout, false, `pipes external commands standard out to bert's standard out.`)
+	rootCmd.Flags().Bool(ArgNamePipeStderr, false, `pipes external commands standard error to bert's standard error.`)
 
 	rootCmd.PersistentFlags().BoolP(ArgNameDebug, "d", false, `runs the program in debug mode.`)
 	rootCmd.PersistentFlags().BoolP(ArgNameSilent, "s", false, `logs only fatal errors.`)
@@ -204,6 +205,7 @@ func resolveReportContext(cmd *cobra.Command) api.ReportContext {
 	return api.ReportContext{
 		Labels:         GetStringSlice(cmd, ArgNameLabel),
 		IncludeHeaders: GetBool(cmd, ArgNameHeaders),
+		UTCDate:        GetBool(cmd, ArgReportUTCDate),
 	}
 }
 

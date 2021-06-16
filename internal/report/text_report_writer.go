@@ -75,8 +75,8 @@ func (trw textReportWriter) Write(summary api.Summary, config api.BenchmarkSpec,
 	trw.writeNewLine()
 	trw.writeTitle(" BENCHMARK SUMMARY")
 	trw.writeLabels(ctx.Labels)
-	trw.writeDate(summary.Time())
-	trw.writeTime(summary.Time())
+	trw.writeDate(summary.Time(), ctx)
+	trw.writeTime(summary.Time(), ctx)
 	trw.writeInt64StatLine("scenarios", func() (int64, error) { return int64(len(config.Scenarios)), nil })
 	trw.writeInt64StatLine("executions", func() (int64, error) { return int64(config.Executions), nil })
 	trw.writePropertyLine("alternate", config.Alternate)
@@ -135,12 +135,12 @@ func (trw textReportWriter) writeLabels(labels []string) {
 	trw.writePropertyLine("labels", strings.Join(labels, ","))
 }
 
-func (trw textReportWriter) writeDate(time time.Time) {
-	trw.writePropertyLine("date", time.Format("Jan 02 2006"))
+func (trw textReportWriter) writeDate(time time.Time, ctx api.ReportContext) {
+	trw.writePropertyLine("date", FormatDate(time, ctx))
 }
 
-func (trw textReportWriter) writeTime(time time.Time) {
-	trw.writePropertyLine("time", time.Format("15:04:05Z07:00"))
+func (trw textReportWriter) writeTime(time time.Time, ctx api.ReportContext) {
+	trw.writePropertyLine("time", FormatTime(time, ctx))
 }
 
 func (trw textReportWriter) writeDurationProperty(name string, c *color.Color, f func() (time.Duration, error)) {

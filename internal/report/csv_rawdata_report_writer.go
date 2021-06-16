@@ -45,7 +45,7 @@ func (rw CsvStreamReportWriter) writeHeaders() (err error) {
 func (rw CsvStreamReportWriter) Handle(trace api.Trace) (err error) {
 	defer rw.writer.Flush()
 
-	timeStr := time.Now().Format(TabularReportDateFormat)
+	timeStr := FormatDateTime(time.Now(), rw.ctx)
 	err = rw.writer.Write([]string{
 		timeStr,
 		trace.ID(),
