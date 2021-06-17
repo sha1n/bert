@@ -6,6 +6,8 @@ PROJECTNAME := "bert"
 PROGRAMNAME := $(PROJECTNAME)
 
 # Go related variables.
+GOHOSTOS := $(shell go env GOHOSTOS)
+GOHOSTARCH := $(shell go env GOHOSTARCH)
 GOBASE := $(shell pwd)
 GOBIN := $(GOBASE)/bin
 GOBUILD := $(GOBASE)/build
@@ -61,6 +63,10 @@ go-lint:
 go-format:
 	@echo "  >  Formating source files..."
 	gofmt -s -w $(GOFILES)
+
+go-build-current:
+	@echo "  >  Building $(GOHOSTOS)/$(GOHOSTARCH) binaries..."
+	@GOPATH=$(GOPATH) GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOBIN=$(GOBIN) go build $(MODFLAGS) $(LDFLAGS) -o $(GOBIN)/$(PROGRAMNAME) $(GOBASE)/cmd
 
 go-build: go-get go-build-linux-amd64 go-build-linux-arm64 go-build-linux-arm go-build-darwin-amd64 go-build-darwin-arm64 go-build-windows-amd64 go-build-windows-arm
 
