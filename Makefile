@@ -1,6 +1,8 @@
+ifndef VERSION
 # Set VERSION to the latest version tag name. Assuming version tags are formatted 'v*'
 VERSION := $(shell git describe --always --abbrev=0 --tags --match "v*" $(git rev-list --tags --max-count=1))
 BUILD := $(shell git rev-parse $(VERSION))
+endif
 PROJECTNAME := "bert"
 # We pass that to the main module to generate the correct help text
 PROGRAMNAME := $(PROJECTNAME)
