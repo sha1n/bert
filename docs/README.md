@@ -11,6 +11,7 @@
 - [Bert](#bert)
   - [Overview](#overview)
   - [Installation](#installation)
+    - [Install From a Homebrew Tap](#install-from-a-homebrew-tap)
     - [Download A Pre-Built Release](#download-a-pre-built-release)
     - [Build From Sources](#build-from-sources)
   - [Usage](#usage)
@@ -54,6 +55,15 @@
 - Constant progress indication
 
 ## Installation
+### Install From a Homebrew Tap
+```bash
+# Tap the formula repository (https://docs.brew.sh/Taps)
+brew tap sha1n/tap
+
+# Install bert
+brew install sha1n/tap/bert
+```
+
 ### Download A Pre-Built Release
 Download the appropriate binary and put it in your `PATH`.
 
