@@ -1,5 +1,3 @@
-# This is an example .goreleaser.yml file with some sane defaults.
-# Make sure to check the documentation at http://goreleaser.com
 before:
   hooks:
     - go mod download
@@ -42,8 +40,8 @@ brews:
       owner: sha1n
       name: homebrew-tap
 
-    url_template: "http://github.com/sha1n/bert/releases/{{ .Tag }}/{{ .ArtifactName }}"
-    download_strategy: CurlDownloadStrategy.
+    url_template: "https://github.com/sha1n/bert/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+    download_strategy: CurlDownloadStrategy
     commit_author:
       name: goreleaserbot
       email: goreleaser@carlosbecker.com
@@ -53,10 +51,9 @@ brews:
     homepage: "https://sha1n.github.io/bert/"
     description: "CLI benchmarking tool"
     license: "MIT"
+
     test: |
       system "#{bin}/{{ .ProjectName }} --version"
 
-    # Custom install script for brew.
-    # Default is 'bin.install "program"'.
     install: |
       bin.install "{{ .ProjectName }}"
