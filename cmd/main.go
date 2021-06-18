@@ -32,6 +32,8 @@ var (
 	Build string
 	// Version : passed from build environment
 	Version string
+	// DisableUpdate : passed from build environment to specify that self-update should be disabled
+	DisableUpdate string
 )
 
 func main() {
@@ -46,7 +48,9 @@ func doRun(exitFn func(int)) {
 
 	// Subcommands
 	rootCmd.AddCommand(cli.CreateConfigCommand(ctx))
-	rootCmd.AddCommand(cli.CreateUpdateCommand(Version, ProgramName, ctx))
+	if DisableUpdate != "true" {
+		rootCmd.AddCommand(cli.CreateUpdateCommand(Version, ProgramName, ctx))
+	}
 
 	if err := rootCmd.Execute(); err != nil {
 		doExit(1)
