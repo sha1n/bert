@@ -62,6 +62,9 @@ brew tap sha1n/tap
 
 # Install bert
 brew install sha1n/tap/bert
+
+# Update bert
+brew upgrade bert
 ```
 
 ### Download A Pre-Built Release
@@ -71,7 +74,7 @@ Download the appropriate binary and put it in your `PATH`.
 # macOS Example (assuming that '$HOME/.local/bin' is in your PATH):
 curl -sSL https://github.com/sha1n/bert/releases/latest/download/bert-darwin-amd64 -o "$HOME/.local/bin/bert"
 
-# once you have it, you can update using the update command
+# Once installed, you can update using the update command (this doesn't work when installing using Homebrew)
 bert update
 ```
 
