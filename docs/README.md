@@ -153,7 +153,7 @@ Sometimes what you really want to measure is the impact of environmental changes
 ### Understanding User & System Time Measurements
 The `user` and `system` values are the calculated *mean* of measured user and system CPU time. It is important to understand that each measurement is the *sum* of the CPU times measured on all CPU cores and therefore can measure higher than perceived time measurements (min, max, mean, median, p90). The following report shows the measurements of two `go test` commands, one executed with `-p 1` which limits concurrency to `1` and the other with automatic parallelism. Notice how close the `user` and `system` metrics are and how they compare to the other metrics.
 
-```
+```bash
  BENCHMARK SUMMARY
      labels:
        date: Jun 15 2021
@@ -181,7 +181,7 @@ The `user` and `system` values are the calculated *mean* of measured user and sy
 
 ### Examples
 #### Text Example
-```
+```bash
  BENCHMARK SUMMARY
      labels: example-label
        date: Jun 12 2021
@@ -251,7 +251,7 @@ Timestamp,Scenario,Samples,Labels,Min,Max,Mean,Median,Percentile 90,StdDev,Error
 ```
 
 #### Markdown Example
-```
+```bash
 | Timestamp                 | Scenario   | Samples | Labels        | Min   | Max   | Mean  | Median | Percentile 90 | StdDev  | Errors |
 | ------------------------- | ---------- | ------- | ------------- | ----- | ----- | ----- | ------ | ------------- | ------- | ------ |
 | 2021-06-10T16:22:26+03:00 | scenario A | 10      | example-label | 1.0s  | 1.0s  | 1.0s  | 1.0s   | 1.0s          | 1.0ms   | 0%     |
