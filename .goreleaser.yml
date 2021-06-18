@@ -1,0 +1,62 @@
+# This is an example .goreleaser.yml file with some sane defaults.
+# Make sure to check the documentation at http://goreleaser.com
+before:
+  hooks:
+    - go mod download
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm
+      - arm64
+    ldflags:
+      - -s -w -X main.Version={{.Version}} -X main.Build={{.Commit}} -X main.ProgramName={{.ProjectName}}
+    main: ./cmd/main.go
+archives:
+  - replacements:
+      darwin: Darwin
+      linux: Linux
+      386: i386
+      amd64: x86_64
+checksum:
+  name_template: "{{ .ProjectName }}_checksums.txt"
+  algorithm: sha256
+snapshot:
+  name_template: "{{ .Tag }}"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+brews:
+  - name: "{{ .ProjectName }}"
+    goarm: 6
+
+    tap:
+      owner: sha1n
+      name: homebrew-tap
+
+    url_template: "http://github.com/sha1n/bert/releases/{{ .Tag }}/{{ .ArtifactName }}"
+    download_strategy: CurlDownloadStrategy.
+    commit_author:
+      name: goreleaserbot
+      email: goreleaser@carlosbecker.com
+
+    folder: Formula
+
+    homepage: "https://sha1n.github.io/bert/"
+    description: "CLI benchmarking tool"
+    license: "MIT"
+    test: |
+      system "#{bin}/{{ .ProjectName }} --version"
+
+    # Custom install script for brew.
+    # Default is 'bin.install "program"'.
+    install: |
+      bin.install "{{ .ProjectName }}"
