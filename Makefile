@@ -24,7 +24,7 @@ GOARCH_ARM := "arm"
 MODFLAGS=-mod=readonly
 
 # Use linker flags to provide version/build settings
-LDFLAGS=-ldflags "-X=main.Version=$(VERSION) -X=main.Build=$(BUILD) -X=main.ProgramName=$(PROGRAMNAME)"
+LDFLAGS=-ldflags "-w -s -X=main.Version=$(VERSION) -X=main.Build=$(BUILD) -X=main.ProgramName=$(PROGRAMNAME)"
 
 # Redirect error output to a file, so we can show it in development mode.
 STDERR := $(GOBUILD)/.$(PROJECTNAME)-stderr.txt
@@ -141,6 +141,13 @@ run-linux-dockerized-tests:
 	@echo "  >  Running with ad-hoc commands..."
 	docker run --rm -ti sha1n/bert /bert/bin/bert-linux-amd64 'ls' 'ls -laH' --executions 10
 
+release:
+ifdef GITHUB_TOKEN
+	@echo "  >  Releasing..."
+	goreleaser release --rm-dist
+else
+	$(error GITHUB_TOKEN is not set)
+endif
 
 .PHONY: help
 all: help
