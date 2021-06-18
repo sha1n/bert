@@ -13,15 +13,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Extract branch
-        id: vars
-        shell: bash
-        run: |
-          echo "##[set-output name=BRANCH;]$(echo ${GITHUB_REF#refs/heads/})"
       - name: Checkout
         uses: actions/checkout@v2
-        with:
-          refs: ${{ steps.vars.outputs.BRANCH }}
+      - run: |-
+          git fetch --all
+          git checkout ${{ github.event.pull_request.head.ref }}
+          #git pull origin ${{ github.event.pull_request.head.ref }}
       - name: Sync README
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -36,12 +33,14 @@ jobs:
           sed -i 's/href="docs\//href="/g' docs/README.md
           sed -i 's/href="\/docs\//href="\//g' docs/README.md
       - name: Commit and push if README changed
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |-
           git diff
           git config --global user.email "housekeeping@example.com"
           git config --global user.name "housekeeping-bot"
           git diff --quiet || (git add docs/README.md && git commit -m "Synced README")
-          git push origin ${{ steps.vars.outputs.BRANCH }}
+          git push -u origin ${{ github.event.pull_request.head.ref }}
       # - name: Create Pull Request
       #   id: PR
       #   uses: peter-evans/create-pull-request@v3
