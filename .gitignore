@@ -7,3 +7,5 @@ no.go
 
 .vagrant
 .vm_config.json
+
+dist/
