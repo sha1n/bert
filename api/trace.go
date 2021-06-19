@@ -3,7 +3,7 @@ package api
 import "time"
 
 // End ends a trace
-type End = func(ExecutionInfo, error)
+type End = func(*ExecutionInfo, error)
 
 // ID ...
 type ID = string

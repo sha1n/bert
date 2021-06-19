@@ -60,7 +60,7 @@ func (tr *tracer) Start(i api.Identifiable) api.End {
 }
 
 func (tr *tracer) endFn(t trace) api.End {
-	return func(execInfo api.ExecutionInfo, exitError error) {
+	return func(execInfo *api.ExecutionInfo, exitError error) {
 		t.perceivedTime = time.Since(t.startTime)
 		t.usrTime, t.sysTime = execInfo.UserTime, execInfo.SystemTime
 		t.error = exitError
