@@ -18,12 +18,10 @@ func TestRegisterInterruptGuard(t *testing.T) {
 	assert.Eventually(t, func() bool { return <-call }, time.Second*10, time.Millisecond)
 }
 
-func TestRegisterInterruptGuardCancellation(t *testing.T) {
+func TestRegisterInterruptGuardCancellationChannelBehaviour(t *testing.T) {
 	cancel, c := registerInterruptGuard(func(s os.Signal) {})
 	cancel()
 
-	assert.Panics(t, func() {
-		c <- os.Interrupt // this should fail panic because the channel is closed
-	})
+	c <- os.Interrupt // this should not fail if the channel is buffered as it should be
 
 }
