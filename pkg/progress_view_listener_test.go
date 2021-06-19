@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/sha1n/bert/api"
-	clibtest "github.com/sha1n/clib/pkg/test"
+	gommonstest "github.com/sha1n/gommons/pkg/test"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -22,7 +22,7 @@ func TestProgressViewOutput(t *testing.T) {
 	spec := aBasicSpecWith(true, 2)
 	scenarioID := spec.Scenarios[0].ID()
 
-	errorMessage := clibtest.RandomString()
+	errorMessage := gommonstest.RandomString()
 
 	progView := NewProgressView(spec, fakeTermDimensions, ctx).(*ProgressView)
 

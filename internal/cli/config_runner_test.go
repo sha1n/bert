@@ -10,19 +10,19 @@ import (
 
 	"github.com/sha1n/bert/api"
 	"github.com/sha1n/bert/pkg"
-	clibtest "github.com/sha1n/clib/pkg/test"
+	gommonstest "github.com/sha1n/gommons/pkg/test"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 )
 
 var (
-	userInputExecutions          = clibtest.RandomUint()
-	userInputAlternate           = clibtest.RandomBool()
-	userInputScenarioName        = clibtest.RandomString()
+	userInputExecutions          = gommonstest.RandomUint()
+	userInputAlternate           = gommonstest.RandomBool()
+	userInputScenarioName        = gommonstest.RandomString()
 	userInputScenarioWorkingDir  = os.TempDir() // has to exist
 	userInputDefineEnvVarsAnswer = "y"
-	userInputEnvVarValue         = fmt.Sprintf("X=%s", clibtest.RandomString())
-	userInputCommand             = fmt.Sprintf("cmd %s", clibtest.RandomString())
+	userInputEnvVarValue         = fmt.Sprintf("X=%s", gommonstest.RandomString())
+	userInputCommand             = fmt.Sprintf("cmd %s", gommonstest.RandomString())
 )
 
 func TestBasicInteractiveFlow(t *testing.T) {
@@ -74,7 +74,7 @@ func TestExampleOutFile(t *testing.T) {
 }
 
 func configureExampleCommand(t *testing.T, ctx api.IOContext) (rootCmd *cobra.Command) {
-	rootCmd = NewRootCommand(clibtest.RandomString(), clibtest.RandomString(), clibtest.RandomString(), ctx)
+	rootCmd = NewRootCommand(gommonstest.RandomString(), gommonstest.RandomString(), gommonstest.RandomString(), ctx)
 	configCmd := CreateConfigCommand(ctx)
 	rootCmd.AddCommand(configCmd)
 
@@ -84,7 +84,7 @@ func configureExampleCommand(t *testing.T, ctx api.IOContext) (rootCmd *cobra.Co
 }
 
 func configureExampleCommandWithOutFile(t *testing.T, ctx api.IOContext) (rootCmd *cobra.Command, configPath string, teardown func()) {
-	rootCmd = NewRootCommand(clibtest.RandomString(), clibtest.RandomString(), clibtest.RandomString(), ctx)
+	rootCmd = NewRootCommand(gommonstest.RandomString(), gommonstest.RandomString(), gommonstest.RandomString(), ctx)
 	configCmd := CreateConfigCommand(ctx)
 	rootCmd.AddCommand(configCmd)
 
@@ -101,7 +101,7 @@ func configureExampleCommandWithOutFile(t *testing.T, ctx api.IOContext) (rootCm
 }
 
 func configureCommand(t *testing.T, ctx api.IOContext) (rootCmd *cobra.Command, configPath string, teardown func()) {
-	rootCmd = NewRootCommand(clibtest.RandomString(), clibtest.RandomString(), clibtest.RandomString(), ctx)
+	rootCmd = NewRootCommand(gommonstest.RandomString(), gommonstest.RandomString(), gommonstest.RandomString(), ctx)
 	cmd := CreateConfigCommand(ctx)
 	rootCmd.AddCommand(cmd)
 

@@ -8,8 +8,8 @@ import (
 
 	"github.com/sha1n/bert/api"
 	"github.com/sha1n/bert/pkg"
-	"github.com/sha1n/clib/pkg/test"
-	clibtest "github.com/sha1n/clib/pkg/test"
+	"github.com/sha1n/gommons/pkg/test"
+	gommonstest "github.com/sha1n/gommons/pkg/test"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -59,7 +59,7 @@ func generateTestMdReport(t *testing.T, includeHeaders bool) ([]string, api.Summ
 
 	summary := pkg.NewFakeSummary(t1, t2)
 	ctx := api.ReportContext{
-		Labels:         clibtest.RandomStrings(),
+		Labels:         gommonstest.RandomStrings(),
 		IncludeHeaders: includeHeaders,
 	}
 
@@ -78,13 +78,13 @@ func aTwoScenarioSpec() api.BenchmarkSpec {
 		Executions: int(test.RandomUint()),
 		Scenarios: []api.ScenarioSpec{
 			{
-				Name: clibtest.RandomString(),
+				Name: gommonstest.RandomString(),
 				Command: &api.CommandSpec{
 					Cmd: []string{"cmd"},
 				},
 			},
 			{
-				Name: clibtest.RandomString(),
+				Name: gommonstest.RandomString(),
 				Command: &api.CommandSpec{
 					Cmd: []string{"cmd"},
 				},

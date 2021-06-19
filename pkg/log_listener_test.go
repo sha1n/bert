@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/sha1n/clib/pkg/test"
+	"github.com/sha1n/gommons/pkg/test"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
