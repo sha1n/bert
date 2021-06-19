@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"runtime"
 	"strings"
 	"time"
 
@@ -101,10 +100,8 @@ func (trw textReportWriter) Write(summary api.Summary, config api.BenchmarkSpec,
 		trw.writeDurationProperty("p90", trw.red, func() (time.Duration, error) { return stats.Percentile(90) })
 		trw.writeNewLine()
 
-		if runtime.GOOS != "windows" {
-			trw.writeDurationProperty("user", trw.hiblue, userStats.Mean)
-			trw.writeDurationProperty("system", trw.hiblue, sysStats.Mean)
-		}
+		trw.writeDurationProperty("user", trw.hiblue, userStats.Mean)
+		trw.writeDurationProperty("system", trw.hiblue, sysStats.Mean)
 		trw.writeErrorRateStat("errors", stats.ErrorRate)
 
 		trw.writeNewLine()
