@@ -27,5 +27,5 @@ func (ce *CmdRecordingExecutor) ExecuteFn(
 		Env:               env,
 	})
 
-	return func() (api.ExecutionInfo, error) { return api.ExecutionInfo{}, nil }
+	return func() (*api.ExecutionInfo, error) { return &api.ExecutionInfo{}, nil }
 }

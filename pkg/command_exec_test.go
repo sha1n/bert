@@ -93,8 +93,23 @@ func TestExecCommandFnWithNonExistingCommand(t *testing.T) {
 
 	execFn := executor.ExecuteFn(spec, "", nil)
 
-	_, err := execFn()
+	execInfo, err := execFn()
 	assert.Error(t, err)
+	assert.Nil(t, execInfo)
+}
+
+func TestExecCommandFnWithExistingCommandExitError(t *testing.T) {
+	spec := aCommandSpec([]string{"go", "away"}, "")
+	executor := NewCommandExecutor(false, false).(*commandExecutor)
+
+	execFn := executor.ExecuteFn(spec, "", nil)
+
+	execInfo, err := execFn()
+	assert.Error(t, err)
+	assert.Equal(t, 2, execInfo.ExitCode)
+	assert.GreaterOrEqual(t, execInfo.PerceivedTime, time.Nanosecond*0)
+	assert.GreaterOrEqual(t, execInfo.UserTime, time.Nanosecond*0)
+	assert.GreaterOrEqual(t, execInfo.SystemTime, time.Nanosecond*0)
 }
 
 func TestExecCommandFnWithExistingCommand(t *testing.T) {
@@ -106,7 +121,6 @@ func TestExecCommandFnWithExistingCommand(t *testing.T) {
 	execInfo, err := execFn()
 
 	assert.NoError(t, err)
-	assert.NoError(t, execInfo.Error)
 	assert.Equal(t, 0, execInfo.ExitCode)
 	assert.GreaterOrEqual(t, execInfo.PerceivedTime, time.Nanosecond*0)
 	assert.GreaterOrEqual(t, execInfo.UserTime, time.Nanosecond*0)

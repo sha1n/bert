@@ -31,18 +31,20 @@ func (ce *commandExecutor) ExecuteFn(cmdSpec *api.CommandSpec, defaultWorkingDir
 
 	cancel := RegisterInterruptGuard(onInterruptSignalFn(execCmd))
 
-	return func() (execInfo api.ExecutionInfo, err error) {
+	return func() (execInfo *api.ExecutionInfo, err error) {
 		defer cancel()
-		if err = execCmd.Start(); err == nil {
-			var state *os.ProcessState
-			if state, err = execCmd.Process.Wait(); err == nil {
-				execInfo.ExitCode = state.ExitCode()
-				execInfo.UserTime = state.UserTime()
-				execInfo.SystemTime = state.SystemTime()
-			} else {
-				execInfo.Error = err
+
+		err = execCmd.Run()
+		state := execCmd.ProcessState
+		if state != nil && state.Exited() {
+			execInfo = &api.ExecutionInfo{
+				ExitCode:   state.ExitCode(),
+				UserTime:   state.UserTime(),
+				SystemTime: state.SystemTime(),
 			}
+
 		}
+
 		return
 	}
 }
