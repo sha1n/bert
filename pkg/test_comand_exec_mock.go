@@ -19,7 +19,7 @@ func (ce *CmdRecordingExecutor) ExecuteFn(
 	cmdSpec *api.CommandSpec,
 	defaultWorkingDir string,
 	env map[string]string,
-) func() error {
+) api.ExecCommandFn {
 
 	ce.RecordedCommandSeq = append(ce.RecordedCommandSeq, &RecordedExecutionParams{
 		Spec:              cmdSpec,
@@ -27,5 +27,5 @@ func (ce *CmdRecordingExecutor) ExecuteFn(
 		Env:               env,
 	})
 
-	return func() error { return nil }
+	return func() (api.ExecutionInfo, error) { return api.ExecutionInfo{}, nil }
 }

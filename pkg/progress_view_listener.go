@@ -155,7 +155,7 @@ func (l *ProgressView) OnScenarioStart(id api.ID) {
 func (l *ProgressView) OnScenarioEnd(id api.ID) {
 	defer l.matrix.UpdateTerminal(true)
 	progressInfo := l.progressInfoByID[id]
-	elapsed := time.Now().Sub(progressInfo.lastStartTime)
+	elapsed := time.Since(progressInfo.lastStartTime)
 	progressInfo.mean = progressInfo.calculateNewApproxMean(elapsed)
 	progressInfo.executions++
 

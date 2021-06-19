@@ -89,7 +89,7 @@ func (l *MinimalProgressView) OnScenarioEnd(id api.ID) {
 	defer l.matrix.UpdateTerminal(true)
 
 	progressInfo := l.progressInfoByID[id]
-	elapsed := time.Now().Sub(progressInfo.lastStartTime)
+	elapsed := time.Since(progressInfo.lastStartTime)
 	progressInfo.mean = progressInfo.calculateNewApproxMean(elapsed)
 	progressInfo.executions++
 
@@ -151,7 +151,7 @@ func (eta etaInfo) update(dur time.Duration, id api.ID) {
 }
 
 func (eta etaInfo) clear() {
-	io.WriteString(eta.writer, termite.TermControlEraseLine)
+	_, _ = io.WriteString(eta.writer, termite.TermControlEraseLine)
 }
 
 func (eta etaInfo) updateString(formattedValue string) {
@@ -159,7 +159,7 @@ func (eta etaInfo) updateString(formattedValue string) {
 }
 
 func (eta etaInfo) updateStringRaw(format string, args ...interface{}) {
-	io.WriteString(eta.writer, bold.Sprintf(format, args...))
+	_, _ = io.WriteString(eta.writer, bold.Sprintf(format, args...))
 }
 
 type minimalProgressInfo struct {
@@ -172,7 +172,7 @@ type minimalProgressInfo struct {
 }
 
 func (pi minimalProgressInfo) writeNotification(msg string) {
-	io.WriteString(pi.notificationWriter, fmt.Sprintf("%11s  %s", "", msg))
+	_, _ = io.WriteString(pi.notificationWriter, fmt.Sprintf("%11s  %s", "", msg))
 }
 
 func (pi minimalProgressInfo) calculateETA() time.Duration {
