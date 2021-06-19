@@ -9,11 +9,11 @@ import (
 	"time"
 
 	"github.com/sha1n/bert/api"
-	clibtest "github.com/sha1n/clib/pkg/test"
+	gommonstest "github.com/sha1n/gommons/pkg/test"
 	"github.com/stretchr/testify/assert"
 )
 
-var randomLabels = append(clibtest.RandomStrings(), clibtest.RandomString()) // ensure at least one label
+var randomLabels = append(gommonstest.RandomStrings(), gommonstest.RandomString()) // ensure at least one label
 
 // GetRawDataHandler a provider for a RawDataHandler instance
 type GetRawDataHandler = func(io.Writer, api.ReportContext) RawDataHandler

@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/sha1n/bert/api"
-	"github.com/sha1n/clib/pkg/test"
+	"github.com/sha1n/gommons/pkg/test"
 	"github.com/stretchr/testify/assert"
 )
 

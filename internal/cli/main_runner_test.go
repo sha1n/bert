@@ -11,8 +11,8 @@ import (
 
 	"github.com/sha1n/bert/api"
 	"github.com/sha1n/bert/pkg"
-	"github.com/sha1n/clib/pkg/test"
-	clibtest "github.com/sha1n/clib/pkg/test"
+	"github.com/sha1n/gommons/pkg/test"
+	gommonstest "github.com/sha1n/gommons/pkg/test"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 )
@@ -91,7 +91,7 @@ func TestBasicCsvRaw(t *testing.T) {
 }
 
 func TestWithMissingConfigFile(t *testing.T) {
-	nonExistingConfigArg := fmt.Sprintf("-c=/tmp/%s", clibtest.RandomString())
+	nonExistingConfigArg := fmt.Sprintf("-c=/tmp/%s", gommonstest.RandomString())
 	runBenchmarkCommandWithPipedStdoutAndExpectPanicWith(t, nonExistingConfigArg)
 }
 
@@ -236,7 +236,7 @@ func runBenchmarkCommandWithPipedStdoutputsAnd(t *testing.T, assert func(stdout,
 	ioContext := api.NewIOContext()
 	ioContext.StdoutWriter = outBuf
 	ioContext.StderrWriter = errBuf
-	rootCmd := NewRootCommand(clibtest.RandomString(), clibtest.RandomString(), clibtest.RandomString(), ioContext)
+	rootCmd := NewRootCommand(gommonstest.RandomString(), gommonstest.RandomString(), gommonstest.RandomString(), ioContext)
 	rootCmd.SetArgs(append(args, "--pipe-stdout=true", "--pipe-stderr=true"))
 	rootCmd.SetOut(ioContext.StdoutWriter)
 	rootCmd.SetErr(ioContext.StderrWriter)
@@ -253,7 +253,7 @@ func runBenchmarkCommandWithPipedStdoutAndExpectPanicWith(t *testing.T, args ...
 	ioContext.StdoutWriter = bufio.NewWriter(buf)
 	ioContext.StderrWriter = bufio.NewWriter(buf)
 
-	rootCmd := NewRootCommand(clibtest.RandomString(), clibtest.RandomString(), clibtest.RandomString(), ioContext)
+	rootCmd := NewRootCommand(gommonstest.RandomString(), gommonstest.RandomString(), gommonstest.RandomString(), ioContext)
 	rootCmd.SetArgs(append(args, "--pipe-stdout=true"))
 	rootCmd.SetOut(writer)
 	rootCmd.SetErr(os.Stderr)
@@ -272,7 +272,7 @@ func expectNoPanic(t *testing.T) {
 }
 
 func newDummyCommandWith(args ...string) *cobra.Command {
-	rootCmd := NewRootCommand(clibtest.RandomString(), clibtest.RandomString(), clibtest.RandomString(), api.NewIOContext())
+	rootCmd := NewRootCommand(gommonstest.RandomString(), gommonstest.RandomString(), gommonstest.RandomString(), api.NewIOContext())
 	rootCmd.SetArgs(args)
 	rootCmd.Run = func(cmd *cobra.Command, args []string) {}
 

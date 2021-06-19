@@ -7,12 +7,12 @@ import (
 	"testing"
 
 	"github.com/sha1n/bert/api"
-	clibtest "github.com/sha1n/clib/pkg/test"
+	gommonstest "github.com/sha1n/gommons/pkg/test"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestRequestString(t *testing.T) {
-	expected := clibtest.RandomString()
+	expected := gommonstest.RandomString()
 	ctx := givenIOContextWithInputContent(expected)
 
 	actual := requestString("", false, ctx)
@@ -20,7 +20,7 @@ func TestRequestString(t *testing.T) {
 }
 
 func TestRequestRequiredString(t *testing.T) {
-	expected := clibtest.RandomString()
+	expected := gommonstest.RandomString()
 	ctx := givenIOContextWithInputContent(fmt.Sprintf("\r\n\r\n%s", expected))
 
 	actual := requestString("", true, ctx)
@@ -28,7 +28,7 @@ func TestRequestRequiredString(t *testing.T) {
 }
 
 func TestRequestInputWithInvalidInput(t *testing.T) {
-	expected := clibtest.RandomString()
+	expected := gommonstest.RandomString()
 	stdin := fmt.Sprintf(`rejected
 %s`, expected)
 
@@ -49,7 +49,7 @@ func TestRequestInputWithInvalidInput(t *testing.T) {
 }
 
 func TestRequestOptionalBool(t *testing.T) {
-	expected := clibtest.RandomBool()
+	expected := gommonstest.RandomBool()
 	ctx := givenIOContextWithInputContent(fmt.Sprint(expected))
 
 	actual := requestOptionalBool("", false, ctx)
@@ -104,7 +104,7 @@ func TestRequestOptionalExistingDirectoryWithExistingDir(t *testing.T) {
 }
 
 func TestRequestOptionalExistingDirectoryWithNonExistingDir(t *testing.T) {
-	attempt1 := path.Join(os.TempDir(), clibtest.RandomString())
+	attempt1 := path.Join(os.TempDir(), gommonstest.RandomString())
 	attempt2 := os.TempDir()
 	userInputSequence := fmt.Sprintf(`%s
 n
@@ -117,7 +117,7 @@ n
 }
 
 func TestRequestOptionalExistingDirectoryWithNonExistingDirAndAutoCreation(t *testing.T) {
-	userEnteredNonExistingDir := path.Join(os.TempDir(), clibtest.RandomString())
+	userEnteredNonExistingDir := path.Join(os.TempDir(), gommonstest.RandomString())
 	userInputSequence := fmt.Sprintf(`%s
 y`,
 		userEnteredNonExistingDir,
@@ -137,7 +137,7 @@ func TestRequestOptionalExistingDirectoryWithSkip(t *testing.T) {
 }
 
 func TestRequestUint(t *testing.T) {
-	expected := clibtest.RandomUint()
+	expected := gommonstest.RandomUint()
 	ctx := givenIOContextWithInputContent(fmt.Sprint(expected))
 
 	actual := requestUint("", false, ctx)
@@ -168,7 +168,7 @@ func TestRequestUintWithInvalidInput(t *testing.T) {
 
 func givenIOContextWithInputContent(content string) api.IOContext {
 	ctx := api.NewIOContext()
-	ctx.StdinReader = clibtest.NewEmulatedStdinReader(content)
+	ctx.StdinReader = gommonstest.NewEmulatedStdinReader(content)
 
 	return ctx
 }

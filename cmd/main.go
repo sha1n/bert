@@ -9,7 +9,7 @@ import (
 	"github.com/sha1n/bert/api"
 	"github.com/sha1n/bert/internal/cli"
 	"github.com/sha1n/bert/pkg"
-	errorhandling "github.com/sha1n/clib/pkg/error_handling"
+	errorhandling "github.com/sha1n/gommons/pkg/error_handling"
 	"github.com/sha1n/termite"
 	log "github.com/sirupsen/logrus"
 )

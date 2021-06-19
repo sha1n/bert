@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/sha1n/bert/api"
-	clibtest "github.com/sha1n/clib/pkg/test"
+	gommonstest "github.com/sha1n/gommons/pkg/test"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -19,7 +19,7 @@ func TestMinimalProgressViewOutput(t *testing.T) {
 	spec := aBasicSpecWith(true, 2)
 	scenarioID := spec.Scenarios[0].ID()
 
-	expectedError := errors.New(clibtest.RandomString())
+	expectedError := errors.New(gommonstest.RandomString())
 
 	progView := NewMinimalProgressView(spec, fakeTermDimensions, ctx).(*MinimalProgressView)
 
