@@ -29,7 +29,7 @@ func testSummaryReportHandlerFinalizeWith(t *testing.T, expectedError error) {
 	handler.Subscribe(tracer.Stream())
 
 	// Fire one trace event
-	tracer.Start(expectedSpec.Scenarios[0])(api.ExecutionInfo{}, nil)
+	tracer.Start(expectedSpec.Scenarios[0])(&api.ExecutionInfo{}, nil)
 
 	actualError := handler.Finalize()
 

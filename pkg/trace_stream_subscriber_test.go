@@ -42,7 +42,7 @@ func createTracerWithNBufferedEvents(n int) api.Tracer {
 	spec := exampleSpec()
 
 	for i := 0; i < n; i++ {
-		tracer.Start(spec.Scenarios[0])(api.ExecutionInfo{}, nil)
+		tracer.Start(spec.Scenarios[0])(&api.ExecutionInfo{}, nil)
 	}
 
 	return tracer
