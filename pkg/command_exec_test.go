@@ -20,7 +20,7 @@ func TestExecuteReturnsErrorOnCommandFailure(t *testing.T) {
 	exec := NewCommandExecutor(true, true)
 	cmdSpec := aCommandSpec(aNonExistingCommand(), "")
 
-	err := exec.ExecuteFn(cmdSpec, defaultWorkingDir, env)()
+	_, err := exec.ExecuteFn(cmdSpec, defaultWorkingDir, env)()
 
 	assert.Error(t, err)
 }
@@ -85,6 +85,32 @@ func TestConfigureCommandWithStderrPiping(t *testing.T) {
 
 	assert.Equal(t, nil, execCmd.Stdout)
 	assert.Equal(t, log.StandardLogger().Out, execCmd.Stderr)
+}
+
+func TestExecCommandFnWithNonExistingCommand(t *testing.T) {
+	spec := aCommandSpec(aNonExistingCommand(), "")
+	executor := NewCommandExecutor(false, false).(*commandExecutor)
+
+	execFn := executor.ExecuteFn(spec, "", nil)
+
+	_, err := execFn()
+	assert.Error(t, err)
+}
+
+func TestExecCommandFnWithExistingCommand(t *testing.T) {
+	spec := aCommandSpec([]string{"go", "version"}, "")
+	executor := NewCommandExecutor(false, false).(*commandExecutor)
+
+	execFn := executor.ExecuteFn(spec, "", nil)
+
+	execInfo, err := execFn()
+
+	assert.NoError(t, err)
+	assert.NoError(t, execInfo.Error)
+	assert.Equal(t, 0, execInfo.ExitCode)
+	assert.GreaterOrEqual(t, execInfo.PerceivedTime, time.Nanosecond*0)
+	assert.GreaterOrEqual(t, execInfo.UserTime, time.Nanosecond*0)
+	assert.GreaterOrEqual(t, execInfo.SystemTime, time.Nanosecond*0)
 }
 
 func configureCommandWithIOSpec(pipeStdout, pipeStderr bool) *exec.Cmd {

@@ -33,7 +33,7 @@ func testStreamReportHandlerFinalizeWith(t *testing.T, expectedHandleError error
 	handler.Subscribe(tracer.Stream())
 
 	// Fire one trace event
-	tracer.Start(expectedSpec.Scenarios[0])(expectedTraceError)
+	tracer.Start(expectedSpec.Scenarios[0])(api.ExecutionInfo{}, expectedTraceError)
 
 	assert.NoError(t, handler.Finalize())
 
