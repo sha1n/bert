@@ -23,7 +23,7 @@ func NewCommandExecutor(pipeStdout bool, pipeStderr bool) api.CommandExecutor {
 }
 
 // Executes a single command in a subprocess based on the specified specs.
-func (ce *commandExecutor) ExecuteFn(cmdSpec *api.CommandSpec, defaultWorkingDir string, env map[string]string) func() error {
+func (ce *commandExecutor) ExecuteFn(cmdSpec *api.CommandSpec, defaultWorkingDir string, env map[string]string) api.ExecCommandFn {
 	log.Debugf("Going to execute command %v", cmdSpec.Cmd)
 
 	execCmd := exec.Command(cmdSpec.Cmd[0], cmdSpec.Cmd[1:]...)
@@ -31,9 +31,19 @@ func (ce *commandExecutor) ExecuteFn(cmdSpec *api.CommandSpec, defaultWorkingDir
 
 	cancel := RegisterInterruptGuard(onInterruptSignalFn(execCmd))
 
-	return func() error {
+	return func() (execInfo api.ExecutionInfo, err error) {
 		defer cancel()
-		return execCmd.Run()
+		if err = execCmd.Start(); err == nil {
+			var state *os.ProcessState
+			if state, err = execCmd.Process.Wait(); err == nil {
+				execInfo.ExitCode = state.ExitCode()
+				execInfo.UserTime = state.UserTime()
+				execInfo.SystemTime = state.SystemTime()
+			} else {
+				execInfo.Error = err
+			}
+		}
+		return
 	}
 }
 
@@ -76,7 +86,9 @@ func onInterruptSignalFn(execCmd *exec.Cmd) func(os.Signal) {
 	return func(sig os.Signal) {
 		if sig == os.Interrupt {
 			log.Debugf("Got %s signal. Forwarding to %s...", sig, execCmd.Args[0])
-			execCmd.Process.Signal(sig)
+			if err := execCmd.Process.Signal(sig); err != nil {
+				log.Debug(err)
+			}
 		}
 	}
 }

@@ -12,7 +12,7 @@ type tracer struct {
 
 type trace struct {
 	id            string
-	cpuTimer      api.CPUTimer
+	startTime     time.Time
 	perceivedTime time.Duration
 	usrTime       time.Duration
 	sysTime       time.Duration
@@ -41,8 +41,7 @@ func (t trace) Error() error {
 
 func newTrace(id string) trace {
 	return trace{
-		id:       id,
-		cpuTimer: NewChildrenCPUTimer(),
+		id: id,
 	}
 }
 
@@ -55,14 +54,15 @@ func NewTracer(bufferSize int) api.Tracer {
 
 func (tr *tracer) Start(i api.Identifiable) api.End {
 	t := newTrace(i.ID())
-	t.cpuTimer.Start()
+	t.startTime = time.Now()
 
 	return tr.endFn(t)
 }
 
 func (tr *tracer) endFn(t trace) api.End {
-	return func(exitError error) {
-		t.perceivedTime, t.usrTime, t.sysTime = t.cpuTimer.Elapsed()
+	return func(execInfo api.ExecutionInfo, exitError error) {
+		t.perceivedTime = time.Since(t.startTime)
+		t.usrTime, t.sysTime = execInfo.UserTime, execInfo.SystemTime
 		t.error = exitError
 
 		tr.stream <- t
