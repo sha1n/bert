@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"runtime"
 	"runtime/debug"
 
 	"github.com/fatih/color"
@@ -32,8 +33,8 @@ var (
 	Build string
 	// Version : passed from build environment
 	Version string
-	// DisableUpdate : passed from build environment to specify that self-update should be disabled
-	DisableUpdate string
+	// DisableSelfUpdate : passed from build environment to specify that self-update should be disabled
+	DisableSelfUpdate string
 )
 
 func main() {
@@ -48,7 +49,7 @@ func doRun(exitFn func(int)) {
 
 	// Subcommands
 	rootCmd.AddCommand(cli.CreateConfigCommand(ctx))
-	if DisableUpdate != "true" {
+	if enableSelfUpdate()  {
 		rootCmd.AddCommand(cli.CreateUpdateCommand(Version, ProgramName, ctx))
 	}
 
@@ -87,4 +88,8 @@ func handlePanics(exitFn func(int)) {
 
 func doExit(code int) {
 	log.Exit(code)
+}
+
+func enableSelfUpdate() bool {
+	return DisableSelfUpdate != "true" && runtime.GOOS != "windows"
 }
