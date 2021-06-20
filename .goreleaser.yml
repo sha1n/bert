@@ -22,7 +22,7 @@ archives:
       386: i386
       amd64: x86_64
 checksum:
-  name_template: "{{ .ProjectName }}_checksums.txt"
+  name_template: "checksums.txt"
   algorithm: sha256
 snapshot:
   name_template: "{{ .Tag }}"
@@ -40,7 +40,7 @@ brews:
       owner: sha1n
       name: homebrew-tap
 
-    url_template: "https://github.com/sha1n/bert/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+    url_template: "https://github.com/sha1n/{{ .ProjectName }}/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
     download_strategy: CurlDownloadStrategy
     commit_author:
       name: goreleaserbot
@@ -48,7 +48,7 @@ brews:
 
     folder: Formula
 
-    homepage: "https://sha1n.github.io/bert/"
+    homepage: "https://sha1n.github.io/{{ .ProjectName }}/"
     description: "CLI benchmarking tool"
     license: "MIT"
 
