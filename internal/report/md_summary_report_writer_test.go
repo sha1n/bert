@@ -20,7 +20,7 @@ func TestCreateMarkdownTableFromWithHeaders(t *testing.T) {
 
 	// Verify table structure and dimensions
 	assert.Equal(t, 2 /*header + sep*/ +2 /*data*/ +1 /*CRLF*/, len(lines))
-	assert.Equal(t, "|Timestamp|Scenario|Samples|Labels|Min|Max|Mean|Median|Percentile 90|StdDev|Errors|", lines[0])
+	assert.Equal(t, "|Timestamp|Scenario|Samples|Labels|Min|Max|Mean|Median|Percentile 90|StdDev|User Time|System Time|Errors|", lines[0])
 	assert.Equal(t, expectedCellsPerRow, strings.Count(lines[1], "|----"))
 	assert.Equal(t, expectedCellsPerRow+1, strings.Count(lines[2], "|"))
 	assert.Equal(t, expectedCellsPerRow+1, strings.Count(lines[3], "|"))

@@ -13,7 +13,15 @@ const ReportErrorValue = "ERR"
 
 var (
 	// RawDataReportHeaders ...
-	RawDataReportHeaders = []string{"Timestamp", "Scenario", "Labels", "Duration", "Error"}
+	RawDataReportHeaders = []string{
+		"Timestamp", 
+		"Scenario", 
+		"Labels", 
+		"Duration",
+		"User Time",
+		"System Time",
+		"Error",
+	}
 
 	// SummaryReportHeaders ...
 	SummaryReportHeaders = []string{
@@ -27,6 +35,8 @@ var (
 		"Median",
 		"Percentile 90",
 		"StdDev",
+		"User Time",
+		"System Time",
 		"Errors",
 	}
 )
