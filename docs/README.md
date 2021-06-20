@@ -144,11 +144,12 @@ Sometimes what you really want to measure is the impact of environmental changes
 
 **Example:**
 
-| Timestamp                 | Scenario | Samples | Labels    | Min   | Max    | Mean  | Median | Percentile 90 | StdDev | Errors |
-| ------------------------- | -------- | ------- | --------- | ----- | ------ | ----- | ------ | ------------- | ------ | ------ |
-| 2021-06-14T19:11:00+03:00 | curl     | 100     | vpn,wifi  | 3.2ms | 11.6ms | 5.1ms | 4.7ms  | 7.0ms         | 1.5ms  | 0%     |
-| 2021-06-14T19:11:09+03:00 | curl     | 100     | vpn,wired | 3.7ms | 10.8ms | 5.2ms | 4.8ms  | 8.0ms         | 1.5ms  | 0%     |
-| 2021-06-14T19:12:37+03:00 | curl     | 100     | wired     | 0.6ms | 8.1ms  | 1.3ms | 1.1ms  | 5.9ms         | 0.8ms  | 0%     |
+| Timestamp                 | Scenario | Samples | Labels    | Min   | Max    | Mean  | Median | Percentile 90 | StdDev  | User Time | System Time | Errors |
+| ------------------------- | -------- | ------- | --------- | ----- | ------ | ----- | ------ | ------------- | ------- | --------- | ----------- | ------ |
+| 2021-06-20T21:01:24Z | curl     | 100     | vpn,wifi  | 3.5ms | 6.4ms  | 4.4ms | 4.3ms  | 5.0ms         | 552.2µs | 646.5µs   | 1.6ms       | 0%     |
+| 2021-06-20T21:02:05Z | curl     | 100     | vpn,wired | 3.4ms | 16.0ms | 4.3ms | 4.1ms  | 4.9ms         | 1.3ms   | 634.0µs   | 1.6ms       | 0%     |
+| 2021-06-20T21:02:33Z | curl     | 100     | wired     | 0.6ms | 8.1ms  | 1.3ms | 1.1ms  | 5.9ms         | 0.8ms   | 559.4µs   | 1.4ms       | 0%     |
+
 
 ### Understanding User & System Time Measurements
 The `user` and `system` values are the calculated *mean* of measured user and system CPU time. It is important to understand that each measurement is the *sum* of the CPU times measured on all CPU cores and therefore can measure higher than perceived time measurements (min, max, mean, median, p90). The following report shows the measurements of two `go test` commands, one executed with `-p 1` which limits concurrency to `1` and the other with automatic parallelism. Notice how close the `user` and `system` metrics are and how they compare to the other metrics.
@@ -157,7 +158,7 @@ The `user` and `system` values are the calculated *mean* of measured user and sy
  BENCHMARK SUMMARY
      labels:
        date: Jun 15 2021
-       time: 20:31:20+03:00
+       time: 20:31:20
   scenarios: 2
  executions: 10
   alternate: true
@@ -185,7 +186,7 @@ The `user` and `system` values are the calculated *mean* of measured user and sy
  BENCHMARK SUMMARY
      labels: example-label
        date: Jun 12 2021
-       time: 18:07:11+03:00
+       time: 18:07:11
   scenarios: 2
  executions: 10
   alternate: true
@@ -245,42 +246,42 @@ The `user` and `system` values are the calculated *mean* of measured user and sy
 #### CSV Example
 
 ```csv
-Timestamp,Scenario,Samples,Labels,Min,Max,Mean,Median,Percentile 90,StdDev,Errors
-2021-06-10T16:23:00+03:00,scenario A,10,example-label,1002473555,1006631000,1004841316,1004925820,1006234538,1263756,0%
-2021-06-10T16:23:00+03:00,scenario B,10,example-label,1387363,1903073,1680485,1681815,1755130,121962,0%
+Timestamp,Scenario,Samples,Labels,Min,Max,Mean,Median,Percentile 90,StdDev,User Time,System Time,Errors
+2021-06-20T21:07:03Z,scenario A,10,example-label,1003901921,1007724021,1005953076,1006408481,1007591335,1316896,444700,1182600,0%
+2021-06-20T21:07:03Z,scenario B,10,example-label,3256932,6759926,3939343,3626742,3947804,963627,469500,1325200,0%
 ```
 
 #### Markdown Example
 ```
-| Timestamp                 | Scenario   | Samples | Labels        | Min   | Max   | Mean  | Median | Percentile 90 | StdDev  | Errors |
-| ------------------------- | ---------- | ------- | ------------- | ----- | ----- | ----- | ------ | ------------- | ------- | ------ |
-| 2021-06-10T16:22:26+03:00 | scenario A | 10      | example-label | 1.0s  | 1.0s  | 1.0s  | 1.0s   | 1.0s          | 1.0ms   | 0%     |
-| 2021-06-10T16:22:26+03:00 | scenario B | 10      | example-label | 1.4ms | 1.8ms | 1.6ms | 1.6ms  | 1.7ms         | 119.5µs | 0%     |
+| Timestamp                 | Scenario   | Samples | Labels        | Min   | Max   | Mean  | Median | Percentile 90 | StdDev  | User Time | System Time | Errors |
+| ------------------------- | ---------- | ------- | ------------- | ----- | ----- | ----- | ------ | ------------- | ------- | --------- | ----------- | ------ |
+| 2021-06-20T21:06:22Z | scenario A | 10      | example-label | 1.0s  | 1.0s  | 1.0s  | 1.0s   | 1.0s          | 1.8ms   | 459.5µs   | 1.2ms       | 0%     |
+| 2021-06-20T21:06:22Z | scenario B | 10      | example-label | 3.1ms | 4.5ms | 3.4ms | 3.2ms  | 3.7ms         | 408.8µs | 439.0µs   | 1.1ms       | 0%     |
 ```
 
 #### Raw CSV Example
 ```csv
-Timestamp,Scenario,Labels,Duration,Error
-2021-06-10T16:23:35+03:00,scenario A,example-label,1004649721,false
-2021-06-10T16:23:35+03:00,scenario B,example-label,1435355,false
-2021-06-10T16:23:36+03:00,scenario A,example-label,1005821367,false
-2021-06-10T16:23:36+03:00,scenario B,example-label,1408095,false
-2021-06-10T16:23:37+03:00,scenario A,example-label,1005883260,false
-2021-06-10T16:23:37+03:00,scenario B,example-label,1450118,false
-2021-06-10T16:23:38+03:00,scenario A,example-label,1003183088,false
-2021-06-10T16:23:38+03:00,scenario B,example-label,1493344,false
-2021-06-10T16:23:39+03:00,scenario A,example-label,1006013983,false
-2021-06-10T16:23:39+03:00,scenario B,example-label,1809823,false
-2021-06-10T16:23:40+03:00,scenario A,example-label,1005611960,false
-2021-06-10T16:23:40+03:00,scenario B,example-label,1651744,false
-2021-06-10T16:23:41+03:00,scenario A,example-label,1004485805,false
-2021-06-10T16:23:41+03:00,scenario B,example-label,1619021,false
-2021-06-10T16:23:42+03:00,scenario A,example-label,1004949755,false
-2021-06-10T16:23:42+03:00,scenario B,example-label,1420214,false
-2021-06-10T16:23:43+03:00,scenario A,example-label,1003371958,false
-2021-06-10T16:23:43+03:00,scenario B,example-label,1747274,false
-2021-06-10T16:23:44+03:00,scenario A,example-label,1004888034,false
-2021-06-10T16:23:44+03:00,scenario B,example-label,1342145,false
+Timestamp,Scenario,Labels,Duration,User Time,System Time,Error
+2021-06-20T21:07:25Z,scenario A,example-label,1003657149,419000,1034000,false
+2021-06-20T21:07:25Z,scenario B,example-label,3234965,407000,1018000,false
+2021-06-20T21:07:26Z,scenario A,example-label,1007011109,462000,1066000,false
+2021-06-20T21:07:26Z,scenario B,example-label,3627639,438000,1149000,false
+2021-06-20T21:07:27Z,scenario A,example-label,1004486684,480000,1057000,false
+2021-06-20T21:07:27Z,scenario B,example-label,3067241,407000,942000,false
+2021-06-20T21:07:28Z,scenario A,example-label,1004747640,424000,952000,false
+2021-06-20T21:07:28Z,scenario B,example-label,3108394,418000,973000,false
+2021-06-20T21:07:29Z,scenario A,example-label,1003754833,452000,1072000,false
+2021-06-20T21:07:29Z,scenario B,example-label,3273611,403000,1047000,false
+2021-06-20T21:07:30Z,scenario A,example-label,1007069722,535000,1130000,false
+2021-06-20T21:07:30Z,scenario B,example-label,3110162,431000,1081000,false
+2021-06-20T21:07:31Z,scenario A,example-label,1003373155,421000,959000,false
+2021-06-20T21:07:31Z,scenario B,example-label,3299774,394000,987000,false
+2021-06-20T21:07:32Z,scenario A,example-label,1005966685,401000,971000,false
+2021-06-20T21:07:32Z,scenario B,example-label,3246400,391000,1046000,false
+2021-06-20T21:07:33Z,scenario A,example-label,1004069658,462000,1074000,false
+2021-06-20T21:07:33Z,scenario B,example-label,3275813,418000,1003000,false
+2021-06-20T21:07:34Z,scenario A,example-label,1006268385,447000,1001000,false
+2021-06-20T21:07:34Z,scenario B,example-label,3444278,401000,1054000,false
 ```
 
 
