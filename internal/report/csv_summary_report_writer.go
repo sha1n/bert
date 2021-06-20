@@ -39,6 +39,8 @@ func (rw csvReportWriter) Write(summary api.Summary, config api.BenchmarkSpec, c
 
 	for _, id := range sortedIds {
 		stats := summary.PerceivedTimeStats(id)
+		userStats := summary.UserTimeStats(id)
+		systemStats := summary.SystemTimeStats(id)
 
 		if err = rw.writer.Write([]string{
 			timeStr,
@@ -51,6 +53,8 @@ func (rw csvReportWriter) Write(summary api.Summary, config api.BenchmarkSpec, c
 			FormatReportDurationPlainNanos(stats.Median),
 			FormatReportDurationPlainNanos(func() (time.Duration, error) { return stats.Percentile(90) }),
 			FormatReportDurationPlainNanos(stats.StdDev),
+			FormatReportDurationPlainNanos(userStats.Mean),
+			FormatReportDurationPlainNanos(systemStats.Mean),
 			FormatReportFloatAsRateInPercents(stats.ErrorRate),
 		}); err != nil {
 			return err
