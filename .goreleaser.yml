@@ -13,7 +13,7 @@ builds:
       - arm
       - arm64
     ldflags:
-      - -s -w -X main.DisableUpdate=true -X main.Version={{.Version}} -X main.Build={{.Commit}} -X main.ProgramName={{.ProjectName}}
+      - -s -w -X main.DisableSelfUpdate=true -X main.Version={{.Version}} -X main.Build={{.Commit}} -X main.ProgramName={{.ProjectName}}
     main: ./cmd/main.go
 archives:
   - replacements:
