@@ -41,7 +41,21 @@ func TestWrite(t *testing.T) {
 	// Titles
 	assert.Equal(
 		t,
-		[]string{"Timestamp", "Scenario", "Samples", "Labels", "Min", "Max", "Mean", "Median", "Percentile 90", "StdDev", "Errors"},
+		[]string{
+			"Timestamp", 
+			"Scenario", 
+			"Samples", 
+			"Labels", 
+			"Min", 
+			"Max", 
+			"Mean", 
+			"Median", 
+			"Percentile 90", 
+			"StdDev", 
+			"User Time", 
+			"System Time", 
+			"Errors",
+		},
 		allRecords[0],
 	)
 
@@ -81,20 +95,24 @@ func TestWriteWithNoHeaders(t *testing.T) {
 }
 
 func assertRecord(t *testing.T, scenario api.Identifiable, summary api.Summary, expectedTimestamp string, actualRecord []string) {
-	stats1 := summary.PerceivedTimeStats(scenario.ID())
+	stats := summary.PerceivedTimeStats(scenario.ID())
+	userStats := summary.UserTimeStats(scenario.ID())
+	systemStats := summary.SystemTimeStats(scenario.ID())
 	expectedLabels := strings.Join(randomLabels, ",")
 
 	assert.Equal(t, expectedTimestamp, actualRecord[0])
 	assert.Equal(t, scenario.ID(), actualRecord[1])
 	assert.Equal(t, expectedIntFormat(func() int { return summary.PerceivedTimeStats(scenario.ID()).Count() }), actualRecord[2])
 	assert.Equal(t, expectedLabels, actualRecord[3])
-	assert.Equal(t, FormatReportDurationPlainNanos(stats1.Min), actualRecord[4])
-	assert.Equal(t, FormatReportDurationPlainNanos(stats1.Max), actualRecord[5])
-	assert.Equal(t, FormatReportDurationPlainNanos(stats1.Mean), actualRecord[6])
-	assert.Equal(t, FormatReportDurationPlainNanos(stats1.Median), actualRecord[7])
-	assert.Equal(t, FormatReportDurationPlainNanos(func() (time.Duration, error) { return stats1.Percentile(90) }), actualRecord[8])
-	assert.Equal(t, FormatReportDurationPlainNanos(stats1.StdDev), actualRecord[9])
-	assert.Equal(t, expectedRateFormat(stats1.ErrorRate), actualRecord[10])
+	assert.Equal(t, FormatReportDurationPlainNanos(stats.Min), actualRecord[4])
+	assert.Equal(t, FormatReportDurationPlainNanos(stats.Max), actualRecord[5])
+	assert.Equal(t, FormatReportDurationPlainNanos(stats.Mean), actualRecord[6])
+	assert.Equal(t, FormatReportDurationPlainNanos(stats.Median), actualRecord[7])
+	assert.Equal(t, FormatReportDurationPlainNanos(func() (time.Duration, error) { return stats.Percentile(90) }), actualRecord[8])
+	assert.Equal(t, FormatReportDurationPlainNanos(stats.StdDev), actualRecord[9])
+	assert.Equal(t, FormatReportDurationPlainNanos(userStats.Mean), actualRecord[10])
+	assert.Equal(t, FormatReportDurationPlainNanos(systemStats.Mean), actualRecord[11])
+	assert.Equal(t, expectedRateFormat(stats.ErrorRate), actualRecord[12])
 }
 
 func expectedIntFormat(f func() int) string {

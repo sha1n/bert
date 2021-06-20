@@ -33,6 +33,8 @@ func (rw mdReportWriter) Write(summary api.Summary, spec api.BenchmarkSpec, ctx 
 		sortedIds := GetSortedScenarioIds(summary)
 		for _, id := range sortedIds {
 			stats := summary.PerceivedTimeStats(id)
+			userStats := summary.UserTimeStats(id)
+			systemStats := summary.SystemTimeStats(id)
 
 			err = rw.tableWriter.WriteRow([]string{
 				timeStr,
@@ -45,6 +47,8 @@ func (rw mdReportWriter) Write(summary api.Summary, spec api.BenchmarkSpec, ctx 
 				FormatReportDuration(stats.Median),
 				FormatReportDuration(func() (time.Duration, error) { return stats.Percentile(90) }),
 				FormatReportDuration(stats.StdDev),
+				FormatReportDuration(userStats.Mean),
+				FormatReportDuration(systemStats.Mean),
 				FormatReportFloatAsRateInPercents(stats.ErrorRate),
 			})
 		}

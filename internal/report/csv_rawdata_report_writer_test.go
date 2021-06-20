@@ -23,7 +23,7 @@ func TestHandle(t *testing.T) {
 	// Headers
 	assert.Equal(
 		t,
-		[]string{"Timestamp", "Scenario", "Labels", "Duration", "Error"},
+		[]string{"Timestamp", "Scenario", "Labels", "Duration", "User Time", "System Time", "Error"},
 		allRecords[0],
 	)
 
