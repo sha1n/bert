@@ -61,7 +61,7 @@
 brew tap sha1n/tap
 
 # Install bert
-brew install sha1n/bert
+brew install bert
 
 # Update bert
 brew upgrade bert
