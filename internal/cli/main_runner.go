@@ -52,7 +52,7 @@ Build label: %s`, version, build),
 	}
 
 	rootCmd.Flags().StringP(ArgNameConfig, "c", "", `config file path. '~' will be expanded.`)
-	rootCmd.Flags().Int(ArgNameExecutions, 0, `the number of executions per scenario.
+	rootCmd.Flags().IntP(ArgNameExecutions, "e", 0, `the number of executions per scenario.
 required when no configuration file is provided. 
 when specified with a configuration file, this argument has priority.`)
 
