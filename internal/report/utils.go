@@ -14,9 +14,9 @@ const ReportErrorValue = "ERR"
 var (
 	// RawDataReportHeaders ...
 	RawDataReportHeaders = []string{
-		"Timestamp", 
-		"Scenario", 
-		"Labels", 
+		"Timestamp",
+		"Scenario",
+		"Labels",
 		"Duration",
 		"User Time",
 		"System Time",
