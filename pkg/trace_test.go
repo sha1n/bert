@@ -32,9 +32,9 @@ func Test_tracer_endFn(t *testing.T) {
 	)
 	received := <-tracer.Stream()
 
-	assert.Equal(t, expectedPerceivedTime, received.Elapsed())
-	assert.Equal(t, expectedUserTime, received.User())
-	assert.Equal(t, expectedSysTime, received.System())
+	assert.Equal(t, expectedPerceivedTime, received.PerceivedTime())
+	assert.Equal(t, expectedUserTime, received.UserCPUTime())
+	assert.Equal(t, expectedSysTime, received.SystemCPUTime())
 	assert.Equal(t, expectedError, received.Error())
 	assert.Equal(t, expectedID, received.ID())
 }
@@ -53,9 +53,9 @@ func Test_tracer_endFn_withError(t *testing.T) {
 	)
 	received := <-tracer.Stream()
 
-	assert.Equal(t, expectedDuration, received.Elapsed())
-	assert.Equal(t, expectedDuration, received.User())
-	assert.Equal(t, expectedDuration, received.System())
+	assert.Equal(t, expectedDuration, received.PerceivedTime())
+	assert.Equal(t, expectedDuration, received.UserCPUTime())
+	assert.Equal(t, expectedDuration, received.SystemCPUTime())
 	assert.Equal(t, expectedError, received.Error())
 	assert.Equal(t, expectedID, received.ID())
 }

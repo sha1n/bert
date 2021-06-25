@@ -12,6 +12,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+const attentionIndicatorRune = '•'
+
 // textReportWriter a simple human readable test report writer
 type textReportWriter struct {
 	writer  *bufio.Writer
@@ -102,6 +104,7 @@ func (trw textReportWriter) Write(summary api.Summary, config api.BenchmarkSpec,
 
 		trw.writeDurationProperty("user", trw.hiblue, userStats.Mean)
 		trw.writeDurationProperty("system", trw.hiblue, sysStats.Mean)
+
 		trw.writeErrorRateStat("errors", stats.ErrorRate)
 
 		trw.writeNewLine()
@@ -144,14 +147,15 @@ func (trw textReportWriter) writeDurationProperty(name string, c *color.Color, f
 	trw.writeProperty(name, FormatReportDuration(f), c)
 }
 
-func (trw textReportWriter) writeErrorRateStat(name string, f func() float64) {
-	value := f()
-	errorRate := int(value * 100)
-	if errorRate > 0 {
-		trw.writeString(trw.yellow.Sprintf("%11s: %d%%", name, errorRate))
-	} else {
-		trw.writeString(fmt.Sprintf("%11s: %d%%", name, errorRate))
+func (trw textReportWriter) writeErrorRateStat(name string, errorRate func() float64) {
+	errorRatePercent := int(errorRate() * 100)
+	var attentionIndicator = ""
+
+	if errorRatePercent > 10 {
+		attentionIndicator = trw.red.Sprintf("%c", attentionIndicatorRune)
 	}
+
+	trw.writeString(fmt.Sprintf("%11s: %d%% %s", name, errorRatePercent, attentionIndicator))
 }
 
 func (trw textReportWriter) writeInt64StatLine(name string, f func() (int64, error)) {
