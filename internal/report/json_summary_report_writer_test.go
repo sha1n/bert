@@ -46,10 +46,12 @@ func generateReport(t *testing.T, buffer *bytes.Buffer) api.Summary {
 		Executions: int(test.RandomUint()),
 	}
 	summary := aSummary()
-	writeFn(summary, spec, api.ReportContext{
+	err := writeFn(summary, spec, api.ReportContext{
 		Labels:         randomLabels,
 		IncludeHeaders: false,
 	})
+
+	assert.NoError(t, err)
 
 	return summary
 }
