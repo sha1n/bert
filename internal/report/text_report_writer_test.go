@@ -67,7 +67,7 @@ func testTxtSanity(t *testing.T, colorsOn bool) {
 	assert.Equal(t, 1, strings.Count(text, "mean: 2.0s"))
 
 	assert.Equal(t, 1, strings.Count(text, "errors: 0%"))
-	assert.Equal(t, 1, strings.Count(text, "errors: 100%"))
+	assert.Equal(t, 1, strings.Count(text, "errors: 100% •"))
 
 	assert.Equal(t, 1, strings.Count(text, "system: 1"))
 	assert.Equal(t, 1, strings.Count(text, "system: 2"))
