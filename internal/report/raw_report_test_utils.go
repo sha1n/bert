@@ -28,9 +28,9 @@ func assertRawTraceRecord(t *testing.T, trace api.Trace, actualRecord []string) 
 	assert.NoError(t, err)
 	assert.Equal(t, trace.ID(), actualRecord[1])
 	assert.Equal(t, expectedLabels, actualRecord[2])
-	assert.Equal(t, fmt.Sprint(trace.Elapsed().Nanoseconds()), actualRecord[3])
-	assert.Equal(t, fmt.Sprint(trace.User().Nanoseconds()), actualRecord[4])
-	assert.Equal(t, fmt.Sprint(trace.System().Nanoseconds()), actualRecord[5])
+	assert.Equal(t, fmt.Sprint(trace.PerceivedTime().Nanoseconds()), actualRecord[3])
+	assert.Equal(t, fmt.Sprint(trace.UserCPUTime().Nanoseconds()), actualRecord[4])
+	assert.Equal(t, fmt.Sprint(trace.SystemCPUTime().Nanoseconds()), actualRecord[5])
 	assert.Equal(t, fmt.Sprint(trace.Error() != nil), actualRecord[6])
 }
 

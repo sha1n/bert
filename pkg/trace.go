@@ -13,8 +13,8 @@ type tracer struct {
 type trace struct {
 	id            string
 	perceivedTime time.Duration
-	usrTime       time.Duration
-	sysTime       time.Duration
+	usrCPUTime    time.Duration
+	sysCPUTime    time.Duration
 	error         error
 }
 
@@ -22,16 +22,16 @@ func (t trace) ID() string {
 	return t.id
 }
 
-func (t trace) Elapsed() time.Duration {
+func (t trace) PerceivedTime() time.Duration {
 	return t.perceivedTime
 }
 
-func (t trace) System() time.Duration {
-	return t.sysTime
+func (t trace) SystemCPUTime() time.Duration {
+	return t.sysCPUTime
 }
 
-func (t trace) User() time.Duration {
-	return t.usrTime
+func (t trace) UserCPUTime() time.Duration {
+	return t.usrCPUTime
 }
 
 func (t trace) Error() error {
@@ -60,7 +60,7 @@ func (tr *tracer) Start(i api.Identifiable) api.End {
 func (tr *tracer) endFn(t trace) api.End {
 	return func(execInfo *api.ExecutionInfo, exitError error) {
 		if execInfo != nil {
-			t.perceivedTime, t.usrTime, t.sysTime = execInfo.PerceivedTime, execInfo.UserTime, execInfo.SystemTime
+			t.perceivedTime, t.usrCPUTime, t.sysCPUTime = execInfo.PerceivedTime, execInfo.UserTime, execInfo.SystemTime
 		}
 		t.error = exitError
 

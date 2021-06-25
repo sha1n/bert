@@ -23,9 +23,9 @@ func NewSummary(tracesByID map[api.ID][]api.Trace) api.Summary {
 		errorCount := 0
 
 		for ti := range traces {
-			perceivedSamples[ti] = float64(traces[ti].Elapsed().Nanoseconds())
-			systemSamples[ti] = float64(traces[ti].System().Nanoseconds())
-			userSamples[ti] = float64(traces[ti].User().Nanoseconds())
+			perceivedSamples[ti] = float64(traces[ti].PerceivedTime().Nanoseconds())
+			systemSamples[ti] = float64(traces[ti].SystemCPUTime().Nanoseconds())
+			userSamples[ti] = float64(traces[ti].UserCPUTime().Nanoseconds())
 			if traces[ti].Error() != nil {
 				errorCount++
 			}

@@ -25,9 +25,9 @@ type Tracer interface {
 // Trace a single time trace
 type Trace interface {
 	ID() string
-	Elapsed() time.Duration
-	System() time.Duration
-	User() time.Duration
+	PerceivedTime() time.Duration
+	SystemCPUTime() time.Duration
+	UserCPUTime() time.Duration
 	Error() error
 }
 
