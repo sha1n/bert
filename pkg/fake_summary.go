@@ -11,8 +11,8 @@ func NewFakeTrace(id string, elapsed, userTime, sysTime time.Duration, err error
 	return &trace{
 		id:            id,
 		perceivedTime: elapsed,
-		usrTime:       userTime,
-		sysTime:       sysTime,
+		usrCPUTime:    userTime,
+		sysCPUTime:    sysTime,
 		error:         err,
 	}
 }

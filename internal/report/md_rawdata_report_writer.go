@@ -38,9 +38,9 @@ func (rw MarkdownStreamReportWriter) Handle(trace api.Trace) (err error) {
 		timeStr,
 		trace.ID(),
 		strings.Join(rw.ctx.Labels, ","),
-		fmt.Sprintf("%d", trace.Elapsed()),
-		fmt.Sprintf("%d", trace.User()),
-		fmt.Sprintf("%d", trace.System()),
+		fmt.Sprintf("%d", trace.PerceivedTime()),
+		fmt.Sprintf("%d", trace.UserCPUTime()),
+		fmt.Sprintf("%d", trace.SystemCPUTime()),
 		fmt.Sprintf("%v", trace.Error() != nil),
 	})
 
