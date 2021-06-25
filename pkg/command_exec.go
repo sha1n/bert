@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"time"
 
 	"github.com/sha1n/bert/api"
 	log "github.com/sirupsen/logrus"
@@ -33,14 +34,17 @@ func (ce *commandExecutor) ExecuteFn(cmdSpec *api.CommandSpec, defaultWorkingDir
 
 	return func() (execInfo *api.ExecutionInfo, err error) {
 		defer cancel()
-
+		
+		startTime := time.Now()
 		err = execCmd.Run()
+		perceivedTime := time.Since(startTime)
 		state := execCmd.ProcessState
 		if state != nil && state.Exited() {
 			execInfo = &api.ExecutionInfo{
 				ExitCode:   state.ExitCode(),
 				UserTime:   state.UserTime(),
 				SystemTime: state.SystemTime(),
+				PerceivedTime: perceivedTime,
 			}
 
 		}
