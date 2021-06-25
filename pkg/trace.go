@@ -12,7 +12,6 @@ type tracer struct {
 
 type trace struct {
 	id            string
-	startTime     time.Time
 	perceivedTime time.Duration
 	usrTime       time.Duration
 	sysTime       time.Duration
@@ -54,15 +53,15 @@ func NewTracer(bufferSize int) api.Tracer {
 
 func (tr *tracer) Start(i api.Identifiable) api.End {
 	t := newTrace(i.ID())
-	t.startTime = time.Now()
 
 	return tr.endFn(t)
 }
 
 func (tr *tracer) endFn(t trace) api.End {
 	return func(execInfo *api.ExecutionInfo, exitError error) {
-		t.perceivedTime = time.Since(t.startTime)
-		t.usrTime, t.sysTime = execInfo.UserTime, execInfo.SystemTime
+		if execInfo != nil {
+			t.perceivedTime, t.usrTime, t.sysTime = execInfo.PerceivedTime, execInfo.UserTime, execInfo.SystemTime
+		}
 		t.error = exitError
 
 		tr.stream <- t
