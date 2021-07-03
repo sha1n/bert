@@ -1,4 +1,4 @@
-package pkg
+package specs
 
 import (
 	"fmt"
@@ -14,11 +14,11 @@ import (
 )
 
 func TestLoadJson(t *testing.T) {
-	testLoad(t, "../test/data/spec_test_load.json")
+	testLoad(t, "../../test/data/spec_test_load.json")
 }
 
 func TestLoadYaml(t *testing.T) {
-	testLoad(t, "../test/data/spec_test_load.yaml")
+	testLoad(t, "../../test/data/spec_test_load.yaml")
 }
 
 func TestSaveYaml(t *testing.T) {

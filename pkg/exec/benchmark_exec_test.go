@@ -1,9 +1,10 @@
-package pkg
+package exec
 
 import (
 	"testing"
 
 	"github.com/sha1n/bert/api"
+	"github.com/sha1n/bert/pkg/ui"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -81,7 +82,7 @@ func recordingExecutionContext() api.ExecutionContext {
 	return api.NewExecutionContext(
 		NewTracer(100),
 		&CmdRecordingExecutor{},
-		NewLoggingProgressListener(),
+		ui.NewLoggingProgressListener(),
 	)
 }
 

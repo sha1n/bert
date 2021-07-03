@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/sha1n/bert/api"
-	"github.com/sha1n/bert/pkg"
+	"github.com/sha1n/bert/pkg/osutil"
 )
 
 // IsValidFn validates the input string and returns true if valid otherwise false.
@@ -74,7 +74,7 @@ func requestOptionalExistingDirectory(prompt string, defaultVal string, ctx api.
 			if path == "" {
 				return true
 			}
-			expandedPath := pkg.ExpandUserPath(path)
+			expandedPath := osutil.ExpandUserPath(path)
 			_, err := os.Stat(expandedPath)
 			exists := !os.IsNotExist(err)
 			if !exists {

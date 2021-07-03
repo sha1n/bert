@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/sha1n/bert/api"
-	"github.com/sha1n/bert/pkg"
+	"github.com/sha1n/bert/pkg/exec"
 	gommonstest "github.com/sha1n/gommons/pkg/test"
 	"github.com/stretchr/testify/assert"
 )
@@ -159,13 +159,13 @@ func aFakeSummaryFor(specs ...struct {
 	traces := []api.Trace{}
 	for _, spec := range specs {
 		if spec.error {
-			traces = append(traces, pkg.NewFakeTrace(spec.id.ID(), spec.perceivedTime, spec.userTime, spec.sysTime, errors.New(gommonstest.RandomString())))
+			traces = append(traces, exec.NewFakeTrace(spec.id.ID(), spec.perceivedTime, spec.userTime, spec.sysTime, errors.New(gommonstest.RandomString())))
 		} else {
-			traces = append(traces, pkg.NewFakeTrace(spec.id.ID(), spec.perceivedTime, spec.userTime, spec.sysTime, nil))
+			traces = append(traces, exec.NewFakeTrace(spec.id.ID(), spec.perceivedTime, spec.userTime, spec.sysTime, nil))
 		}
 	}
 
-	return pkg.NewFakeSummary(traces...)
+	return exec.NewFakeSummary(traces...)
 }
 
 type scenario struct {

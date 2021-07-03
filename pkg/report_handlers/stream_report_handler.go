@@ -1,20 +1,21 @@
-package pkg
+package report_handlers
 
 import (
 	"github.com/sha1n/bert/api"
+	"github.com/sha1n/bert/pkg/exec"
 )
 
 type streamReportHandler struct {
 	spec        api.BenchmarkSpec
 	ctx         api.ReportContext
-	subscriber  StreamSubscriber
-	handleFn    HandleFn
-	unsubscribe Unsubscribe
+	subscriber  exec.StreamSubscriber
+	handleFn    exec.HandleFn
+	unsubscribe exec.Unsubscribe
 }
 
 // NewStreamReportHandler create stream report subscriber.
 // Stream report handlers are designed to handle events in real time.
-func NewStreamReportHandler(spec api.BenchmarkSpec, ctx api.ReportContext, handleFn HandleFn) api.ReportHandler {
+func NewStreamReportHandler(spec api.BenchmarkSpec, ctx api.ReportContext, handleFn exec.HandleFn) api.ReportHandler {
 	return &streamReportHandler{
 		spec:     spec,
 		ctx:      ctx,
@@ -23,7 +24,7 @@ func NewStreamReportHandler(spec api.BenchmarkSpec, ctx api.ReportContext, handl
 }
 
 func (h *streamReportHandler) Subscribe(stream api.TraceStream) {
-	h.subscriber = *NewStreamSubscriber(stream, h.handleFn)
+	h.subscriber = *exec.NewStreamSubscriber(stream, h.handleFn)
 	h.unsubscribe = h.subscriber.Subscribe()
 }
 

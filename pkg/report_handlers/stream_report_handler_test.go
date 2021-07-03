@@ -1,10 +1,11 @@
-package pkg
+package report_handlers
 
 import (
 	"errors"
 	"testing"
 
 	"github.com/sha1n/bert/api"
+	"github.com/sha1n/bert/pkg/exec"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -22,7 +23,7 @@ func TestStreamReportHandlerFinalizeTraceError(t *testing.T) {
 }
 
 func testStreamReportHandlerFinalizeWith(t *testing.T, expectedHandleError error, expectedTraceError error) {
-	tracer := NewTracer(1)
+	tracer := exec.NewTracer(1)
 	expectedSpec := exampleSpec()
 	expectedCtx := api.ReportContext{}
 

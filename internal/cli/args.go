@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/sha1n/bert/api"
-	"github.com/sha1n/bert/pkg"
+	"github.com/sha1n/bert/pkg/osutil"
 
 	"github.com/spf13/cobra"
 )
@@ -65,7 +65,7 @@ func ResolveOutputArg(cmd *cobra.Command, name string, ctx api.IOContext) io.Wri
 	var err error = nil
 
 	if outputFilePath := GetString(cmd, name); outputFilePath != "" {
-		resolvedfilePath := pkg.ExpandUserPath(outputFilePath)
+		resolvedfilePath := osutil.ExpandUserPath(outputFilePath)
 		outputFile, err = os.OpenFile(resolvedfilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	}
 	CheckBenchmarkInitFatal(err)

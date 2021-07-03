@@ -1,14 +1,15 @@
-package pkg
+package report_handlers
 
 import (
 	"github.com/sha1n/bert/api"
+	"github.com/sha1n/bert/pkg/exec"
 )
 
 type summaryReportHandler struct {
 	spec          api.BenchmarkSpec
 	ctx           api.ReportContext
-	sink          TraceSink
-	unsubscribe   Unsubscribe
+	sink          exec.TraceSink
+	unsubscribe   exec.Unsubscribe
 	writeReportFn api.WriteSummaryReportFn
 }
 
@@ -23,7 +24,7 @@ func NewSummaryReportHandler(spec api.BenchmarkSpec, ctx api.ReportContext, writ
 }
 
 func (h *summaryReportHandler) Subscribe(stream api.TraceStream) {
-	h.sink = *NewTraceSink(stream)
+	h.sink = *exec.NewTraceSink(stream)
 	h.unsubscribe = h.sink.Subscribe()
 }
 

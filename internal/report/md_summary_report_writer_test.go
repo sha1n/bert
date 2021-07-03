@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/sha1n/bert/api"
-	"github.com/sha1n/bert/pkg"
+	"github.com/sha1n/bert/pkg/exec"
 	"github.com/sha1n/gommons/pkg/test"
 	gommonstest "github.com/sha1n/gommons/pkg/test"
 	"github.com/stretchr/testify/assert"
@@ -54,10 +54,10 @@ func generateTestMdReport(t *testing.T, includeHeaders bool) ([]string, api.Summ
 	writer := buf
 
 	spec := aTwoScenarioSpec()
-	t1 := pkg.NewFakeTrace(spec.Scenarios[0].ID(), 1, 1, 1, nil)
-	t2 := pkg.NewFakeTrace(spec.Scenarios[1].ID(), 2, 2, 2, errors.New("err2"))
+	t1 := exec.NewFakeTrace(spec.Scenarios[0].ID(), 1, 1, 1, nil)
+	t2 := exec.NewFakeTrace(spec.Scenarios[1].ID(), 2, 2, 2, errors.New("err2"))
 
-	summary := pkg.NewFakeSummary(t1, t2)
+	summary := exec.NewFakeSummary(t1, t2)
 	ctx := api.ReportContext{
 		Labels:         gommonstest.RandomStrings(),
 		IncludeHeaders: includeHeaders,

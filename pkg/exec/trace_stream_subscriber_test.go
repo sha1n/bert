@@ -1,10 +1,11 @@
-package pkg
+package exec
 
 import (
 	"math/rand"
 	"testing"
 
 	"github.com/sha1n/bert/api"
+	"github.com/sha1n/gommons/pkg/test"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -39,11 +40,26 @@ func TestCanOnlySubscribeOnce(t *testing.T) {
 
 func createTracerWithNBufferedEvents(n int) api.Tracer {
 	tracer := NewTracer(n)
-	spec := exampleSpec()
+	spec := aSpec(true, 1)
 
 	for i := 0; i < n; i++ {
 		tracer.Start(spec.Scenarios[0])(&api.ExecutionInfo{}, nil)
 	}
 
 	return tracer
+}
+
+func aSpec(alternate bool, executions int) api.BenchmarkSpec {
+	return api.BenchmarkSpec{
+		Executions: executions,
+		Alternate:  alternate,
+		Scenarios: []api.ScenarioSpec{
+			{
+				Name: test.RandomString(),
+				Command: &api.CommandSpec{
+					Cmd: []string{"cmd"},
+				},
+			},
+		},
+	}
 }

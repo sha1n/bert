@@ -1,4 +1,4 @@
-package pkg
+package exec
 
 import (
 	"fmt"
@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/sha1n/bert/api"
+	"github.com/sha1n/bert/pkg/osutil"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -30,7 +31,7 @@ func (ce *commandExecutor) ExecuteFn(cmdSpec *api.CommandSpec, defaultWorkingDir
 	execCmd := exec.Command(cmdSpec.Cmd[0], cmdSpec.Cmd[1:]...)
 	ce.configureCommand(cmdSpec, execCmd, defaultWorkingDir, env)
 
-	cancel := RegisterInterruptGuard(onInterruptSignalFn(execCmd))
+	cancel := osutil.RegisterInterruptGuard(onInterruptSignalFn(execCmd))
 
 	return func() (execInfo *api.ExecutionInfo, err error) {
 		defer cancel()
@@ -56,11 +57,11 @@ func (ce *commandExecutor) ExecuteFn(cmdSpec *api.CommandSpec, defaultWorkingDir
 func (ce *commandExecutor) configureCommand(cmd *api.CommandSpec, execCmd *exec.Cmd, defaultWorkingDir string, env map[string]string) {
 	if cmd.WorkingDirectory != "" {
 		log.Debugf("Setting command working directory to '%s'", cmd.WorkingDirectory)
-		execCmd.Dir = ExpandUserPath(cmd.WorkingDirectory)
+		execCmd.Dir = osutil.ExpandUserPath(cmd.WorkingDirectory)
 	} else {
 		if defaultWorkingDir != "" {
 			log.Debugf("Setting command working directory to '%s'", defaultWorkingDir)
-			execCmd.Dir = ExpandUserPath(defaultWorkingDir)
+			execCmd.Dir = osutil.ExpandUserPath(defaultWorkingDir)
 		}
 	}
 

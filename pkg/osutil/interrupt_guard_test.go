@@ -1,4 +1,4 @@
-package pkg
+package osutil
 
 import (
 	"os"

@@ -1,4 +1,4 @@
-package pkg
+package exec
 
 import (
 	"github.com/sha1n/bert/api"

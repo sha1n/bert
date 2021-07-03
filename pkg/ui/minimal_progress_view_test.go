@@ -1,4 +1,4 @@
-package pkg
+package ui
 
 import (
 	"bytes"
@@ -16,7 +16,7 @@ func TestMinimalProgressViewOutput(t *testing.T) {
 	ctx.Tty = true
 	ctx.StdoutWriter = new(bytes.Buffer)
 	ctx.StderrWriter = new(bytes.Buffer)
-	spec := aBasicSpecWith(true, 2)
+	spec := aSpec(true, 2)
 	scenarioID := spec.Scenarios[0].ID()
 
 	expectedError := errors.New(gommonstest.RandomString())
@@ -49,28 +49,28 @@ func TestMinimalProgressViewOutput(t *testing.T) {
 func TestMinimalProgressViewEndNotStartedStateContract(t *testing.T) {
 	testProgressViewEndNotStartedStateContract(
 		t,
-		NewMinimalProgressView(aBasicSpecWith(true, 1), fakeTermDimensions, api.NewIOContext()),
+		NewMinimalProgressView(aSpec(true, 1), fakeTermDimensions, api.NewIOContext()),
 	)
 }
 
 func TestMinimalProgressViewEndStateContract(t *testing.T) {
 	testProgressViewEndStateContract(
 		t,
-		NewMinimalProgressView(aBasicSpecWith(true, 1), fakeTermDimensions, api.NewIOContext()),
+		NewMinimalProgressView(aSpec(true, 1), fakeTermDimensions, api.NewIOContext()),
 	)
 }
 
 func TestMinimalProgressViewStartAlreadyEndedStateContract(t *testing.T) {
 	testProgressViewStartAlreadyEndedStateContract(
 		t,
-		NewMinimalProgressView(aBasicSpecWith(true, 1), fakeTermDimensions, api.NewIOContext()),
+		NewMinimalProgressView(aSpec(true, 1), fakeTermDimensions, api.NewIOContext()),
 	)
 }
 
 func TestMinimalProgressViewStartStateContract(t *testing.T) {
 	testProgressViewStartStateContract(
 		t,
-		NewMinimalProgressView(aBasicSpecWith(true, 1), fakeTermDimensions, api.NewIOContext()),
+		NewMinimalProgressView(aSpec(true, 1), fakeTermDimensions, api.NewIOContext()),
 	)
 }
 

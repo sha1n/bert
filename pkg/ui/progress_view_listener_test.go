@@ -1,4 +1,4 @@
-package pkg
+package ui
 
 import (
 	"bytes"
@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/sha1n/bert/api"
+	"github.com/sha1n/gommons/pkg/test"
 	gommonstest "github.com/sha1n/gommons/pkg/test"
 	"github.com/stretchr/testify/assert"
 )
@@ -19,7 +20,7 @@ func TestProgressViewOutput(t *testing.T) {
 	ctx.Tty = true
 	ctx.StdoutWriter = new(bytes.Buffer)
 	ctx.StderrWriter = new(bytes.Buffer)
-	spec := aBasicSpecWith(true, 2)
+	spec := aSpec(true, 2)
 	scenarioID := spec.Scenarios[0].ID()
 
 	errorMessage := gommonstest.RandomString()
@@ -52,28 +53,28 @@ func TestProgressViewOutput(t *testing.T) {
 func TestProgressViewStartStateContract(t *testing.T) {
 	testProgressViewStartStateContract(
 		t,
-		NewProgressView(aBasicSpecWith(true, 1), fakeTermDimensions, api.NewIOContext()),
+		NewProgressView(aSpec(true, 1), fakeTermDimensions, api.NewIOContext()),
 	)
 }
 
 func TestProgressViewStartAlreadyEndedStateContract(t *testing.T) {
 	testProgressViewStartAlreadyEndedStateContract(
 		t,
-		NewProgressView(aBasicSpecWith(true, 1), fakeTermDimensions, api.NewIOContext()),
+		NewProgressView(aSpec(true, 1), fakeTermDimensions, api.NewIOContext()),
 	)
 }
 
 func TestProgressViewEndStateContract(t *testing.T) {
 	testProgressViewEndStateContract(
 		t,
-		NewProgressView(aBasicSpecWith(true, 1), fakeTermDimensions, api.NewIOContext()),
+		NewProgressView(aSpec(true, 1), fakeTermDimensions, api.NewIOContext()),
 	)
 }
 
 func TestProgressViewEndNotStartedStateContract(t *testing.T) {
 	testProgressViewEndNotStartedStateContract(
 		t,
-		NewProgressView(aBasicSpecWith(true, 1), fakeTermDimensions, api.NewIOContext()),
+		NewProgressView(aSpec(true, 1), fakeTermDimensions, api.NewIOContext()),
 	)
 }
 
@@ -152,4 +153,19 @@ func stdoutContainsFn(ctx api.IOContext, want string) func() bool {
 
 func fakeTermDimensions() (int, int) {
 	return 100, 100
+}
+
+func aSpec(alternate bool, executions int) api.BenchmarkSpec {
+	return api.BenchmarkSpec{
+		Executions: executions,
+		Alternate:  alternate,
+		Scenarios: []api.ScenarioSpec{
+			{
+				Name: test.RandomString(),
+				Command: &api.CommandSpec{
+					Cmd: []string{"cmd"},
+				},
+			},
+		},
+	}
 }

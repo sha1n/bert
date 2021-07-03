@@ -1,4 +1,4 @@
-package pkg
+package osutil
 
 import gommonsos "github.com/sha1n/gommons/pkg/os"
 
