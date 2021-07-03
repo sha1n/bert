@@ -21,6 +21,20 @@ func TestLoadYaml(t *testing.T) {
 	testLoad(t, "../../test/data/spec_test_load.yaml")
 }
 
+func TestLoadInvalidMissingRequiredYaml(t *testing.T) {
+	_, err := LoadSpec("../../test/data/spec_test_load_invalid_missing_required.yaml")
+
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "Invalid configuration")
+}
+
+func TestLoadInvalidTypeYaml(t *testing.T) {
+	_, err := LoadSpec("../../test/data/spec_test_load_invalid_type.yaml")
+
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "cannot unmarshal")
+}
+
 func TestSaveYaml(t *testing.T) {
 	filePath := path.Join(os.TempDir(), "TestSaveYaml.yml")
 	f, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY, 0644)
@@ -33,6 +47,14 @@ func TestSaveYaml(t *testing.T) {
 	actualSpec, err := loadYaml(t, filePath)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedSpec, actualSpec)
+}
+
+func TestSaveInvalidYaml(t *testing.T) {
+	filePath := path.Join(os.TempDir(), "TestSaveYaml.yml")
+	f, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY, 0644)
+	assert.NoError(t, err)
+
+	assert.Error(t, SaveSpec(api.BenchmarkSpec{}, f))
 }
 
 func TestSaveYamlClosesFile(t *testing.T) {

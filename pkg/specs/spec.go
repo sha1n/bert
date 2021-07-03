@@ -126,9 +126,6 @@ func validate(spec api.BenchmarkSpec) (err error) {
 }
 
 func translateError(err error, trans ut.Translator) (errs []string) {
-	if err == nil {
-		return nil
-	}
 	validatorErrs := err.(validator.ValidationErrors)
 	for _, e := range validatorErrs {
 		translatedErr := fmt.Errorf(e.Translate(trans))
