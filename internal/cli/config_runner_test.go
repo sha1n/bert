@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/sha1n/bert/api"
-	"github.com/sha1n/bert/pkg"
+	"github.com/sha1n/bert/pkg/specs"
 	gommonstest "github.com/sha1n/gommons/pkg/test"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
@@ -34,7 +34,7 @@ func TestBasicInteractiveFlow(t *testing.T) {
 	err := rootCmd.Execute()
 	assert.NoError(t, err)
 
-	actual, err := pkg.LoadSpec(configPath)
+	actual, err := specs.LoadSpec(configPath)
 
 	assert.NoError(t, err)
 	assert.Equal(t, expectedSpec(), actual)
@@ -51,7 +51,7 @@ func TestExampleSpecValidity(t *testing.T) {
 	err := rootCmd.Execute()
 	assert.NoError(t, err)
 
-	actual, err := pkg.LoadSpecFromYamlData(buffer.Bytes())
+	actual, err := specs.LoadSpecFromYamlData(buffer.Bytes())
 	assert.NoError(t, err)
 	assert.NotNil(t, actual)
 }
@@ -61,14 +61,14 @@ func TestExampleOutFile(t *testing.T) {
 	rootCmd, configPath, teardown := configureExampleCommandWithOutFile(t, ctx)
 	teardown()
 
-	expected, err := pkg.LoadSpecFromYamlData([]byte(getExampleSpec()))
+	expected, err := specs.LoadSpecFromYamlData([]byte(getExampleSpec()))
 	assert.NoError(t, err)
 	assert.NotNil(t, expected)
 
 	err = rootCmd.Execute()
 	assert.NoError(t, err)
 
-	actual, err := pkg.LoadSpec(configPath)
+	actual, err := specs.LoadSpec(configPath)
 	assert.NoError(t, err)
 	assert.Equal(t, expected, actual)
 }

@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/sha1n/bert/api"
-	"github.com/sha1n/bert/pkg"
+	"github.com/sha1n/bert/pkg/specs"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -50,7 +50,7 @@ func runConfigToolFn(ctx api.IOContext) func(*cobra.Command, []string) {
 
 			fmt.Print("\r\nWriting your configuration...\r\n\r\n")
 
-			if err := pkg.SaveSpec(spec, writeCloser); err != nil {
+			if err := specs.SaveSpec(spec, writeCloser); err != nil {
 				log.Error(err)
 				log.Exit(1)
 			}
