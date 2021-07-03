@@ -9,14 +9,14 @@ import (
 	"github.com/fatih/color"
 	"github.com/sha1n/bert/api"
 	"github.com/sha1n/bert/internal/cli"
-	"github.com/sha1n/bert/pkg"
+	"github.com/sha1n/bert/pkg/osutil"
 	errorhandling "github.com/sha1n/gommons/pkg/error_handling"
 	"github.com/sha1n/termite"
 	log "github.com/sirupsen/logrus"
 )
 
 func init() {
-	pkg.RegisterInterruptGuard(func(sig os.Signal) {
+	osutil.RegisterInterruptGuard(func(sig os.Signal) {
 		termite.NewCursor(os.Stdout).Show()
 		doExit(1)
 	})

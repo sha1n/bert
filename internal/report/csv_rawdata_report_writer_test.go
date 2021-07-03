@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/sha1n/bert/api"
-	"github.com/sha1n/bert/pkg"
 	gommonstest "github.com/sha1n/gommons/pkg/test"
 	"github.com/stretchr/testify/assert"
 )
@@ -55,14 +54,14 @@ func writeCsvRawReport(t *testing.T, includeHeaders bool, traces ...api.Trace) [
 }
 
 func twoRandomTraceEvents() (api.Trace, api.Trace) {
-	return pkg.NewFakeTrace(
+	return NewFakeTrace(
 			gommonstest.RandomString(),
 			time.Duration(gommonstest.RandomUint()),
 			time.Duration(gommonstest.RandomUint()),
 			time.Duration(gommonstest.RandomUint()),
 			nil,
 		),
-		pkg.NewFakeTrace(
+		NewFakeTrace(
 			gommonstest.RandomString(),
 			time.Duration(gommonstest.RandomUint()),
 			time.Duration(gommonstest.RandomUint()),

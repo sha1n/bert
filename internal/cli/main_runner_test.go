@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/sha1n/bert/api"
-	"github.com/sha1n/bert/pkg"
+	"github.com/sha1n/bert/pkg/specs"
 	"github.com/sha1n/gommons/pkg/test"
 	gommonstest "github.com/sha1n/gommons/pkg/test"
 	"github.com/spf13/cobra"
@@ -105,7 +105,7 @@ func TestWithCombinedDebugAndSilent(t *testing.T) {
 }
 
 func Test_loadSpecWithExecutionsOverride(t *testing.T) {
-	expectedSpec, _ := pkg.LoadSpec(itConfigFilePath)
+	expectedSpec, _ := specs.LoadSpec(itConfigFilePath)
 	expectedSpec.Executions = expectedSpec.Executions + rand.Intn(10)
 	command := newDummyCommandWith("-c", itConfigFilePath, "--executions", fmt.Sprint(expectedSpec.Executions))
 
@@ -117,7 +117,7 @@ func Test_loadSpecWithExecutionsOverride(t *testing.T) {
 
 func Test_loadSpecFromPositionalArguments(t *testing.T) {
 	expectedExecutions := rand.Intn(100)
-	expectedValidSpec, _ := pkg.CreateSpecFrom(
+	expectedValidSpec, _ := specs.CreateSpecFrom(
 		expectedExecutions,
 		false,
 		api.CommandSpec{Cmd: []string{"cmd", "-a"}},

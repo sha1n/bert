@@ -9,7 +9,11 @@ import (
 
 	"github.com/sha1n/bert/api"
 	"github.com/sha1n/bert/internal/report"
-	"github.com/sha1n/bert/pkg"
+	"github.com/sha1n/bert/pkg/exec"
+	"github.com/sha1n/bert/pkg/osutil"
+	"github.com/sha1n/bert/pkg/report_handlers"
+	"github.com/sha1n/bert/pkg/specs"
+	"github.com/sha1n/bert/pkg/ui"
 	"github.com/sha1n/termite"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -106,11 +110,11 @@ func runFn(ctx api.IOContext) func(*cobra.Command, []string) {
 		defer closer.Close()
 
 		if err == nil {
-			tracer := pkg.NewTracer(spec.Executions * len(spec.Scenarios))
+			tracer := exec.NewTracer(spec.Executions * len(spec.Scenarios))
 			reportHandler.Subscribe(tracer.Stream())
 
 			log.Info("Executing...")
-			pkg.Execute(spec, resolveExecutionContext(cmd, spec, ctx, tracer))
+			exec.Execute(spec, resolveExecutionContext(cmd, spec, ctx, tracer))
 
 			log.Info("Finalizing report...")
 			err = reportHandler.Finalize()
@@ -133,15 +137,15 @@ func loadSpec(cmd *cobra.Command, args []string) (spec api.BenchmarkSpec, err er
 				Cmd: parseCommand(strings.Trim(args[i], "'\"")),
 			})
 		}
-		spec, err = pkg.CreateSpecFrom(executions, false, commands...)
+		spec, err = specs.CreateSpecFrom(executions, false, commands...)
 
 	} else {
 		var filePath string
 		filePath = GetString(cmd, ArgNameConfig)
-		filePath, err = filepath.Abs(pkg.ExpandUserPath(filePath))
+		filePath, err = filepath.Abs(osutil.ExpandUserPath(filePath))
 
 		if err == nil {
-			_, err = os.Stat(pkg.ExpandUserPath(filePath))
+			_, err = os.Stat(osutil.ExpandUserPath(filePath))
 			exists := !os.IsNotExist(err)
 
 			if err != nil || !exists {
@@ -149,7 +153,7 @@ func loadSpec(cmd *cobra.Command, args []string) (spec api.BenchmarkSpec, err er
 				return
 			}
 
-			if spec, err = pkg.LoadSpec(filePath); err != nil {
+			if spec, err = specs.LoadSpec(filePath); err != nil {
 				return
 			}
 		}
@@ -171,20 +175,20 @@ func resolveReportHandler(cmd *cobra.Command, spec api.BenchmarkSpec, ctx api.IO
 	switch reportFormat := GetString(cmd, ArgNameFormat); reportFormat {
 	case ArgValueReportFormatMarkdownRaw:
 		streamReportWriter := report.NewMarkdownStreamReportWriter(writer, reportCtx)
-		handler = pkg.NewStreamReportHandler(spec, reportCtx, streamReportWriter.Handle)
+		handler = report_handlers.NewStreamReportHandler(spec, reportCtx, streamReportWriter.Handle)
 
 	case ArgValueReportFormatCsvRaw:
 		streamReportWriter := report.NewCsvStreamReportWriter(writer, reportCtx)
-		handler = pkg.NewStreamReportHandler(spec, reportCtx, streamReportWriter.Handle)
+		handler = report_handlers.NewStreamReportHandler(spec, reportCtx, streamReportWriter.Handle)
 
 	case ArgValueReportFormatMarkdown:
-		handler = pkg.NewSummaryReportHandler(spec, reportCtx, report.NewMarkdownSummaryReportWriter(writer))
+		handler = report_handlers.NewSummaryReportHandler(spec, reportCtx, report.NewMarkdownSummaryReportWriter(writer))
 
 	case ArgValueReportFormatCsv:
-		handler = pkg.NewSummaryReportHandler(spec, reportCtx, report.NewCsvReportWriter(writer))
+		handler = report_handlers.NewSummaryReportHandler(spec, reportCtx, report.NewCsvReportWriter(writer))
 
 	case ArgValueReportFormatJSON:
-		handler = pkg.NewSummaryReportHandler(spec, reportCtx, report.NewJSONReportWriter(writer))
+		handler = report_handlers.NewSummaryReportHandler(spec, reportCtx, report.NewJSONReportWriter(writer))
 
 	case ArgValueReportFormatTxt:
 		var colorsOn = false
@@ -192,7 +196,7 @@ func resolveReportHandler(cmd *cobra.Command, spec api.BenchmarkSpec, ctx api.IO
 			colorsOn = true
 		}
 
-		handler = pkg.NewSummaryReportHandler(spec, reportCtx, report.NewTextReportWriter(writer, colorsOn))
+		handler = report_handlers.NewSummaryReportHandler(spec, reportCtx, report.NewTextReportWriter(writer, colorsOn))
 
 	default:
 		err = fmt.Errorf("Invalid report format '%s'", reportFormat)
@@ -215,17 +219,17 @@ func resolveExecutionContext(cmd *cobra.Command, spec api.BenchmarkSpec, ctx api
 
 	return api.NewExecutionContext(
 		tracer,
-		pkg.NewCommandExecutor(pipeStdOut, pipeStdErr),
+		exec.NewCommandExecutor(pipeStdOut, pipeStdErr),
 		resolveExecutionListener(cmd, spec, ctx),
 	)
 }
 
 func resolveExecutionListener(cmd *cobra.Command, spec api.BenchmarkSpec, ctx api.IOContext) api.Listener {
 	if enableTerminalGUI(cmd, ctx) {
-		return pkg.NewProgressView(spec, terminalDimensionsOrFake, ctx)
+		return ui.NewProgressView(spec, terminalDimensionsOrFake, ctx)
 	}
 
-	return pkg.NewLoggingProgressListener()
+	return ui.NewLoggingProgressListener()
 }
 
 func enableTerminalGUI(cmd *cobra.Command, ctx api.IOContext) bool {

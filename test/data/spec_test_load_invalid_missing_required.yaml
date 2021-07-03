@@ -1,0 +1,28 @@
+---
+alternate: true
+scenarios:
+- name: scenario A
+  workingDir: "/tmp"
+  env:
+    KEY: value
+  beforeAll:
+    cmd:
+    - echo
+    - setupA
+  afterAll:
+    cmd:
+    - echo
+    - teardownA
+  beforeEach:
+    workingDir: "~/tmp"
+    cmd:
+    - echo
+    - beforeA
+  afterEach:
+    cmd:
+    - echo
+    - afterA
+  command:
+    cmd:
+    - sleep
+    - '1'
