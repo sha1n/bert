@@ -1,4 +1,4 @@
-package report_handlers
+package reporthandlers
 
 import (
 	"errors"
