@@ -36,7 +36,7 @@ func TestLoadInvalidTypeYaml(t *testing.T) {
 }
 
 func TestSaveYaml(t *testing.T) {
-	filePath := path.Join(os.TempDir(), "TestSaveYaml.yml")
+	filePath := tempFileName("TestSaveYaml", "yml")
 	f, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY, 0644)
 	assert.NoError(t, err)
 
@@ -50,7 +50,7 @@ func TestSaveYaml(t *testing.T) {
 }
 
 func TestSaveInvalidYaml(t *testing.T) {
-	filePath := path.Join(os.TempDir(), "TestSaveYaml.yml")
+	filePath := tempFileName("TestSaveInvalidYaml", "yml")
 	f, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY, 0644)
 	assert.NoError(t, err)
 
@@ -58,7 +58,7 @@ func TestSaveInvalidYaml(t *testing.T) {
 }
 
 func TestSaveYamlClosesFile(t *testing.T) {
-	filePath := path.Join(os.TempDir(), "TestSaveYamlClosesFile.yml")
+	filePath := tempFileName("TestSaveYamlClosesFile", "yml")
 	f, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY, 0644)
 	assert.NoError(t, err)
 
@@ -211,6 +211,10 @@ func expectedBenchmarkSpec() api.BenchmarkSpec {
 		},
 	}
 
+}
+
+func tempFileName(prefix string, ext string) string {
+	return path.Join(os.TempDir(), fmt.Sprintf("%s-%s.%s", prefix, test.RandomString(), ext))
 }
 
 func loadYaml(t *testing.T, filePath string) (spec api.BenchmarkSpec, err error) {
