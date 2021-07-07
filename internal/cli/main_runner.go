@@ -175,20 +175,20 @@ func resolveReportHandler(cmd *cobra.Command, spec api.BenchmarkSpec, ctx api.IO
 	switch reportFormat := GetString(cmd, ArgNameFormat); reportFormat {
 	case ArgValueReportFormatMarkdownRaw:
 		streamReportWriter := report.NewMarkdownStreamReportWriter(writer, reportCtx)
-		handler = report_handlers.NewStreamReportHandler(spec, reportCtx, streamReportWriter.Handle)
+		handler = reporthandlers.NewStreamReportHandler(spec, reportCtx, streamReportWriter.Handle)
 
 	case ArgValueReportFormatCsvRaw:
 		streamReportWriter := report.NewCsvStreamReportWriter(writer, reportCtx)
-		handler = report_handlers.NewStreamReportHandler(spec, reportCtx, streamReportWriter.Handle)
+		handler = reporthandlers.NewStreamReportHandler(spec, reportCtx, streamReportWriter.Handle)
 
 	case ArgValueReportFormatMarkdown:
-		handler = report_handlers.NewSummaryReportHandler(spec, reportCtx, report.NewMarkdownSummaryReportWriter(writer))
+		handler = reporthandlers.NewSummaryReportHandler(spec, reportCtx, report.NewMarkdownSummaryReportWriter(writer))
 
 	case ArgValueReportFormatCsv:
-		handler = report_handlers.NewSummaryReportHandler(spec, reportCtx, report.NewCsvReportWriter(writer))
+		handler = reporthandlers.NewSummaryReportHandler(spec, reportCtx, report.NewCsvReportWriter(writer))
 
 	case ArgValueReportFormatJSON:
-		handler = report_handlers.NewSummaryReportHandler(spec, reportCtx, report.NewJSONReportWriter(writer))
+		handler = reporthandlers.NewSummaryReportHandler(spec, reportCtx, report.NewJSONReportWriter(writer))
 
 	case ArgValueReportFormatTxt:
 		var colorsOn = false
@@ -196,7 +196,7 @@ func resolveReportHandler(cmd *cobra.Command, spec api.BenchmarkSpec, ctx api.IO
 			colorsOn = true
 		}
 
-		handler = report_handlers.NewSummaryReportHandler(spec, reportCtx, report.NewTextReportWriter(writer, colorsOn))
+		handler = reporthandlers.NewSummaryReportHandler(spec, reportCtx, report.NewTextReportWriter(writer, colorsOn))
 
 	default:
 		err = fmt.Errorf("Invalid report format '%s'", reportFormat)
