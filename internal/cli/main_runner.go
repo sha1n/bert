@@ -11,7 +11,7 @@ import (
 	"github.com/sha1n/bert/internal/report"
 	"github.com/sha1n/bert/pkg/exec"
 	"github.com/sha1n/bert/pkg/osutil"
-	"github.com/sha1n/bert/pkg/report_handlers"
+	"github.com/sha1n/bert/pkg/reporthandlers"
 	"github.com/sha1n/bert/pkg/specs"
 	"github.com/sha1n/bert/pkg/ui"
 	"github.com/sha1n/termite"
