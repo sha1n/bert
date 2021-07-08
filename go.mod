@@ -6,7 +6,7 @@ require (
 	github.com/fatih/color v1.12.0
 	github.com/go-playground/locales v0.13.0
 	github.com/go-playground/universal-translator v0.17.0
-	github.com/go-playground/validator/v10 v10.6.1
+	github.com/go-playground/validator/v10 v10.7.0
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/montanaflynn/stats v0.6.6
 	github.com/sha1n/gommons v0.0.9
