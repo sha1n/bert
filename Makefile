@@ -12,6 +12,7 @@ GOHOSTOS := $(shell go env GOHOSTOS)
 GOHOSTARCH := $(shell go env GOHOSTARCH)
 GOBASE := $(shell pwd)
 GOBIN := $(GOBASE)/bin
+GODIST := $(GOBASE)/dist
 GOBUILD := $(GOBASE)/build
 GOFILES := $(shell find . -type f -name '*.go' -not -path './vendor/*')
 GOOS_DARWIN := "darwin"
@@ -46,9 +47,15 @@ lint: go-lint
 .PHONY: build
 build:
 	@[ -d $(GOBUILD) ] || mkdir -p $(GOBUILD)
+	@-mkdir -p $(GOBUILD)/completions
 	@-touch $(STDERR)
 	@-rm $(STDERR)
 	@-$(MAKE) -s go-build #2> $(STDERR)
+	# generate completions
+	bin/bert-$(GOHOSTOS)-$(GOHOSTARCH) completion zsh > $(GOBUILD)/completions/_bert
+	bin/bert-$(GOHOSTOS)-$(GOHOSTARCH) completion bash > $(GOBUILD)/completions/bert.bash
+	bin/bert-$(GOHOSTOS)-$(GOHOSTARCH) completion fish > $(GOBUILD)/completions/bert.fish
+
 	#@cat $(STDERR) | sed -e '1s/.*/\nError:\n/'  | sed 's/make\[.*/ /' | sed "/^/s/^/     /" 1>&2
 
 
