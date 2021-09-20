@@ -29,6 +29,7 @@
       - [Markdown Example](#markdown-example)
       - [Raw CSV Example](#raw-csv-example)
   - [Output Control](#output-control)
+  - [Shell Completion Scripts](#shell-completion-scripts)
   - [Alternatives](#alternatives)
 
 
@@ -71,8 +72,27 @@ brew upgrade bert
 Download the appropriate binary and put it in your `PATH`.
 
 ```bash
-# macOS Example (assuming that '$HOME/.local/bin' is in your PATH):
-curl -sSL https://github.com/sha1n/bert/releases/latest/download/bert-darwin-amd64 -o "$HOME/.local/bin/bert"
+# macOS single line example (assuming that '$HOME/.local/bin' is in your PATH):
+bash -c 'VERSION="2.3.12" && TMP=$(mktemp -d) && cd $TMP && curl -sSL "https://github.com/sha1n/bert/releases/download/v${VERSION}/bert_${VERSION}_Darwin_x86_64.tar.gz" | tar -xz && mv bert ~/.local/bin && rm -rf $TMP'
+
+
+# breaking it down
+
+# specify which version you want
+VERSION="2.3.12"
+# create a temp directory
+TMP=$(mktemp -d)
+# change directory 
+cd "$TMP"
+# download and extract the archive in the temp dir
+curl -sSL "https://github.com/sha1n/bert/releases/download/v${VERSION}/bert_${VERSION}_Darwin_x86_64.tar.gz" | tar -xz
+# move the binary file to a dir in your PATH
+mv bert ~/.local/bin
+
+# optionally install completion scripts from ./completions
+
+# delete the temp directory
+rm -rf $TMP
 
 # Once installed, you can update using the update command (this doesn't work when installing using Homebrew)
 bert update
@@ -144,8 +164,8 @@ Sometimes what you really want to measure is the impact of environmental changes
 
 **Example:**
 
-| Timestamp                 | Scenario | Samples | Labels    | Min   | Max    | Mean  | Median | Percentile 90 | StdDev  | User Time | System Time | Errors |
-| ------------------------- | -------- | ------- | --------- | ----- | ------ | ----- | ------ | ------------- | ------- | --------- | ----------- | ------ |
+| Timestamp            | Scenario | Samples | Labels    | Min   | Max    | Mean  | Median | Percentile 90 | StdDev  | User Time | System Time | Errors |
+| -------------------- | -------- | ------- | --------- | ----- | ------ | ----- | ------ | ------------- | ------- | --------- | ----------- | ------ |
 | 2021-06-20T21:01:24Z | curl     | 100     | vpn,wifi  | 3.5ms | 6.4ms  | 4.4ms | 4.3ms  | 5.0ms         | 552.2µs | 646.5µs   | 1.6ms       | 0%     |
 | 2021-06-20T21:02:05Z | curl     | 100     | vpn,wired | 3.4ms | 16.0ms | 4.3ms | 4.1ms  | 4.9ms         | 1.3ms   | 634.0µs   | 1.6ms       | 0%     |
 | 2021-06-20T21:02:33Z | curl     | 100     | wired     | 0.6ms | 8.1ms  | 1.3ms | 1.1ms  | 5.9ms         | 0.8ms   | 559.4µs   | 1.4ms       | 0%     |
@@ -253,8 +273,8 @@ Timestamp,Scenario,Samples,Labels,Min,Max,Mean,Median,Percentile 90,StdDev,User 
 
 #### Markdown Example
 ```
-| Timestamp                 | Scenario   | Samples | Labels        | Min   | Max   | Mean  | Median | Percentile 90 | StdDev  | User Time | System Time | Errors |
-| ------------------------- | ---------- | ------- | ------------- | ----- | ----- | ----- | ------ | ------------- | ------- | --------- | ----------- | ------ |
+| Timestamp            | Scenario   | Samples | Labels        | Min   | Max   | Mean  | Median | Percentile 90 | StdDev  | User Time | System Time | Errors |
+| -------------------- | ---------- | ------- | ------------- | ----- | ----- | ----- | ------ | ------------- | ------- | --------- | ----------- | ------ |
 | 2021-06-20T21:06:22Z | scenario A | 10      | example-label | 1.0s  | 1.0s  | 1.0s  | 1.0s   | 1.0s          | 1.8ms   | 459.5µs   | 1.2ms       | 0%     |
 | 2021-06-20T21:06:22Z | scenario B | 10      | example-label | 3.1ms | 4.5ms | 3.4ms | 3.2ms  | 3.7ms         | 408.8µs | 439.0µs   | 1.1ms       | 0%     |
 ```
@@ -292,6 +312,9 @@ However, there are several ways you can control what is logged and in what level
 - `--pipe-stdout` and `--pipe-stderr` - pipe the standard out and err of executed benchmark commands respectively, to standard err.
 - `--silent` or `-s` - sets the logging level to the lowest level possible, which includes only fatal errors. That is a softer version of `2>/dev/null` and should be preferred in general.
 - `--debug` or `-d` - sets the logging level to the highest possible level, for troubleshooting.
+
+## Shell Completion Scripts
+`bert` comes with completion scripts for `zsh`, `bash`, `fish` and `PowerShell`. When installed with [brew](#install-from-a-homebrew-tap) completions scripts are automatically installed to the appropriate location, otherwise the scripts can be found in the tar-ball version of the released binaries.
 
 ## Alternatives
 Before developing `bert` I looked into the following tools. Both target similar use-cases, but with different focus.
