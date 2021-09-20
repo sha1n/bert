@@ -49,6 +49,7 @@ func doRun(exitFn func(int)) {
 
 	// Subcommands
 	rootCmd.AddCommand(cli.CreateConfigCommand(ctx))
+	rootCmd.AddCommand(cli.CreateCompletionCommand())
 	if enableSelfUpdate() {
 		rootCmd.AddCommand(cli.CreateUpdateCommand(Version, ProgramName, ctx))
 	}

@@ -16,11 +16,20 @@ builds:
       - -s -w -X main.DisableSelfUpdate=true -X main.Version={{.Version}} -X main.Build={{.Commit}} -X main.ProgramName={{.ProjectName}}
     main: ./cmd/main.go
 archives:
-  - replacements:
+  -
+    id: main
+    replacements:
       darwin: Darwin
       linux: Linux
       386: i386
       amd64: x86_64
+    files:
+      - LICENSE
+      - build/completions
+      - src: 'build/completions/*'
+        dst: completions
+        strip_parent: true
+
 checksum:
   name_template: "checksums.txt"
   algorithm: sha256
@@ -57,3 +66,6 @@ brews:
 
     install: |
       bin.install "{{ .ProjectName }}"
+      bash_completion.install "completions/bert.bash" => "bert"
+      fish_completion.install "completions/bert.fish" => "bert"
+      zsh_completion.install "completions/_bert" => "_bert"
