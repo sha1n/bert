@@ -10,6 +10,7 @@ import (
 	"github.com/sha1n/bert/api"
 	"github.com/sha1n/bert/internal/cli"
 	"github.com/sha1n/bert/pkg/osutil"
+	"github.com/sha1n/gommons/pkg/cmd"
 	errorhandling "github.com/sha1n/gommons/pkg/error_handling"
 	"github.com/sha1n/termite"
 	log "github.com/sirupsen/logrus"
@@ -49,7 +50,7 @@ func doRun(exitFn func(int)) {
 
 	// Subcommands
 	rootCmd.AddCommand(cli.CreateConfigCommand(ctx))
-	rootCmd.AddCommand(cli.CreateCompletionCommand())
+	rootCmd.AddCommand(cmd.CreateShellCompletionScriptGenCommand())
 	if enableSelfUpdate() {
 		rootCmd.AddCommand(cli.CreateUpdateCommand(Version, ProgramName, ctx))
 	}
