@@ -9,7 +9,7 @@ require (
 	github.com/go-playground/validator/v10 v10.9.0
 	github.com/montanaflynn/stats v0.6.6
 	github.com/sha1n/gommons v0.0.10
-	github.com/sha1n/termite v0.0.19
+	github.com/sha1n/termite v0.0.20
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.2.1
 	github.com/stretchr/testify v1.7.0
