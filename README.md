@@ -17,6 +17,7 @@
   - [Usage](#usage)
     - [Quick Ad-Hoc Benchmarks](#quick-ad-hoc-benchmarks)
     - [Using a Configuration File](#using-a-configuration-file)
+    - [Directory Local Configuration (.bertconfig)](#directory-local-configuration-bertconfig)
   - [Reports](#reports)
     - [Report Formats](#report-formats)
     - [Accumulating Data](#accumulating-data)
@@ -136,6 +137,9 @@ bert --config benchmark-config.yml
 # Equivalent shorthand version of the above
 bert -c benchmark-config.yml
 ```
+
+### Directory Local Configuration (.bertconfig)
+When a file named `.bertconfig` exists in `bert`'s current directory and no other configuration method is specified, `bert` assumes that file is a benchmark configuration file and attempts to load specs from it.
 
 ## Reports
 ### Report Formats

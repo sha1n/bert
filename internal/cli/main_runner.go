@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 
@@ -141,7 +142,7 @@ func loadSpec(cmd *cobra.Command, args []string) (spec api.BenchmarkSpec, err er
 
 	} else {
 		var filePath string
-		filePath = GetString(cmd, ArgNameConfig)
+		filePath = GetConfigFilePath(cmd)
 		filePath, err = filepath.Abs(osutil.ExpandUserPath(filePath))
 
 		if err == nil {
@@ -258,7 +259,15 @@ func validatePositionalArgs(cmd *cobra.Command, args []string) error {
 			return fmt.Errorf("--%s is required", ArgNameExecutions)
 		}
 	} else {
-		if outputFilePath := GetString(cmd, ArgNameConfig); outputFilePath == "" {
+		var dirConfigExists = false
+		wd, err := os.Getwd()
+		if err == nil {
+			bertConfigPath := path.Join(wd, DirectoryConfigFileName)
+			_, err = os.Stat(bertConfigPath)
+			dirConfigExists = !os.IsNotExist(err)
+		}
+
+		if outputFilePath := GetString(cmd, ArgNameConfig); outputFilePath == "" && !dirConfigExists {
 			return fmt.Errorf("either specify a configuration file with '--%s', or inline commands to benchmark", ArgNameConfig)
 		}
 	}
