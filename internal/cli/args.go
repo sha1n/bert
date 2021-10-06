@@ -3,6 +3,7 @@ package cli
 import (
 	"io"
 	"os"
+	"path"
 
 	"github.com/sha1n/bert/api"
 	"github.com/sha1n/bert/pkg/osutil"
@@ -53,6 +54,9 @@ const (
 	ArgValueReportFormatMarkdown = "md"
 	// ArgValueReportFormatMarkdownRaw : Markdown report format arg value
 	ArgValueReportFormatMarkdownRaw = "md/raw"
+
+	// DirectoryConfigFileName : working directory default config file name
+	DirectoryConfigFileName = ".bertconfig"
 )
 
 // StreamingReportFormats a slice containing the values that represent report formats that are reporting in streaming
@@ -120,6 +124,27 @@ func IsExperimentEnabled(cmd *cobra.Command, name string) bool {
 	}
 
 	return false
+}
+
+// GetConfigFilePath resolved the effective config file.
+func GetConfigFilePath(cmd *cobra.Command) string {
+	var configPath string
+	var err error
+	configPath, err = cmd.Flags().GetString(ArgNameConfig)
+
+	// Experimental: look for a dot-file if no config has been specified
+	if err != nil || configPath == "" {
+		wd, err := os.Getwd()
+
+		if err == nil {
+			configPath = path.Join(wd, DirectoryConfigFileName)
+			_, err = os.Stat(configPath)
+		}
+	}
+
+	CheckUserArgFatal(err)
+
+	return configPath
 }
 
 // stdOutNonClosingWriteCloser a wrapper around os.Stdout that implements the io.WriteCloser interface but never closes the file

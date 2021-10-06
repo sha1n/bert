@@ -1,0 +1,7 @@
+executions: 1
+scenarios:
+- name: NAME
+  command:
+    cmd:
+    - go 
+    - version
