@@ -129,7 +129,7 @@ In order to gain full control over benchmark configuration `bert` uses a configu
 - unlock advanced features such as alternate execution, custom environment variables, working directories and setup commands per scenario
 - easily share elaborate benchmark configurations, store them in VCS and reuse them on different environments and over time
 
-More about configuration [here](configuration.md).
+More about configuration [here](docs/configuration.md).
 
 ```bash
 bert --config benchmark-config.yml
