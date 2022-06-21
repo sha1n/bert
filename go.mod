@@ -12,7 +12,7 @@ require (
 	github.com/sha1n/termite v0.0.21
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.4.0
-	github.com/stretchr/testify v1.7.3
+	github.com/stretchr/testify v1.7.4
 	gopkg.in/yaml.v2 v2.4.0
 )
 
