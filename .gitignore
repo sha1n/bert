@@ -1,11 +1,12 @@
-vendor
-bin
-build
+vendor/
+bin/
+build/
+.vscode/
 
-sketches
+sketches/
 no.go
 
-.vagrant
+.vagrant/
 .vm_config.json
 
 dist/
