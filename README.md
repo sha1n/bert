@@ -124,7 +124,7 @@ bert 'command -optA' 'command -optB' 'anotherCommand' --executions 100
 ### Using a Configuration File
 In order to gain full control over benchmark configuration `bert` uses a configuration file. The configuration file can be either in YAML or JSON format. `bert` treats files with the `.json` extension as JSON, otherwise it assumes YAML. You may create a configuration file manually or use the `config` command to interactively generate your configuration.
 
-**Why use a config files?**
+**Why use a config file?**
 
 - unlock advanced features such as alternate execution, custom environment variables, working directories and setup commands per scenario
 - easily share elaborate benchmark configurations, store them in VCS and reuse them on different environments and over time
