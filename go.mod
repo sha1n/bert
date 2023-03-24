@@ -9,7 +9,7 @@ require (
 	github.com/go-playground/validator/v10 v10.12.0
 	github.com/montanaflynn/stats v0.7.0
 	github.com/sha1n/gommons v0.0.12
-	github.com/sha1n/termite v0.0.21
+	github.com/sha1n/termite v0.0.22
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/cobra v1.6.1
 	github.com/stretchr/testify v1.8.2
@@ -25,7 +25,7 @@ require (
 	github.com/kopoli/go-terminal-size v0.0.0-20170219200355-5c97524c8b54 // indirect
 	github.com/leodido/go-urn v1.2.2 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
-	github.com/mattn/go-isatty v0.0.17 // indirect
+	github.com/mattn/go-isatty v0.0.18 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	golang.org/x/crypto v0.7.0 // indirect
