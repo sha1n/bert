@@ -6,7 +6,7 @@ require (
 	github.com/fatih/color v1.15.0
 	github.com/go-playground/locales v0.14.1
 	github.com/go-playground/universal-translator v0.18.1
-	github.com/go-playground/validator/v10 v10.12.0
+	github.com/go-playground/validator/v10 v10.13.0
 	github.com/montanaflynn/stats v0.7.0
 	github.com/sha1n/gommons v0.0.12
 	github.com/sha1n/termite v0.0.22
@@ -23,7 +23,7 @@ require (
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/kopoli/go-terminal-size v0.0.0-20170219200355-5c97524c8b54 // indirect
-	github.com/leodido/go-urn v1.2.2 // indirect
+	github.com/leodido/go-urn v1.2.3 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.18 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
