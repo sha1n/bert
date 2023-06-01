@@ -22,7 +22,7 @@
     - [Report Formats](#report-formats)
     - [Accumulating Data](#accumulating-data)
     - [Labelling Data](#labelling-data)
-    - [Understanding User & System Time Measurements](#understanding-user--system-time-measurements)
+    - [Understanding User \& System Time Measurements](#understanding-user--system-time-measurements)
     - [Examples](#examples)
       - [Text Example](#text-example)
       - [JSON Example](#json-example)
@@ -119,6 +119,9 @@ bert 'command -opt' --executions 100
 
 # Multiple commands
 bert 'command -optA' 'command -optB' 'anotherCommand' --executions 100
+
+# Multiple commands with alternate execution
+bert 'command -optA' 'command -optB' 'anotherCommand' --executions 100 --alternate
 ```
 
 ### Using a Configuration File
