@@ -16,6 +16,8 @@ const (
 	ArgNameConfig = "config"
 	// ArgNameExecutions : program arg name
 	ArgNameExecutions = "executions"
+	// ArgNameAlternate : program arg name
+	ArgNameAlternate = "alternate"
 	// ArgNameOutputFile : program arg name
 	ArgNameOutputFile = "out-file"
 	// ArgNameConfigExample : program arg name

@@ -130,11 +130,22 @@ func Test_loadSpecWithExecutionsOverride(t *testing.T) {
 	assert.Equal(t, expectedSpec, spec)
 }
 
+func Test_loadSpecWithAlternateOverride(t *testing.T) {
+	expectedSpec, _ := specs.LoadSpec(itConfigFilePath)
+	expectedSpec.Alternate = true
+	command := newDummyCommandWith("-c", itConfigFilePath, "--alternate")
+
+	spec, err := loadSpec(command, []string{})
+
+	assert.NoError(t, err)
+	assert.Equal(t, expectedSpec, spec)
+}
+
 func Test_loadSpecFromPositionalArguments(t *testing.T) {
 	expectedExecutions := rand.Intn(100)
 	expectedValidSpec, _ := specs.CreateSpecFrom(
 		expectedExecutions,
-		false,
+		true,
 		api.CommandSpec{Cmd: []string{"cmd", "-a"}},
 		api.CommandSpec{Cmd: []string{"cmd", "-b"}},
 		api.CommandSpec{Cmd: []string{"cmd", "a string"}},
@@ -153,7 +164,7 @@ func Test_loadSpecFromPositionalArguments(t *testing.T) {
 		{
 			name: "call with positional single-quote framed commands",
 			args: args{
-				cmd:  newDummyCommandWith("--executions", fmt.Sprint(expectedExecutions)),
+				cmd:  newDummyCommandWith("--alternate", "--executions", fmt.Sprint(expectedExecutions)),
 				args: []string{"'cmd -a'", "'cmd -b'", "'cmd \"a string\"'"},
 			},
 			wantSpec: expectedValidSpec,
@@ -162,7 +173,7 @@ func Test_loadSpecFromPositionalArguments(t *testing.T) {
 		{
 			name: "call with positional double-quote framed commands",
 			args: args{
-				cmd:  newDummyCommandWith("--executions", fmt.Sprint(expectedExecutions)),
+				cmd:  newDummyCommandWith("--alternate", "--executions", fmt.Sprint(expectedExecutions)),
 				args: []string{"\"cmd -a\"", "\"cmd -b\"", "\"cmd 'a string'\""},
 			},
 			wantSpec: expectedValidSpec,

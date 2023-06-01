@@ -60,6 +60,7 @@ Build label: %s`, version, build),
 	rootCmd.Flags().IntP(ArgNameExecutions, "e", 0, `the number of executions per scenario.
 required when no configuration file is provided. 
 when specified with a configuration file, this argument has priority.`)
+	rootCmd.Flags().BoolP(ArgNameAlternate, "a", false, `whether to use alternate executions or finish one scenario before commencing to the next one.`)
 
 	// Reporting
 	rootCmd.Flags().StringP(ArgNameOutputFile, "o", "", `output file path. Optional. Writes to stdout by default.`)
@@ -130,6 +131,7 @@ func runFn(ctx api.IOContext) func(*cobra.Command, []string) {
 
 func loadSpec(cmd *cobra.Command, args []string) (spec api.BenchmarkSpec, err error) {
 	executions := GetInt(cmd, ArgNameExecutions)
+	alternate := GetBool(cmd, ArgNameAlternate)
 
 	if len(args) > 0 { // positional args are used for ad-hoc config
 		commands := []api.CommandSpec{}
@@ -138,7 +140,7 @@ func loadSpec(cmd *cobra.Command, args []string) (spec api.BenchmarkSpec, err er
 				Cmd: parseCommand(strings.Trim(args[i], "'\"")),
 			})
 		}
-		spec, err = specs.CreateSpecFrom(executions, false, commands...)
+		spec, err = specs.CreateSpecFrom(executions, alternate, commands...)
 
 	} else {
 		var filePath string
@@ -164,6 +166,8 @@ func loadSpec(cmd *cobra.Command, args []string) (spec api.BenchmarkSpec, err er
 	if executions > 0 {
 		spec.Executions = executions
 	}
+
+	spec.Alternate = alternate
 
 	return spec, err
 }
