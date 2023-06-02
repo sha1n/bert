@@ -151,7 +151,7 @@ run-linux-dockerized-tests:
 release:
 ifdef GITHUB_TOKEN
 	@echo "  >  Releasing..."
-	goreleaser release --rm-dist
+	goreleaser release --clean
 else
 	$(error GITHUB_TOKEN is not set)
 endif
