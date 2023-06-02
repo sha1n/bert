@@ -17,12 +17,13 @@ builds:
     main: ./cmd/main.go
 archives:
   -
+    rlcp: true
     id: main
-    replacements:
-      darwin: Darwin
-      linux: Linux
-      386: i386
-      amd64: x86_64
+#    replacements:
+#      darwin: Darwin
+#      linux: Linux
+#      386: i386
+#      amd64: x86_64
     files:
       - README.md
       - LICENSE
