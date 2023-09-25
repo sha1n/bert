@@ -10,7 +10,7 @@ require (
 	github.com/go-playground/universal-translator v0.18.1
 	github.com/go-playground/validator/v10 v10.15.1
 	github.com/montanaflynn/stats v0.7.1
-	github.com/sha1n/gommons v0.0.14
+	github.com/sha1n/gommons v0.0.17
 	github.com/sha1n/termite v0.0.23
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.7.0
