@@ -20,7 +20,7 @@ type ScenarioSpec struct {
 
 // BenchmarkSpec benchmark specs top level structure
 type BenchmarkSpec struct {
-	Scenarios  []ScenarioSpec `json:"scenarios" yaml:"scenarios" validate:"required,min=1,dive"`
+	Scenarios  []ScenarioSpec `json:"scenarios" yaml:"scenarios" validate:"required,min=1"`
 	Executions int            `validate:"required,gte=1"`
 	Alternate  bool           `json:"alternate,omitempty" yaml:"alternate,omitempty"`
 }
