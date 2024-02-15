@@ -138,7 +138,8 @@ func GetConfigFilePath(cmd *cobra.Command) string {
 
 	// Experimental: look for a dot-file if no config has been specified
 	if err != nil || configPath == "" {
-		wd, err := os.Getwd()
+		var wd string
+		wd, err = os.Getwd()
 
 		if err == nil {
 			configPath = path.Join(wd, DirectoryConfigFileName)

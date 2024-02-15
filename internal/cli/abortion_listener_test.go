@@ -18,7 +18,7 @@ func TestFailFastListener_OnError(t *testing.T) {
 		if actual == nil {
 			t.Errorf("The code did not panic")
 		}
-		
+
 		_, ok := actual.(ExecutionAbortedError)
 		if !ok {
 			t.Errorf("Unexpected panic type: %T", actual)

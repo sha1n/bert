@@ -127,7 +127,7 @@ func TestCreateSpecFrom(t *testing.T) {
 	type args struct {
 		executions int
 		alternate  bool
-		failFast  bool
+		failFast   bool
 		commands   []api.CommandSpec
 	}
 	tests := []struct {
@@ -181,7 +181,7 @@ func expectedBenchmarkSpec() api.BenchmarkSpec {
 	return api.BenchmarkSpec{
 		Executions: 10,
 		Alternate:  true,
-		FailFast: true,
+		FailFast:   true,
 		Scenarios: []api.ScenarioSpec{
 			{
 				Name:             "scenario A",

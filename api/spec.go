@@ -23,7 +23,7 @@ type BenchmarkSpec struct {
 	Scenarios  []ScenarioSpec `json:"scenarios" yaml:"scenarios" validate:"required,min=1"`
 	Executions int            `validate:"required,gte=1"`
 	Alternate  bool           `json:"alternate,omitempty" yaml:"alternate,omitempty"`
-	FailFast  bool            `json:"failFast,omitempty" yaml:"failFast,omitempty"`
+	FailFast   bool           `json:"failFast,omitempty" yaml:"failFast,omitempty"`
 }
 
 // ID returns a unique identifier
