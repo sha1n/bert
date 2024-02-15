@@ -136,24 +136,24 @@ func TestRequestOptionalExistingDirectoryWithSkip(t *testing.T) {
 	assert.Equal(t, "", actual)
 }
 
-func TestRequestUint(t *testing.T) {
-	expected := gommonstest.RandomUint()
+func TestRequestUint16(t *testing.T) {
+	expected := uint16(gommonstest.RandomUint())
 	ctx := givenIOContextWithInputContent(fmt.Sprint(expected))
 
-	actual := requestUint("", false, ctx)
+	actual := requestUint16("", false, ctx)
 	assert.Equal(t, expected, actual)
 }
 
-func TestRequestUintWithEmptyInput(t *testing.T) {
-	expected := uint(0)
+func TestRequestUint16WithEmptyInput(t *testing.T) {
+	expected := uint16(0)
 	ctx := givenIOContextWithInputContent("\r\n")
 
-	actual := requestUint("", false, ctx)
+	actual := requestUint16("", false, ctx)
 	assert.Equal(t, expected, actual)
 }
 
-func TestRequestUintWithInvalidInput(t *testing.T) {
-	expected := uint(2)
+func TestRequestUint16WithInvalidInput(t *testing.T) {
+	expected := uint16(2)
 	userInputSequence := fmt.Sprintf(`invalid
 -1
 %d`,
@@ -162,7 +162,7 @@ func TestRequestUintWithInvalidInput(t *testing.T) {
 
 	ctx := givenIOContextWithInputContent(userInputSequence)
 
-	actual := requestUint("", true, ctx)
+	actual := requestUint16("", true, ctx)
 	assert.Equal(t, expected, actual)
 }
 

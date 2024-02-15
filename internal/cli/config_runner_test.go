@@ -16,7 +16,7 @@ import (
 )
 
 var (
-	userInputExecutions          = gommonstest.RandomUint()
+	userInputExecutions          = uint16(gommonstest.RandomUint())
 	userInputAlternate           = gommonstest.RandomBool()
 	userInputScenarioName        = gommonstest.RandomString()
 	userInputScenarioWorkingDir  = os.TempDir() // has to exist
@@ -88,7 +88,7 @@ func configureExampleCommandWithOutFile(t *testing.T, ctx api.IOContext) (rootCm
 	configCmd := CreateConfigCommand(ctx)
 	rootCmd.AddCommand(configCmd)
 
-	tmpFile, err := ioutil.TempFile("", "configureCommand")
+	tmpFile, err := os.CreateTemp("", "configureCommand")
 	assert.NoError(t, err)
 
 	configPath = tmpFile.Name()

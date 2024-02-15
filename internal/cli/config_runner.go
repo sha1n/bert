@@ -43,7 +43,7 @@ func runConfigToolFn(ctx api.IOContext) func(*cobra.Command, []string) {
 			printHints()
 
 			spec := api.BenchmarkSpec{
-				Executions: int(requestUint("number of executions", true, ctx)),
+				Executions: int(requestUint16("number of executions", true, ctx)),
 				Alternate:  requestOptionalBool("alternate executions", false, ctx),
 				Scenarios:  requestScenarios(ctx),
 			}
