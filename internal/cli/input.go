@@ -91,18 +91,18 @@ func requestOptionalExistingDirectory(prompt string, defaultVal string, ctx api.
 	)
 }
 
-func requestUint(prompt string, required bool, ctx api.IOContext) uint {
+func requestUint16(prompt string, required bool, ctx api.IOContext) uint16 {
 	var str string
 	for {
 		str = requestInput(prompt, required, defaultIsValidFn, ctx)
 		if str == "" {
 			return 0
 		}
-		if v, err := strconv.ParseUint(str, 10, 32); err == nil {
-			return uint(v)
+		if v, err := strconv.ParseUint(str, 10, 16); err == nil {
+			return uint16(v)
 		}
 
-		_, _ = printRed("please enter an unsigned integer value\r\n")
+		_, _ = printRed("please enter a 16 bit unsigned integer value\r\n")
 	}
 }
 
