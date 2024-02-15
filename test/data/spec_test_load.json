@@ -1,5 +1,6 @@
 {
   "alternate": true,
+  "failFast": true,
   "executions": 10,
   "scenarios": [
     {

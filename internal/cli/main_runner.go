@@ -61,6 +61,7 @@ Build label: %s`, version, build),
 required when no configuration file is provided. 
 when specified with a configuration file, this argument has priority.`)
 	rootCmd.Flags().BoolP(ArgNameAlternate, "a", false, `whether to use alternate executions or finish one scenario before commencing to the next one.`)
+	rootCmd.Flags().BoolP(ArgNameFailFast, "k", false, `whether to exit immediately on the first execution failure and print the process output.`)
 
 	// Reporting
 	rootCmd.Flags().StringP(ArgNameOutputFile, "o", "", `output file path. Optional. Writes to stdout by default.`)
@@ -132,6 +133,7 @@ func runFn(ctx api.IOContext) func(*cobra.Command, []string) {
 func loadSpec(cmd *cobra.Command, args []string) (spec api.BenchmarkSpec, err error) {
 	executions := GetInt(cmd, ArgNameExecutions)
 	alternate := GetBool(cmd, ArgNameAlternate)
+	failFast := GetBool(cmd, ArgNameFailFast)
 
 	if len(args) > 0 { // positional args are used for ad-hoc config
 		commands := []api.CommandSpec{}
@@ -140,7 +142,7 @@ func loadSpec(cmd *cobra.Command, args []string) (spec api.BenchmarkSpec, err er
 				Cmd: parseCommand(strings.Trim(args[i], "'\"")),
 			})
 		}
-		spec, err = specs.CreateSpecFrom(executions, alternate, commands...)
+		spec, err = specs.CreateSpecFrom(executions, alternate, failFast, commands...)
 
 	} else {
 		var filePath string
@@ -230,11 +232,18 @@ func resolveExecutionContext(cmd *cobra.Command, spec api.BenchmarkSpec, ctx api
 }
 
 func resolveExecutionListener(cmd *cobra.Command, spec api.BenchmarkSpec, ctx api.IOContext) api.Listener {
+	var listener api.Listener
 	if enableTerminalGUI(cmd, ctx) {
-		return ui.NewProgressView(spec, terminalDimensionsOrFake, ctx)
+		listener = ui.NewProgressView(spec, terminalDimensionsOrFake, ctx)
+	} else {
+		listener = ui.NewLoggingProgressListener()
 	}
 
-	return ui.NewLoggingProgressListener()
+	if spec.FailFast {
+		listener = NewFailFastListener(listener)
+	}
+
+	return listener
 }
 
 func enableTerminalGUI(cmd *cobra.Command, ctx api.IOContext) bool {

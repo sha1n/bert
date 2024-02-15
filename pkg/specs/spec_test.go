@@ -127,6 +127,7 @@ func TestCreateSpecFrom(t *testing.T) {
 	type args struct {
 		executions int
 		alternate  bool
+		failFast  bool
 		commands   []api.CommandSpec
 	}
 	tests := []struct {
@@ -137,26 +138,26 @@ func TestCreateSpecFrom(t *testing.T) {
 	}{
 		{
 			name:     "valid alternate",
-			args:     args{executions: 1, alternate: true, commands: []api.CommandSpec{{Cmd: []string{"ls", "-l"}}}},
-			wantSpec: api.BenchmarkSpec{Executions: 1, Alternate: true, Scenarios: []api.ScenarioSpec{{Name: "[ls -l]", Command: &api.CommandSpec{Cmd: []string{"ls", "-l"}}}}},
+			args:     args{executions: 1, alternate: true, failFast: true, commands: []api.CommandSpec{{Cmd: []string{"ls", "-l"}}}},
+			wantSpec: api.BenchmarkSpec{Executions: 1, Alternate: true, FailFast: true, Scenarios: []api.ScenarioSpec{{Name: "[ls -l]", Command: &api.CommandSpec{Cmd: []string{"ls", "-l"}}}}},
 			wantErr:  false,
 		},
 		{
 			name:     "valid dual command",
-			args:     args{executions: 1, alternate: false, commands: []api.CommandSpec{{Cmd: []string{"ls", "-l"}}, {Cmd: []string{"ls", "-a"}}}},
-			wantSpec: api.BenchmarkSpec{Executions: 1, Alternate: false, Scenarios: []api.ScenarioSpec{{Name: "[ls -l]", Command: &api.CommandSpec{Cmd: []string{"ls", "-l"}}}, {Name: "[ls -a]", Command: &api.CommandSpec{Cmd: []string{"ls", "-a"}}}}},
+			args:     args{executions: 1, alternate: false, failFast: true, commands: []api.CommandSpec{{Cmd: []string{"ls", "-l"}}, {Cmd: []string{"ls", "-a"}}}},
+			wantSpec: api.BenchmarkSpec{Executions: 1, Alternate: false, FailFast: true, Scenarios: []api.ScenarioSpec{{Name: "[ls -l]", Command: &api.CommandSpec{Cmd: []string{"ls", "-l"}}}, {Name: "[ls -a]", Command: &api.CommandSpec{Cmd: []string{"ls", "-a"}}}}},
 			wantErr:  false,
 		},
 		{
 			name:     "non-positive executions",
-			args:     args{executions: rand.Intn(10) * -1, alternate: false, commands: []api.CommandSpec{{Cmd: []string{"ls", "-l"}}}},
+			args:     args{executions: rand.Intn(10) * -1, alternate: false, failFast: true, commands: []api.CommandSpec{{Cmd: []string{"ls", "-l"}}}},
 			wantSpec: api.BenchmarkSpec{},
 			wantErr:  true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotSpec, err := CreateSpecFrom(tt.args.executions, tt.args.alternate, tt.args.commands...)
+			gotSpec, err := CreateSpecFrom(tt.args.executions, tt.args.alternate, tt.args.failFast, tt.args.commands...)
 
 			if tt.wantErr {
 				assert.Error(t, err)
@@ -180,6 +181,7 @@ func expectedBenchmarkSpec() api.BenchmarkSpec {
 	return api.BenchmarkSpec{
 		Executions: 10,
 		Alternate:  true,
+		FailFast: true,
 		Scenarios: []api.ScenarioSpec{
 			{
 				Name:             "scenario A",

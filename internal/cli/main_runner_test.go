@@ -146,6 +146,7 @@ func Test_loadSpecFromPositionalArguments(t *testing.T) {
 	expectedValidSpec, _ := specs.CreateSpecFrom(
 		expectedExecutions,
 		true,
+		false,
 		api.CommandSpec{Cmd: []string{"cmd", "-a"}},
 		api.CommandSpec{Cmd: []string{"cmd", "-b"}},
 		api.CommandSpec{Cmd: []string{"cmd", "a string"}},

@@ -18,6 +18,8 @@ const (
 	ArgNameExecutions = "executions"
 	// ArgNameAlternate : program arg name
 	ArgNameAlternate = "alternate"
+	// ArgNameFailFast : program arg name
+	ArgNameFailFast = "fail-fast"
 	// ArgNameOutputFile : program arg name
 	ArgNameOutputFile = "out-file"
 	// ArgNameConfigExample : program arg name
