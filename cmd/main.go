@@ -66,6 +66,10 @@ func handlePanics(exitFn func(int)) {
 			log.Fatal(err)
 			exitFn(1)
 		}
+		if err, ok := o.(cli.ExecutionAbortedError); ok {
+			log.Error(err)
+			exitFn(0)
+		}
 
 		issueURL := errorhandling.GenerateGitHubCreateNewIssueURL(
 			"sha1n",

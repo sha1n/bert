@@ -10,14 +10,43 @@ import (
 
 func TestExitCodeWithMissingRequiredArguments(t *testing.T) {
 	expectedPanicExitCode := 1
-	actualExitcode := 0
+	actualExitCode := 0
 
 	os.Args = []string{}
 	doRun(func(i int) {
-		actualExitcode = i
+		actualExitCode = i
 	})
 
-	assert.Equal(t, expectedPanicExitCode, actualExitcode)
+	assert.Equal(t, expectedPanicExitCode, actualExitCode)
+}
+
+func TestExitCodeWithFailFastAndCommandFailure(t *testing.T) {
+	var (
+		actualExitCode int
+		hasValue       bool
+	)
+
+	testWith(
+		t,
+		[]string{
+			"program",
+			"-e",
+			"1",
+			"-k",
+			"'<non-existent-command>'",
+		},
+		true,
+		func(t *testing.T) {
+			doRun(func(code int) {
+				if !hasValue {
+					actualExitCode = code
+					hasValue = true
+				}
+			})
+		},
+	)
+
+	assert.Equal(t, 0, actualExitCode)
 }
 
 func TestSanity(t *testing.T) {

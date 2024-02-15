@@ -39,7 +39,7 @@ func LoadSpec(path string) (api.BenchmarkSpec, error) {
 // CreateSpecFrom creates a spec from the specified parameters.
 //
 // Returns an error if the specified 'executions' is non-positive.
-func CreateSpecFrom(executions int, alternate bool, commands ...api.CommandSpec) (spec api.BenchmarkSpec, err error) {
+func CreateSpecFrom(executions int, alternate bool, failFast bool, commands ...api.CommandSpec) (spec api.BenchmarkSpec, err error) {
 	if executions < 1 {
 		return spec, errors.New("executions must be positive")
 	}
@@ -47,6 +47,7 @@ func CreateSpecFrom(executions int, alternate bool, commands ...api.CommandSpec)
 	spec = api.BenchmarkSpec{
 		Executions: executions,
 		Alternate:  alternate,
+		FailFast:   failFast,
 		Scenarios:  []api.ScenarioSpec{},
 	}
 

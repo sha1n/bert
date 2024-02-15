@@ -18,6 +18,8 @@ const (
 	ArgNameExecutions = "executions"
 	// ArgNameAlternate : program arg name
 	ArgNameAlternate = "alternate"
+	// ArgNameFailFast : program arg name
+	ArgNameFailFast = "fail-fast"
 	// ArgNameOutputFile : program arg name
 	ArgNameOutputFile = "out-file"
 	// ArgNameConfigExample : program arg name
@@ -136,7 +138,8 @@ func GetConfigFilePath(cmd *cobra.Command) string {
 
 	// Experimental: look for a dot-file if no config has been specified
 	if err != nil || configPath == "" {
-		wd, err := os.Getwd()
+		var wd string
+		wd, err = os.Getwd()
 
 		if err == nil {
 			configPath = path.Join(wd, DirectoryConfigFileName)

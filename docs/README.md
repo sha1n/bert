@@ -30,6 +30,7 @@
       - [Markdown Example](#markdown-example)
       - [Raw CSV Example](#raw-csv-example)
   - [Output Control](#output-control)
+  - [Other Features](#other-features)
   - [Shell Completion Scripts](#shell-completion-scripts)
   - [Alternatives](#alternatives)
 
@@ -48,6 +49,7 @@
 - Accumulate results for different runs and compare them later
 - Set the number of times every scenario is executed
 - Choose between alternate executions and sequential execution of the same command
+- Fail-fast to exit immediately when a benchmark error is reported
 - Save results in `txt`, `json`, `csv`, `csv/raw`, `md` and `md/raw` formats
 - Control your benchmark environment
   - Set optional working directory per scenario and/or command 
@@ -319,6 +321,10 @@ However, there are several ways you can control what is logged and in what level
 - `--pipe-stdout` and `--pipe-stderr` - pipe the standard out and err of executed benchmark commands respectively, to standard err.
 - `--silent` or `-s` - sets the logging level to the lowest level possible, which includes only fatal errors. That is a softer version of `2>/dev/null` and should be preferred in general.
 - `--debug` or `-d` - sets the logging level to the highest possible level, for troubleshooting.
+
+## Other Features
+- `--alternate` - when combined with multiple commands, `bert` uses alternate scenario execution instead of executing scenarios one after another.
+- `--fail-fast` - tells `bert` to exit immediately when a benchmark error is reported. This is handy for reproducing illusive errors using brute-force.
 
 ## Shell Completion Scripts
 `bert` comes with completion scripts for `zsh`, `bash`, `fish` and `PowerShell`. When installed with [brew](#install-from-a-homebrew-tap) completions scripts are automatically installed to the appropriate location, otherwise the scripts can be found in the tar-ball version of the released binaries.

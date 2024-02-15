@@ -27,7 +27,7 @@ type CheckFatalFn = func(error)
 // CheckBenchmarkInitFatal checks the specified error and treats it as fatal if not nil
 func CheckBenchmarkInitFatal(err error) {
 	if err != nil {
-		panic(NewFatalUserErrorf("Failed to initialize benchark. Error: %s", err.Error()))
+		panic(NewFatalUserErrorf("Failed to initialize benchmark. Error: %s", err.Error()))
 	}
 }
 
