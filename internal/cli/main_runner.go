@@ -240,7 +240,7 @@ func resolveExecutionListener(cmd *cobra.Command, spec api.BenchmarkSpec, ctx ap
 	}
 
 	if spec.FailFast {
-		listener = NewFailFastListener(listener)
+		listener = NewAbortOnErrorListener(listener)
 	}
 
 	return listener

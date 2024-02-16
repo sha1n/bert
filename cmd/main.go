@@ -66,7 +66,7 @@ func handlePanics(exitFn func(int)) {
 			log.Fatal(err)
 			exitFn(1)
 		}
-		if err, ok := o.(cli.ExecutionAbortedError); ok {
+		if err, ok := o.(cli.AbortionError); ok {
 			log.Error(err)
 			exitFn(0)
 		}
