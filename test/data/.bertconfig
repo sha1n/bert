@@ -1,3 +1,4 @@
+alternate: false
 executions: 1
 scenarios:
 - name: NAME
