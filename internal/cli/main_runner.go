@@ -169,7 +169,7 @@ func loadSpec(cmd *cobra.Command, args []string) (spec api.BenchmarkSpec, err er
 		spec.Executions = executions
 	}
 
-	spec.Alternate = alternate
+	spec.Alternate = alternate || spec.Alternate
 
 	return spec, err
 }

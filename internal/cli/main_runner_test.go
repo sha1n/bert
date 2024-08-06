@@ -95,14 +95,48 @@ func TestWithMissingConfigFile(t *testing.T) {
 	runBenchmarkCommandWithPipedStdoutAndExpectPanicWith(t, nonExistingConfigArg)
 }
 
-func TestWithWdConfigDorFile(t *testing.T) {
+func TestWithWDConfigFile(t *testing.T) {
+	wd, _ := os.Getwd()
+	os.Chdir("../../test/data") // expecting '../../test/data/.bertconfig' to be loaded
+	defer os.Chdir(wd)
+
+	expectedSpec, _ := specs.LoadSpec(itConfigFilePath)
+	expectedSpec.Executions = 1
+	expectedSpec.Alternate = false
+	command := newDummyCommandWith()
+
+	spec, err := loadSpec(command, []string{})
+
+	assert.NoError(t, err)
+	assert.Equal(t, expectedSpec, spec)
+}
+
+
+func TestWithWDConfigFileAndExecutionsOptionOverride(t *testing.T) {
 	wd, _ := os.Getwd()
 	os.Chdir("../../test/data") // expecting '../../test/data/.bertconfig' to be loaded
 	defer os.Chdir(wd)
 
 	expectedSpec, _ := specs.LoadSpec(itConfigFilePath)
 	expectedSpec.Executions = expectedSpec.Executions + rand.Intn(10)
+	expectedSpec.Alternate = false
 	command := newDummyCommandWith("--executions", fmt.Sprint(expectedSpec.Executions))
+
+	spec, err := loadSpec(command, []string{})
+
+	assert.NoError(t, err)
+	assert.Equal(t, expectedSpec, spec)
+}
+
+func TestWithWDConfigFileAndAlternateOptionOverride(t *testing.T) {
+	wd, _ := os.Getwd()
+	os.Chdir("../../test/data") // expecting '../../test/data/.bertconfig' to be loaded
+	defer os.Chdir(wd)
+
+	expectedSpec, _ := specs.LoadSpec(itConfigFilePath)
+	expectedSpec.Executions = 1
+	expectedSpec.Alternate = true
+	command := newDummyCommandWith("--alternate")
 
 	spec, err := loadSpec(command, []string{})
 
