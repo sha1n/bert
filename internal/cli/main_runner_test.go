@@ -111,7 +111,6 @@ func TestWithWDConfigFile(t *testing.T) {
 	assert.Equal(t, expectedSpec, spec)
 }
 
-
 func TestWithWDConfigFileAndExecutionsOptionOverride(t *testing.T) {
 	wd, _ := os.Getwd()
 	os.Chdir("../../test/data") // expecting '../../test/data/.bertconfig' to be loaded

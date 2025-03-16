@@ -120,7 +120,7 @@ func validate(spec api.BenchmarkSpec) (err error) {
 		var errstrings []string
 		errstrings = append(errstrings, "Invalid configuration:")
 		errstrings = append(errstrings, translateError(err, trans)...)
-		err = fmt.Errorf(strings.Join(errstrings, "\n\t- "))
+		err = errors.New(strings.Join(errstrings, "\n\t- "))
 	}
 
 	return err
@@ -129,7 +129,7 @@ func validate(spec api.BenchmarkSpec) (err error) {
 func translateError(err error, trans ut.Translator) (errs []string) {
 	validatorErrs := err.(validator.ValidationErrors)
 	for _, e := range validatorErrs {
-		translatedErr := fmt.Errorf(e.Translate(trans))
+		translatedErr := errors.New(e.Translate(trans))
 		log.Debug(e)
 		errs = append(errs, translatedErr.Error())
 	}
