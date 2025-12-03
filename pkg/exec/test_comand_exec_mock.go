@@ -1,6 +1,10 @@
 package exec
 
-import "github.com/sha1n/bert/api"
+import (
+	"context"
+
+	"github.com/sha1n/bert/api"
+)
 
 // CmdRecordingExecutor ...
 type CmdRecordingExecutor struct {
@@ -16,6 +20,7 @@ type RecordedExecutionParams struct {
 
 // ExecuteFn records execution parameters and stores them in order
 func (ce *CmdRecordingExecutor) ExecuteFn(
+	ctx context.Context,
 	cmdSpec *api.CommandSpec,
 	defaultWorkingDir string,
 	env map[string]string,

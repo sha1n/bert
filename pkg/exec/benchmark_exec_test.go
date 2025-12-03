@@ -1,6 +1,7 @@
 package exec
 
 import (
+	"context"
 	"testing"
 
 	"github.com/sha1n/bert/api"
@@ -65,7 +66,7 @@ func TestExecuteBenchmarkWithSetupAndTeardownSpecs(t *testing.T) {
 func executeWith(spec api.BenchmarkSpec) *CmdRecordingExecutor {
 	recordingCtx := recordingExecutionContext()
 
-	Execute(spec, recordingCtx)
+	Execute(context.Background(), spec, recordingCtx)
 
 	return recordingCtx.Executor.(*CmdRecordingExecutor)
 }

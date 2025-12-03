@@ -2,26 +2,18 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"runtime"
 	"runtime/debug"
 
 	"github.com/fatih/color"
 	"github.com/sha1n/bert/api"
 	"github.com/sha1n/bert/internal/cli"
-	"github.com/sha1n/bert/pkg/osutil"
 	"github.com/sha1n/gommons/pkg/cmd"
 	errorhandling "github.com/sha1n/gommons/pkg/error_handling"
-	"github.com/sha1n/termite"
 	log "github.com/sirupsen/logrus"
 )
 
 func init() {
-	osutil.RegisterInterruptGuard(func(sig os.Signal) {
-		termite.NewCursor(os.Stdout).Show()
-		doExit(1)
-	})
-
 	log.SetFormatter(&log.TextFormatter{
 		DisableTimestamp: true,
 	})

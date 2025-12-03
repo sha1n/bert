@@ -1,6 +1,7 @@
 package exec
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"testing"
@@ -20,7 +21,7 @@ func TestExecuteReturnsErrorOnCommandFailure(t *testing.T) {
 	exec := NewCommandExecutor(true, true)
 	cmdSpec := aCommandSpec(aNonExistingCommand(), "")
 
-	_, err := exec.ExecuteFn(cmdSpec, defaultWorkingDir, env)()
+	_, err := exec.ExecuteFn(context.Background(), cmdSpec, defaultWorkingDir, env)()
 
 	assert.Error(t, err)
 }
@@ -91,7 +92,7 @@ func TestExecCommandFnWithNonExistingCommand(t *testing.T) {
 	spec := aCommandSpec(aNonExistingCommand(), "")
 	executor := NewCommandExecutor(false, false).(*commandExecutor)
 
-	execFn := executor.ExecuteFn(spec, "", nil)
+	execFn := executor.ExecuteFn(context.Background(), spec, "", nil)
 
 	execInfo, err := execFn()
 	assert.Error(t, err)
@@ -102,7 +103,7 @@ func TestExecCommandFnWithExistingCommandExitError(t *testing.T) {
 	spec := aCommandSpec([]string{"go", "away"}, "")
 	executor := NewCommandExecutor(false, false).(*commandExecutor)
 
-	execFn := executor.ExecuteFn(spec, "", nil)
+	execFn := executor.ExecuteFn(context.Background(), spec, "", nil)
 
 	execInfo, err := execFn()
 	assert.Error(t, err)
@@ -116,7 +117,7 @@ func TestExecCommandFnWithExistingCommand(t *testing.T) {
 	spec := aCommandSpec([]string{"go", "version"}, "")
 	executor := NewCommandExecutor(false, false).(*commandExecutor)
 
-	execFn := executor.ExecuteFn(spec, "", nil)
+	execFn := executor.ExecuteFn(context.Background(), spec, "", nil)
 
 	execInfo, err := execFn()
 
@@ -125,6 +126,21 @@ func TestExecCommandFnWithExistingCommand(t *testing.T) {
 	assert.GreaterOrEqual(t, execInfo.PerceivedTime, time.Nanosecond*0)
 	assert.GreaterOrEqual(t, execInfo.UserTime, time.Nanosecond*0)
 	assert.GreaterOrEqual(t, execInfo.SystemTime, time.Nanosecond*0)
+}
+
+func TestExecCommandFnWithContextCancellation(t *testing.T) {
+	spec := aCommandSpec([]string{"sleep", "10"}, "")
+	executor := NewCommandExecutor(false, false).(*commandExecutor)
+	ctx, cancel := context.WithCancel(context.Background())
+
+	execFn := executor.ExecuteFn(ctx, spec, "", nil)
+
+	cancel()
+
+	execInfo, err := execFn()
+
+	assert.Error(t, err)
+	assert.Nil(t, execInfo)
 }
 
 func configureCommandWithIOSpec(pipeStdout, pipeStderr bool) *exec.Cmd {
