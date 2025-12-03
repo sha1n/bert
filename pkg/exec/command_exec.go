@@ -1,6 +1,7 @@
 package exec
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
@@ -25,17 +26,13 @@ func NewCommandExecutor(pipeStdout bool, pipeStderr bool) api.CommandExecutor {
 }
 
 // Executes a single command in a subprocess based on the specified specs.
-func (ce *commandExecutor) ExecuteFn(cmdSpec *api.CommandSpec, defaultWorkingDir string, env map[string]string) api.ExecCommandFn {
+func (ce *commandExecutor) ExecuteFn(ctx context.Context, cmdSpec *api.CommandSpec, defaultWorkingDir string, env map[string]string) api.ExecCommandFn {
 	log.Debugf("Going to execute command %v", cmdSpec.Cmd)
 
-	execCmd := exec.Command(cmdSpec.Cmd[0], cmdSpec.Cmd[1:]...)
+	execCmd := exec.CommandContext(ctx, cmdSpec.Cmd[0], cmdSpec.Cmd[1:]...)
 	ce.configureCommand(cmdSpec, execCmd, defaultWorkingDir, env)
 
-	cancel := osutil.RegisterInterruptGuard(onInterruptSignalFn(execCmd))
-
 	return func() (execInfo *api.ExecutionInfo, err error) {
-		defer cancel()
-
 		startTime := time.Now()
 		err = execCmd.Run()
 		perceivedTime := time.Since(startTime)
@@ -87,15 +84,4 @@ func toEnvVarsArray(env map[string]string) []string {
 	}
 
 	return arr
-}
-
-func onInterruptSignalFn(execCmd *exec.Cmd) func(os.Signal) {
-	return func(sig os.Signal) {
-		if sig == os.Interrupt {
-			log.Debugf("Got %s signal. Forwarding to %s...", sig, execCmd.Args[0])
-			if err := execCmd.Process.Signal(sig); err != nil {
-				log.Debug(err)
-			}
-		}
-	}
 }

@@ -1,17 +1,21 @@
 package cli
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"os"
+	"os/signal"
 	"path"
 	"path/filepath"
 	"strings"
+	"syscall"
 
 	"github.com/sha1n/bert/api"
 	"github.com/sha1n/bert/internal/report"
 	"github.com/sha1n/bert/pkg/exec"
 	"github.com/sha1n/bert/pkg/osutil"
+
 	"github.com/sha1n/bert/pkg/reporthandlers"
 	"github.com/sha1n/bert/pkg/specs"
 	"github.com/sha1n/bert/pkg/ui"
@@ -117,7 +121,12 @@ func runFn(ctx api.IOContext) func(*cobra.Command, []string) {
 			reportHandler.Subscribe(tracer.Stream())
 
 			log.Info("Executing...")
-			exec.Execute(spec, resolveExecutionContext(cmd, spec, ctx, tracer))
+
+			// Create a context that is cancelled on interrupt signal
+			execCtx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+			defer cancel()
+
+			exec.Execute(execCtx, spec, resolveExecutionContext(cmd, spec, ctx, tracer))
 
 			log.Info("Finalizing report...")
 			err = reportHandler.Finalize()

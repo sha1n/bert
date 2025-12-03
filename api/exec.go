@@ -1,6 +1,9 @@
 package api
 
-import "time"
+import (
+	"context"
+	"time"
+)
 
 // ExecutionInfo information about an executed command
 type ExecutionInfo struct {
@@ -16,7 +19,7 @@ type ExecCommandFn = func() (*ExecutionInfo, error)
 
 // CommandExecutor is an abstraction for commands executed as subprocesses.
 type CommandExecutor interface {
-	ExecuteFn(cmd *CommandSpec, defaultWorkingDir string, env map[string]string) ExecCommandFn
+	ExecuteFn(ctx context.Context, cmd *CommandSpec, defaultWorkingDir string, env map[string]string) ExecCommandFn
 }
 
 // ExecutionContext provides access to benchmark global resources
