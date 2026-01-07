@@ -171,7 +171,7 @@ func aCustomEnv() map[string]string {
 }
 
 func expectedEnvFor(e map[string]string) []string {
-	return append(toEnvVarsArray(e), os.Environ()...) // user vars are expected to be first
+	return append(os.Environ(), toEnvVarsArray(e)...)
 }
 
 func userHomeDir() string {
