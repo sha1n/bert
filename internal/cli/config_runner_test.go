@@ -3,7 +3,6 @@ package cli
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 	"testing"
@@ -97,7 +96,7 @@ func configureExampleCommandWithOutFile(t *testing.T, ctx api.IOContext) (rootCm
 
 	rootCmd.SetArgs(args)
 
-	return rootCmd, configPath, func() { os.Remove(tmpFile.Name()) }
+	return rootCmd, configPath, func() { _ = os.Remove(tmpFile.Name()) }
 }
 
 func configureCommand(t *testing.T, ctx api.IOContext) (rootCmd *cobra.Command, configPath string, teardown func()) {
@@ -105,12 +104,12 @@ func configureCommand(t *testing.T, ctx api.IOContext) (rootCmd *cobra.Command, 
 	cmd := CreateConfigCommand(ctx)
 	rootCmd.AddCommand(cmd)
 
-	tmpFile, err := ioutil.TempFile("", "configureCommand")
+	tmpFile, err := os.CreateTemp("", "configureCommand")
 	assert.NoError(t, err)
 
 	rootCmd.SetArgs([]string{"config", "--out-file", tmpFile.Name()})
 
-	return rootCmd, tmpFile.Name(), func() { os.Remove(tmpFile.Name()) }
+	return rootCmd, tmpFile.Name(), func() { _ = os.Remove(tmpFile.Name()) }
 }
 
 func userInput() string {

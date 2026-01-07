@@ -54,9 +54,10 @@ func questionYN(prompt string, ctx api.IOContext) bool {
 		displayPrompt()
 		str, _ = reader.ReadString('\n')
 		str = strings.TrimSpace(strings.ToLower(str))
-		if str == "y" {
+		switch str {
+		case "y":
 			return true
-		} else if str == "n" || str == "" {
+		case "n", "":
 			return false
 		}
 	}

@@ -26,7 +26,9 @@ func NewMarkdownTableWriter(writer io.Writer) MarkdownTableWriter {
 
 // WriteHeaders writes table headers line
 func (tw MarkdownTableWriter) WriteHeaders(headers []string) (err error) {
-	defer tw.writer.Flush()
+	defer func() {
+		_ = tw.writer.Flush()
+	}()
 	if err = tw.WriteRow(headers); err == nil {
 		err = tw.writeString(fmt.Sprintf("%s|\r\n", strings.Repeat("|----", len(headers))))
 	}
@@ -37,7 +39,9 @@ func (tw MarkdownTableWriter) WriteHeaders(headers []string) (err error) {
 // WriteRow writes a row line
 func (tw MarkdownTableWriter) WriteRow(row []string) (err error) {
 	// TODO theoretically we need to escape '|' chars
-	defer tw.writer.Flush()
+	defer func() {
+		_ = tw.writer.Flush()
+	}()
 	return tw.writeString(fmt.Sprintf("|%s|\r\n", strings.Join(row, "|")))
 }
 

@@ -3,7 +3,6 @@ package report
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"strings"
 	"testing"
 	"time"
@@ -50,7 +49,7 @@ func writeMdRawReport(t *testing.T, includeHeaders bool, traces ...api.Trace) []
 	readRecords := func(r io.Reader) (records [][]string, err error) {
 		records = make([][]string, expectedRows)
 		var mdBytes []byte
-		if mdBytes, err = ioutil.ReadAll(r); err == nil {
+		if mdBytes, err = io.ReadAll(r); err == nil {
 			lines := strings.Split(strings.TrimSpace(string(mdBytes)), "\n")
 			for i, line := range lines {
 				line = strings.Trim(line, "|")

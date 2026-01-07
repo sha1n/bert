@@ -35,7 +35,7 @@ func NewMarkdownStreamReportWriter(writer io.Writer, ctx api.ReportContext) RawD
 
 // Handle handles a real time trace event
 func (rw *MarkdownStreamReportWriter) Handle(trace api.Trace) (err error) {
-	_, err = rw.writer.WriteString(fmt.Sprintf("| %s | %s | %s | %s | %s | %s | %t |\n",
+	_, err = fmt.Fprintf(rw.writer, "| %s | %s | %s | %s | %s | %s | %t |\n",
 		FormatDateTime(time.Now(), rw.ctx),
 		trace.ID(),
 		strings.Join(rw.ctx.Labels, ","),
@@ -43,7 +43,7 @@ func (rw *MarkdownStreamReportWriter) Handle(trace api.Trace) (err error) {
 		FormatReportDuration(func() (time.Duration, error) { return trace.UserCPUTime(), nil }),
 		FormatReportDuration(func() (time.Duration, error) { return trace.SystemCPUTime(), nil }),
 		trace.Error() != nil,
-	))
+	)
 
 	if err == nil {
 		err = rw.writer.Flush()

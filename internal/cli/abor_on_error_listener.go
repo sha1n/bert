@@ -36,5 +36,5 @@ func NewAbortOnErrorListener(delegate api.Listener) api.Listener {
 func (l abortOnErrorListener) OnError(id api.ID, err error) {
 	defer panic(NewAbortionError(id, err))
 	l.Listener.OnError(id, err)
-	l.Listener.OnScenarioEnd(id)
+	l.OnScenarioEnd(id)
 }

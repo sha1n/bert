@@ -17,8 +17,13 @@ jobs:
         with:
           go-version: 1.24
 
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: latest
+
       - name: Build
-        run: make lint build
+        run: make build
 
       - name: Test
         run: |

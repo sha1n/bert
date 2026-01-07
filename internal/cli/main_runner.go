@@ -114,7 +114,9 @@ func runFn(ctx api.IOContext) func(*cobra.Command, []string) {
 
 		var reportHandler api.ReportHandler
 		reportHandler, closer, err = resolveReportHandler(cmd, spec, ctx)
-		defer closer.Close()
+		defer func() {
+			_ = closer.Close()
+		}()
 
 		if err == nil {
 			tracer := exec.NewTracer(spec.Executions * len(spec.Scenarios))
@@ -215,7 +217,7 @@ func resolveReportHandler(cmd *cobra.Command, spec api.BenchmarkSpec, ctx api.IO
 		handler = reporthandlers.NewSummaryReportHandler(spec, reportCtx, report.NewTextReportWriter(writer, colorsOn))
 
 	default:
-		err = fmt.Errorf("Invalid report format '%s'", reportFormat)
+		err = fmt.Errorf("invalid report format '%s'", reportFormat)
 	}
 
 	return handler, writeCloser, err
@@ -263,7 +265,7 @@ func enableTerminalGUI(cmd *cobra.Command, ctx api.IOContext) bool {
 	pipeOutputsMode := GetBool(cmd, ArgNamePipeStdout)
 	pipeOutputsMode = pipeOutputsMode || GetBool(cmd, ArgNamePipeStderr)
 
-	return ctx.Tty && enableRichOut && !(silentMode || debugMode || pipeOutputsMode)
+	return ctx.Tty && enableRichOut && !silentMode && !debugMode && !pipeOutputsMode
 }
 
 func terminalDimensionsOrFake() (int, int) {

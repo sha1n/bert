@@ -11,7 +11,6 @@ import (
 
 	"github.com/sha1n/bert/api"
 	"github.com/sha1n/bert/pkg/specs"
-	"github.com/sha1n/gommons/pkg/test"
 	gommonstest "github.com/sha1n/gommons/pkg/test"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
@@ -97,8 +96,10 @@ func TestWithMissingConfigFile(t *testing.T) {
 
 func TestWithWDConfigFile(t *testing.T) {
 	wd, _ := os.Getwd()
-	os.Chdir("../../test/data") // expecting '../../test/data/.bertconfig' to be loaded
-	defer os.Chdir(wd)
+	_ = os.Chdir("../../test/data") // expecting '../../test/data/.bertconfig' to be loaded
+	defer func() {
+		_ = os.Chdir(wd)
+	}()
 
 	expectedSpec, _ := specs.LoadSpec(itConfigFilePath)
 	expectedSpec.Executions = 1
@@ -113,8 +114,10 @@ func TestWithWDConfigFile(t *testing.T) {
 
 func TestWithWDConfigFileAndExecutionsOptionOverride(t *testing.T) {
 	wd, _ := os.Getwd()
-	os.Chdir("../../test/data") // expecting '../../test/data/.bertconfig' to be loaded
-	defer os.Chdir(wd)
+	_ = os.Chdir("../../test/data") // expecting '../../test/data/.bertconfig' to be loaded
+	defer func() {
+		_ = os.Chdir(wd)
+	}()
 
 	expectedSpec, _ := specs.LoadSpec(itConfigFilePath)
 	expectedSpec.Executions = expectedSpec.Executions + rand.Intn(10)
@@ -129,8 +132,10 @@ func TestWithWDConfigFileAndExecutionsOptionOverride(t *testing.T) {
 
 func TestWithWDConfigFileAndAlternateOptionOverride(t *testing.T) {
 	wd, _ := os.Getwd()
-	os.Chdir("../../test/data") // expecting '../../test/data/.bertconfig' to be loaded
-	defer os.Chdir(wd)
+	_ = os.Chdir("../../test/data") // expecting '../../test/data/.bertconfig' to be loaded
+	defer func() {
+		_ = os.Chdir(wd)
+	}()
 
 	expectedSpec, _ := specs.LoadSpec(itConfigFilePath)
 	expectedSpec.Executions = 1
@@ -257,7 +262,7 @@ func Test_validatePositionalArgs(t *testing.T) {
 			name: "call with positional and no executions param",
 			args: args{
 				cmd:  newDummyCommandWith("-c", "/some-file"),
-				args: []string{test.RandomString(), test.RandomString()},
+				args: []string{gommonstest.RandomString(), gommonstest.RandomString()},
 			},
 			wantErr: true,
 		},
@@ -265,7 +270,7 @@ func Test_validatePositionalArgs(t *testing.T) {
 			name: "call with positional and invalid executions param",
 			args: args{
 				cmd:  newDummyCommandWith("--executions", "-1"),
-				args: []string{test.RandomString(), test.RandomString()},
+				args: []string{gommonstest.RandomString(), gommonstest.RandomString()},
 			},
 			wantErr: true,
 		},
@@ -273,7 +278,7 @@ func Test_validatePositionalArgs(t *testing.T) {
 			name: "call with positional and valid executions param",
 			args: args{
 				cmd:  newDummyCommandWith("--executions", "100"),
-				args: []string{test.RandomString(), test.RandomString()},
+				args: []string{gommonstest.RandomString(), gommonstest.RandomString()},
 			},
 			wantErr: false,
 		},

@@ -36,14 +36,22 @@ PID := $(GOBUILD)/.$(PROJECTNAME).pid
 # Make is verbose in Linux. Make it silent.
 MAKEFLAGS += --silent
 
+.PHONY: default
 default: install lint format test build
 
+## install: Checks for missing dependencies and installs them
+.PHONY: install
 install: go-get
 
+## format: Formats Go source files
+.PHONY: format
 format: go-format
 
-lint: go-lint
+## lint: Runs all linters including go vet and golangci-lint
+.PHONY: lint
+lint: go-lint golangci-lint
 
+## build: Builds binaries for all supported platforms
 .PHONY: build
 build:
 	@[ -d $(GOBUILD) ] || mkdir -p $(GOBUILD)
@@ -56,84 +64,113 @@ build:
 	bin/bert-$(GOHOSTOS)-$(GOHOSTARCH) completion bash > $(GOBUILD)/completions/bert.bash
 	bin/bert-$(GOHOSTOS)-$(GOHOSTARCH) completion fish > $(GOBUILD)/completions/bert.fish
 
-	#@cat $(STDERR) | sed -e '1s/.*/\nError:\n/'  | sed 's/make\[.*/ /' | sed "/^/s/^/     /" 1>&2
+	#@cat $(STDERR) | sed -e '1s/.*/\nError:\n/'  | sed 's/make\[.*\]/ /' | sed "/^/s/^/     /" 1>&2
 
 
+## test: Runs all Go tests
+.PHONY: test
 test: install go-test
 
+## clean: Removes build artifacts
+.PHONY: clean
 clean:
 	@-rm $(GOBIN)/$(PROGRAMNAME)* 2> /dev/null
 	@-$(MAKE) go-clean
 
+.PHONY: go-lint
 go-lint:
 	@echo "  >  Linting source files..."
 	go vet $(MODFLAGS) -c=10 `go list $(MODFLAGS) ./...`
 
+## golangci-lint: Runs golangci-lint
+.PHONY: golangci-lint
+golangci-lint:
+	@echo "  >  Running golangci-lint..."
+	golangci-lint run
+
+.PHONY: go-format
 go-format:
 	@echo "  >  Formating source files..."
 	gofmt -s -w $(GOFILES)
 
+.PHONY: go-build-current
 go-build-current:
 	@echo "  >  Building $(GOHOSTOS)/$(GOHOSTARCH) binaries..."
 	@GOPATH=$(GOPATH) GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) GOBIN=$(GOBIN) go build $(MODFLAGS) $(LDFLAGS) -o $(GOBIN)/$(PROGRAMNAME) $(GOBASE)/cmd
 
+.PHONY: go-build
 go-build: go-get go-build-linux-amd64 go-build-linux-arm64 go-build-linux-arm go-build-darwin-amd64 go-build-darwin-arm64 go-build-windows-amd64 go-build-windows-arm
 
+.PHONY: go-test
 go-test:
 	@echo "  >  Running Go tests..."
 	go test $(MODFLAGS) -covermode=count `go list $(MODFLAGS) ./...`
 
+.PHONY: go-build-linux-amd64
 go-build-linux-amd64:
 	@echo "  >  Building linux amd64 binaries..."
 	@GOPATH=$(GOPATH) GOOS=$(GOOS_LINUX) GOARCH=$(GOARCH_AMD64) GOBIN=$(GOBIN) go build $(MODFLAGS) $(LDFLAGS) -o $(GOBIN)/$(PROGRAMNAME)-$(GOOS_LINUX)-$(GOARCH_AMD64) $(GOBASE)/cmd
 
+.PHONY: go-build-linux-arm64
 go-build-linux-arm64:
 	@echo "  >  Building linux arm64 binaries..."
 	@GOPATH=$(GOPATH) GOOS=$(GOOS_LINUX) GOARCH=$(GOARCH_ARM64) GOBIN=$(GOBIN) go build $(MODFLAGS) $(LDFLAGS) -o $(GOBIN)/$(PROGRAMNAME)-$(GOOS_LINUX)-$(GOARCH_ARM64) $(GOBASE)/cmd
 
+.PHONY: go-build-linux-arm
 go-build-linux-arm:
 	@echo "  >  Building linux arm binaries..."
 	@GOPATH=$(GOPATH) GOOS=$(GOOS_LINUX) GOARCH=$(GOARCH_ARM) GOBIN=$(GOBIN) go build $(MODFLAGS) $(LDFLAGS) -o $(GOBIN)/$(PROGRAMNAME)-$(GOOS_LINUX)-$(GOARCH_ARM) $(GOBASE)/cmd
 
+.PHONY: go-build-darwin-amd64
 go-build-darwin-amd64:
 	@echo "  >  Building darwin amd64 binaries..."
 	@GOPATH=$(GOPATH) GOOS=$(GOOS_DARWIN) GOARCH=$(GOARCH_AMD64) GOBIN=$(GOBIN) go build $(MODFLAGS) $(LDFLAGS) -o $(GOBIN)/$(PROGRAMNAME)-$(GOOS_DARWIN)-$(GOARCH_AMD64) $(GOBASE)/cmd
 
+.PHONY: go-build-darwin-arm64
 go-build-darwin-arm64:
 	@echo "  >  Building darwin arm64 binaries..."
 	@GOPATH=$(GOPATH) GOOS=$(GOOS_DARWIN) GOARCH=$(GOARCH_ARM64) GOBIN=$(GOBIN) go build $(MODFLAGS) $(LDFLAGS) -o $(GOBIN)/$(PROGRAMNAME)-$(GOOS_DARWIN)-$(GOARCH_ARM64) $(GOBASE)/cmd
 
+.PHONY: go-build-windows-amd64
 go-build-windows-amd64:
 	@echo "  >  Building windows amd64 binaries..."
 	@GOPATH=$(GOPATH) GOOS=$(GOOS_WINDOWS) GOARCH=$(GOARCH_AMD64) GOBIN=$(GOBIN) go build $(MODFLAGS) $(LDFLAGS) -o $(GOBIN)/$(PROGRAMNAME)-$(GOOS_WINDOWS)-$(GOARCH_AMD64).exe $(GOBASE)/cmd
 
+.PHONY: go-build-windows-arm
 go-build-windows-arm:
 	@echo "  >  Building windows arm binaries..."
 	@GOPATH=$(GOPATH) GOOS=$(GOOS_WINDOWS) GOARCH=$(GOARCH_ARM) GOBIN=$(GOBIN) go build $(MODFLAGS) $(LDFLAGS) -o $(GOBIN)/$(PROGRAMNAME)-$(GOOS_WINDOWS)-$(GOARCH_ARM).exe $(GOBASE)/cmd
 
+.PHONY: go-generate
 go-generate:
 	@echo "  >  Generating dependency files..."
 	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go generate $(generate)
 
+.PHONY: go-get
 go-get:
 	@echo "  >  Checking if there is any missing dependencies..."
 	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go mod tidy
 
+.PHONY: go-install
 go-install:
 	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go install $(GOFILES)
 
+.PHONY: go-clean
 go-clean:
 	@echo "  >  Cleaning build cache"
 	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go clean $(MODFLAGS) $(GOBASE)/cmd
 	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go clean -modcache
 
+.PHONY: run-sanity-tests
 run-sanity-tests: build-docker run-linux-dockerized-tests
 
+.PHONY: build-docker
 build-docker:
 	@echo "  >  Building docker image..."
 	docker build -t sha1n/$(PROJECTNAME):latest .
 	docker tag sha1n/$(PROJECTNAME):latest sha1n/$(PROJECTNAME):$(VERSION:v%=%)
 
+.PHONY: run-linux-dockerized-tests
 run-linux-dockerized-tests:
 	@echo "  >  Running with experimental UI..."
 	docker run --rm -ti sha1n/bert /bert/bin/bert-linux-amd64 -c /bert/test/data/spec_test_load.yaml
@@ -148,6 +185,7 @@ run-linux-dockerized-tests:
 	@echo "  >  Running with ad-hoc commands..."
 	docker run --rm -ti sha1n/bert /bert/bin/bert-linux-amd64 'ls' 'ls -laH' --executions 10
 
+.PHONY: release
 release:
 ifdef GITHUB_TOKEN
 	@echo "  >  Releasing..."
@@ -156,8 +194,10 @@ else
 	$(error GITHUB_TOKEN is not set)
 endif
 
-.PHONY: help
+.PHONY: all
 all: help
+
+.PHONY: help
 help: Makefile
 	@echo
 	@echo " Choose a command run in "$(PROJECTNAME)":"

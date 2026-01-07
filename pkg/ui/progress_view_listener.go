@@ -68,7 +68,7 @@ func NewProgressView(spec api.BenchmarkSpec, termDimensionsFn func() (int, int),
 		return w
 	}
 	if len(rows)+1 > termHeight {
-		yellow.Printf("Your terminal window is too small to dispaly full progress information...\n\n")
+		_, _ = yellow.Printf("Your terminal window is too small to dispaly full progress information...\n\n")
 		return NewMinimalProgressView(spec, termDimensionsFn, ioc)
 	}
 

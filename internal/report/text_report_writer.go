@@ -71,7 +71,9 @@ func NewTextReportWriter(writer io.Writer, colorsOn bool) api.WriteSummaryReport
 }
 
 func (trw textReportWriter) Write(summary api.Summary, config api.BenchmarkSpec, ctx api.ReportContext) (err error) {
-	defer trw.writer.Flush()
+	defer func() {
+		_ = trw.writer.Flush()
+	}()
 
 	trw.writeNewLine()
 	trw.writeTitle(" BENCHMARK SUMMARY")

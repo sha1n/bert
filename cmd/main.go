@@ -66,7 +66,7 @@ func handlePanics(exitFn func(int)) {
 		) + "&labels=bug"
 
 		yellow := color.New(color.FgYellow)
-		yellow.Println("\nOh no... Please kindly report this issue by following this URL:")
+		_, _ = yellow.Println("\nOh no... Please kindly report this issue by following this URL:")
 		fmt.Printf(`
 
 %s

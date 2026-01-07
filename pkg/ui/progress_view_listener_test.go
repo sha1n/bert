@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/sha1n/bert/api"
-	"github.com/sha1n/gommons/pkg/test"
 	gommonstest "github.com/sha1n/gommons/pkg/test"
 	"github.com/stretchr/testify/assert"
 )
@@ -161,7 +160,7 @@ func aSpec(alternate bool, executions int) api.BenchmarkSpec {
 		Alternate:  alternate,
 		Scenarios: []api.ScenarioSpec{
 			{
-				Name: test.RandomString(),
+				Name: gommonstest.RandomString(),
 				Command: &api.CommandSpec{
 					Cmd: []string{"cmd"},
 				},
