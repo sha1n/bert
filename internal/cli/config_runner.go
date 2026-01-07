@@ -35,10 +35,12 @@ func runConfigToolFn(ctx api.IOContext) func(*cobra.Command, []string) {
 		configureOutput(cmd, slog.LevelError, ctx)
 
 		writeCloser := ResolveOutputArg(cmd, ArgNameOutputFile, ctx)
-		defer writeCloser.Close()
+		defer func() {
+			_ = writeCloser.Close()
+		}()
 
 		if GetBool(cmd, ArgNameConfigExample) {
-			io.WriteString(writeCloser, getExampleSpec())
+			_, _ = io.WriteString(writeCloser, getExampleSpec())
 
 		} else {
 			printHints()

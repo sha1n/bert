@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/sha1n/bert/api"
-	"github.com/sha1n/gommons/pkg/test"
 	gommonstest "github.com/sha1n/gommons/pkg/test"
 	"github.com/stretchr/testify/assert"
 )
@@ -74,7 +73,7 @@ func generateTestMdReport(t *testing.T, includeHeaders bool) ([]string, api.Summ
 
 func aTwoScenarioSpec() api.BenchmarkSpec {
 	return api.BenchmarkSpec{
-		Executions: int(test.RandomUint()),
+		Executions: int(gommonstest.RandomUint()),
 		Scenarios: []api.ScenarioSpec{
 			{
 				Name: gommonstest.RandomString(),
