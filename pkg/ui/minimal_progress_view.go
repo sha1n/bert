@@ -21,6 +21,7 @@ type MinimalProgressView struct {
 	eta              etaInfo
 	alternate        bool
 	cancelHandlers   []context.CancelFunc
+	stderr           io.Writer
 }
 
 // NewMinimalProgressView creates a new MinimalProgressView for the specified benchmark spec
@@ -45,6 +46,7 @@ func NewMinimalProgressView(spec api.BenchmarkSpec, termDimensionsFn func() (int
 		cursor:           termite.NewCursor(ioc.StdoutWriter),
 		alternate:        spec.Alternate,
 		cancelHandlers:   cancelHandlers,
+		stderr:           ioc.StderrWriter,
 	}
 }
 
@@ -55,7 +57,7 @@ func (l *MinimalProgressView) OnBenchmarkStart() {
 	}
 
 	l.started = true
-	l.cancelHandlers = append(l.cancelHandlers, l.hideCursor(), shutOffLogs())
+	l.cancelHandlers = append(l.cancelHandlers, l.hideCursor(), shutOffLogs(l.stderr))
 }
 
 // OnBenchmarkEnd stops all view component updates.

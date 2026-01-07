@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"log/slog"
+	"os"
 	"runtime"
 	"runtime/debug"
 
@@ -10,14 +12,7 @@ import (
 	"github.com/sha1n/bert/internal/cli"
 	"github.com/sha1n/gommons/pkg/cmd"
 	errorhandling "github.com/sha1n/gommons/pkg/error_handling"
-	log "github.com/sirupsen/logrus"
 )
-
-func init() {
-	log.SetFormatter(&log.TextFormatter{
-		DisableTimestamp: true,
-	})
-}
 
 var (
 	// ProgramName : passed from build environment
@@ -55,11 +50,11 @@ func doRun(exitFn func(int)) {
 func handlePanics(exitFn func(int)) {
 	if o := recover(); o != nil {
 		if err, ok := o.(cli.FatalUserError); ok {
-			log.Fatal(err)
+			slog.Error(err.Error())
 			exitFn(1)
 		}
 		if err, ok := o.(cli.AbortionError); ok {
-			log.Error(err)
+			slog.Error(err.Error())
 			exitFn(0)
 		}
 
@@ -85,7 +80,7 @@ func handlePanics(exitFn func(int)) {
 }
 
 func doExit(code int) {
-	log.Exit(code)
+	os.Exit(code)
 }
 
 func enableSelfUpdate() bool {

@@ -2,11 +2,11 @@ package cli
 
 import (
 	"errors"
+	"log/slog"
 
 	"github.com/fatih/color"
 	"github.com/sha1n/bert/api"
 	"github.com/sha1n/termite"
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -22,7 +22,7 @@ var (
 	sprintBold  = color.New(color.Bold).Sprint
 )
 
-func configureOutput(cmd *cobra.Command, defaultLogLevel log.Level, ctx api.IOContext) {
+func configureOutput(cmd *cobra.Command, defaultLogLevel slog.Level, ctx api.IOContext) {
 	silent := GetBool(cmd, ArgNameSilent)
 	debug := GetBool(cmd, ArgNameDebug)
 	var level = defaultLogLevel
@@ -31,18 +31,22 @@ func configureOutput(cmd *cobra.Command, defaultLogLevel log.Level, ctx api.IOCo
 		CheckUserArgFatal(errors.New("'--%s' and '--%s' are mutually exclusive"))
 	}
 	if silent {
-		level = log.FatalLevel
+		level = slog.LevelError + 1 // effectively disable everything below critical
 	}
 	if debug {
-		level = log.DebugLevel
-	}
-	if ctx.Tty {
-		log.SetFormatter(&log.TextFormatter{
-			DisableTimestamp: true,
-			ForceColors:      true,
-		})
+		level = slog.LevelDebug
 	}
 
-	log.StandardLogger().SetLevel(level)
-	log.StandardLogger().SetOutput(ctx.StderrWriter)
+	opts := &slog.HandlerOptions{
+		Level: level,
+		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
+			if a.Key == slog.TimeKey {
+				return slog.Attr{}
+			}
+			return a
+		},
+	}
+
+	logger := slog.New(slog.NewTextHandler(ctx.StderrWriter, opts))
+	slog.SetDefault(logger)
 }

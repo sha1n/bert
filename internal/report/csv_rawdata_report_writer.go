@@ -3,12 +3,11 @@ package report
 import (
 	"fmt"
 	"io"
+	"log/slog"
 	"strings"
 	"time"
 
 	"encoding/csv"
-
-	log "github.com/sirupsen/logrus"
 
 	"github.com/sha1n/bert/api"
 )
@@ -27,7 +26,7 @@ func NewCsvStreamReportWriter(writer io.Writer, ctx api.ReportContext) RawDataHa
 	}
 
 	if err := w.writeHeaders(); err != nil {
-		log.Error(err)
+		slog.Error(err.Error())
 	}
 
 	return w

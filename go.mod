@@ -12,7 +12,6 @@ require (
 	github.com/montanaflynn/stats v0.7.1
 	github.com/sha1n/gommons v0.0.19
 	github.com/sha1n/termite v0.0.25
-	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.10.2
 	github.com/stretchr/testify v1.11.1
 	gopkg.in/yaml.v2 v2.4.0
@@ -30,6 +29,7 @@ require (
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/stretchr/objx v0.5.3 // indirect
 	golang.org/x/crypto v0.46.0 // indirect

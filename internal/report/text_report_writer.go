@@ -4,12 +4,12 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"log/slog"
 	"strings"
 	"time"
 
 	"github.com/fatih/color"
 	"github.com/sha1n/bert/api"
-	log "github.com/sirupsen/logrus"
 )
 
 const attentionIndicatorRune = '•'
@@ -179,6 +179,6 @@ func (trw textReportWriter) writeProperty(name string, value interface{}, c *col
 func (trw textReportWriter) writeString(str string) {
 	_, err := trw.writer.WriteString(str)
 	if err != nil {
-		log.Error(err)
+		slog.Error(err.Error())
 	}
 }

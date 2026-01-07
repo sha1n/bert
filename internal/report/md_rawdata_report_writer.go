@@ -1,55 +1,65 @@
 package report
 
 import (
+	"bufio"
 	"fmt"
 	"io"
+	"log/slog"
 	"strings"
 	"time"
-
-	log "github.com/sirupsen/logrus"
 
 	"github.com/sha1n/bert/api"
 )
 
 // MarkdownStreamReportWriter a simple human readable test report writer
 type MarkdownStreamReportWriter struct {
-	writer MarkdownTableWriter
+	writer *bufio.Writer
 	ctx    api.ReportContext
 }
 
-// NewMarkdownStreamReportWriter returns a streaming CSV report writer.
+// NewMarkdownStreamReportWriter returns a new MarkdownStreamReportWriter
 func NewMarkdownStreamReportWriter(writer io.Writer, ctx api.ReportContext) RawDataHandler {
-	w := MarkdownStreamReportWriter{
-		writer: NewMarkdownTableWriter(writer),
+	w := &MarkdownStreamReportWriter{
+		writer: bufio.NewWriter(writer),
 		ctx:    ctx,
 	}
 
-	if err := w.writeHeaders(); err != nil {
-		log.Error(err)
+	if ctx.IncludeHeaders {
+		if err := w.writeHeader(); err != nil {
+			slog.Error(err.Error())
+		}
 	}
 
 	return w
 }
 
 // Handle handles a real time trace event
-func (rw MarkdownStreamReportWriter) Handle(trace api.Trace) (err error) {
-	timeStr := FormatDateTime(time.Now(), rw.ctx)
-	err = rw.writer.WriteRow([]string{
-		timeStr,
+func (rw *MarkdownStreamReportWriter) Handle(trace api.Trace) (err error) {
+	_, err = rw.writer.WriteString(fmt.Sprintf("| %s | %s | %s | %s | %s | %s | %t |\n",
+		FormatDateTime(time.Now(), rw.ctx),
 		trace.ID(),
 		strings.Join(rw.ctx.Labels, ","),
-		fmt.Sprintf("%d", trace.PerceivedTime()),
-		fmt.Sprintf("%d", trace.UserCPUTime()),
-		fmt.Sprintf("%d", trace.SystemCPUTime()),
-		fmt.Sprintf("%v", trace.Error() != nil),
-	})
+		FormatReportDuration(func() (time.Duration, error) { return trace.PerceivedTime(), nil }),
+		FormatReportDuration(func() (time.Duration, error) { return trace.UserCPUTime(), nil }),
+		FormatReportDuration(func() (time.Duration, error) { return trace.SystemCPUTime(), nil }),
+		trace.Error() != nil,
+	))
+
+	if err == nil {
+		err = rw.writer.Flush()
+	}
+
+	if err != nil {
+		slog.Error(err.Error())
+	}
 
 	return err
 }
 
-func (rw MarkdownStreamReportWriter) writeHeaders() (err error) {
-	if rw.ctx.IncludeHeaders {
-		err = rw.writer.WriteHeaders(RawDataReportHeaders)
+func (rw *MarkdownStreamReportWriter) writeHeader() (err error) {
+	_, err = rw.writer.WriteString("| Timestamp | Scenario | Labels | Duration | User Time | System Time | Error |\n")
+	if err == nil {
+		_, err = rw.writer.WriteString("|-----------|----------|--------|----------|-----------|-------------|-------|\n")
 	}
 
 	return err
