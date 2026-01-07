@@ -10,7 +10,7 @@ import (
 	"github.com/sha1n/bert/api"
 	"github.com/sha1n/gommons/pkg/test"
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 func TestLoadJson(t *testing.T) {
