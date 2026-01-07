@@ -3,11 +3,11 @@ package exec
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"reflect"
 	"sync"
 
 	"github.com/sha1n/bert/api"
-	log "github.com/sirupsen/logrus"
 )
 
 // Unsubscribe drains a TraceStream from buffered events and unsubscribes from it.
@@ -89,6 +89,6 @@ func (s *StreamSubscriber) drain() {
 
 func (s *StreamSubscriber) handle(trace api.Trace) {
 	if err := s.handleFn(trace); err != nil {
-		log.Errorf("Failed to handle trace event. Error: %v", err)
+		slog.Error(fmt.Sprintf("Failed to handle trace event. Error: %v", err))
 	}
 }

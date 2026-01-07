@@ -1,13 +1,13 @@
 package exec
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"os"
 	"testing"
 	"time"
-
-	log "github.com/sirupsen/logrus"
 
 	"os/exec"
 
@@ -18,7 +18,7 @@ import (
 func TestExecuteReturnsErrorOnCommandFailure(t *testing.T) {
 	defaultWorkingDir := "default/dir"
 	env := map[string]string{}
-	exec := NewCommandExecutor(true, true)
+	exec := NewCommandExecutor(true, true, io.Discard)
 	cmdSpec := aCommandSpec(aNonExistingCommand(), "")
 
 	_, err := exec.ExecuteFn(context.Background(), cmdSpec, defaultWorkingDir, env)()
@@ -75,22 +75,24 @@ func TestConfigureCommandWithCustomEnv(t *testing.T) {
 }
 
 func TestConfigureCommandWithStdoutPiping(t *testing.T) {
-	execCmd := configureCommandWithIOSpec(true, false)
+	var buf bytes.Buffer
+	execCmd := configureCommandWithIOSpec(true, false, &buf)
 
-	assert.Equal(t, log.StandardLogger().Out, execCmd.Stdout)
+	assert.Equal(t, &buf, execCmd.Stdout)
 	assert.Equal(t, nil, execCmd.Stderr)
 }
 
 func TestConfigureCommandWithStderrPiping(t *testing.T) {
-	execCmd := configureCommandWithIOSpec(false, true)
+	var buf bytes.Buffer
+	execCmd := configureCommandWithIOSpec(false, true, &buf)
 
 	assert.Equal(t, nil, execCmd.Stdout)
-	assert.Equal(t, log.StandardLogger().Out, execCmd.Stderr)
+	assert.Equal(t, &buf, execCmd.Stderr)
 }
 
 func TestExecCommandFnWithNonExistingCommand(t *testing.T) {
 	spec := aCommandSpec(aNonExistingCommand(), "")
-	executor := NewCommandExecutor(false, false).(*commandExecutor)
+	executor := NewCommandExecutor(false, false, io.Discard).(*commandExecutor)
 
 	execFn := executor.ExecuteFn(context.Background(), spec, "", nil)
 
@@ -101,7 +103,7 @@ func TestExecCommandFnWithNonExistingCommand(t *testing.T) {
 
 func TestExecCommandFnWithExistingCommandExitError(t *testing.T) {
 	spec := aCommandSpec([]string{"go", "away"}, "")
-	executor := NewCommandExecutor(false, false).(*commandExecutor)
+	executor := NewCommandExecutor(false, false, io.Discard).(*commandExecutor)
 
 	execFn := executor.ExecuteFn(context.Background(), spec, "", nil)
 
@@ -115,7 +117,7 @@ func TestExecCommandFnWithExistingCommandExitError(t *testing.T) {
 
 func TestExecCommandFnWithExistingCommand(t *testing.T) {
 	spec := aCommandSpec([]string{"go", "version"}, "")
-	executor := NewCommandExecutor(false, false).(*commandExecutor)
+	executor := NewCommandExecutor(false, false, io.Discard).(*commandExecutor)
 
 	execFn := executor.ExecuteFn(context.Background(), spec, "", nil)
 
@@ -130,7 +132,7 @@ func TestExecCommandFnWithExistingCommand(t *testing.T) {
 
 func TestExecCommandFnWithContextCancellation(t *testing.T) {
 	spec := aCommandSpec([]string{"sleep", "10"}, "")
-	executor := NewCommandExecutor(false, false).(*commandExecutor)
+	executor := NewCommandExecutor(false, false, io.Discard).(*commandExecutor)
 	ctx, cancel := context.WithCancel(context.Background())
 
 	execFn := executor.ExecuteFn(ctx, spec, "", nil)
@@ -143,9 +145,9 @@ func TestExecCommandFnWithContextCancellation(t *testing.T) {
 	assert.Nil(t, execInfo)
 }
 
-func configureCommandWithIOSpec(pipeStdout, pipeStderr bool) *exec.Cmd {
+func configureCommandWithIOSpec(pipeStdout, pipeStderr bool, writer io.Writer) *exec.Cmd {
 	spec := aCommandSpec(aNonExistingCommand(), "")
-	executor := NewCommandExecutor(pipeStdout, pipeStderr).(*commandExecutor)
+	executor := NewCommandExecutor(pipeStdout, pipeStderr, writer).(*commandExecutor)
 	execCmd := exec.Command(spec.Cmd[0], spec.Cmd[1:]...)
 
 	executor.configureCommand(spec, execCmd, "", map[string]string{})
@@ -154,7 +156,7 @@ func configureCommandWithIOSpec(pipeStdout, pipeStderr bool) *exec.Cmd {
 }
 
 func configureCommand(spec *api.CommandSpec, defaultWorkingDir string, env map[string]string) *exec.Cmd {
-	executor := NewCommandExecutor(false, false).(*commandExecutor)
+	executor := NewCommandExecutor(false, false, io.Discard).(*commandExecutor)
 	execCmd := exec.Command(spec.Cmd[0], spec.Cmd[1:]...)
 
 	executor.configureCommand(spec, execCmd, defaultWorkingDir, env)

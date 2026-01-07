@@ -5,12 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log/slog"
 	"os"
 	"strings"
 
 	"github.com/sha1n/bert/api"
-
-	log "github.com/sirupsen/logrus"
 
 	"github.com/go-playground/locales/en"
 	ut "github.com/go-playground/universal-translator"
@@ -25,7 +24,7 @@ import (
 func LoadSpec(path string) (api.BenchmarkSpec, error) {
 	var unmarshalFn func([]byte, interface{}) error
 
-	log.Infof("Loading benchmark specs from '%s'...", path)
+	slog.Info(fmt.Sprintf("Loading benchmark specs from '%s'...", path))
 
 	if strings.HasSuffix(path, ".json") {
 		unmarshalFn = json.Unmarshal
@@ -90,7 +89,7 @@ func save(spec api.BenchmarkSpec, wc io.WriteCloser) (err error) {
 	}
 
 	if closeErr := wc.Close(); closeErr != nil {
-		log.Error(closeErr)
+		slog.Error(closeErr.Error())
 	}
 
 	return err
@@ -130,7 +129,7 @@ func translateError(err error, trans ut.Translator) (errs []string) {
 	validatorErrs := err.(validator.ValidationErrors)
 	for _, e := range validatorErrs {
 		translatedErr := errors.New(e.Translate(trans))
-		log.Debug(e)
+		slog.Debug(e.Error())
 		errs = append(errs, translatedErr.Error())
 	}
 	return errs

@@ -3,11 +3,12 @@ package cli
 import (
 	"fmt"
 	"io"
+	"log/slog"
+	"os"
 	"strings"
 
 	"github.com/sha1n/bert/api"
 	"github.com/sha1n/bert/pkg/specs"
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -31,7 +32,7 @@ func CreateConfigCommand(ctx api.IOContext) *cobra.Command {
 // runConfigToolFn returns a function that runs the config tool with the specified IOContext
 func runConfigToolFn(ctx api.IOContext) func(*cobra.Command, []string) {
 	return func(cmd *cobra.Command, args []string) {
-		configureOutput(cmd, log.ErrorLevel, ctx)
+		configureOutput(cmd, slog.LevelError, ctx)
 
 		writeCloser := ResolveOutputArg(cmd, ArgNameOutputFile, ctx)
 		defer writeCloser.Close()
@@ -51,8 +52,8 @@ func runConfigToolFn(ctx api.IOContext) func(*cobra.Command, []string) {
 			fmt.Print("\r\nWriting your configuration...\r\n\r\n")
 
 			if err := specs.SaveSpec(spec, writeCloser); err != nil {
-				log.Error(err)
-				log.Exit(1)
+				slog.Error(err.Error())
+				os.Exit(1)
 			}
 		}
 	}

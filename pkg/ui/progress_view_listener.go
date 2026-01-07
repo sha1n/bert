@@ -4,12 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
+	"log/slog"
 	"time"
 
 	"github.com/fatih/color"
 	"github.com/sha1n/bert/api"
 	"github.com/sha1n/termite"
-	log "github.com/sirupsen/logrus"
 )
 
 const approxSymbol = '≅'
@@ -48,6 +49,7 @@ type ProgressView struct {
 	started          bool
 	ended            bool
 	eta              etaInfo
+	stderr           io.Writer
 }
 
 // NewProgressView creates a new ProgressView for the specified benchmark spec
@@ -102,6 +104,7 @@ func NewProgressView(spec api.BenchmarkSpec, termDimensionsFn func() (int, int),
 		progressInfoByID: progressInfoByID,
 		cancelHandlers:   cancelHandlers,
 		cursor:           termite.NewCursor(ioc.StdoutWriter),
+		stderr:           ioc.StderrWriter,
 	}
 }
 
@@ -115,7 +118,7 @@ func (l *ProgressView) OnBenchmarkStart() {
 
 	l.started = true
 	l.startTime = time.Now()
-	restoreLogs := shutOffLogs()
+	restoreLogs := shutOffLogs(l.stderr)
 	restoreCursor := l.hideCursor()
 
 	l.cancelHandlers = append(
@@ -192,11 +195,15 @@ func (l *ProgressView) hideCursor() (restore func()) {
 	return func() { l.cursor.Show() }
 }
 
-func shutOffLogs() (cancel func()) {
-	origLevel := log.GetLevel()
-	log.SetLevel(log.FatalLevel)
+func shutOffLogs(writer io.Writer) (cancel func()) {
+	original := slog.Default()
+	opts := &slog.HandlerOptions{
+		Level: slog.LevelError,
+	}
 
-	return func() { log.SetLevel(origLevel) }
+	slog.SetDefault(slog.New(slog.NewTextHandler(writer, opts)))
+
+	return func() { slog.SetDefault(original) }
 }
 
 type progressBarFormatter struct {

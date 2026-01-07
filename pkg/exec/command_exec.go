@@ -3,31 +3,34 @@ package exec
 import (
 	"context"
 	"fmt"
+	"io"
+	"log/slog"
 	"os"
 	"os/exec"
 	"time"
 
 	"github.com/sha1n/bert/api"
 	"github.com/sha1n/bert/pkg/osutil"
-	log "github.com/sirupsen/logrus"
 )
 
 type commandExecutor struct {
-	pipeStdout bool
-	pipeStderr bool
+	pipeStdout   bool
+	pipeStderr   bool
+	outputWriter io.Writer
 }
 
 // NewCommandExecutor creates a new command executor.
-func NewCommandExecutor(pipeStdout bool, pipeStderr bool) api.CommandExecutor {
+func NewCommandExecutor(pipeStdout bool, pipeStderr bool, outputWriter io.Writer) api.CommandExecutor {
 	return &commandExecutor{
-		pipeStdout: pipeStdout,
-		pipeStderr: pipeStderr,
+		pipeStdout:   pipeStdout,
+		pipeStderr:   pipeStderr,
+		outputWriter: outputWriter,
 	}
 }
 
 // Executes a single command in a subprocess based on the specified specs.
 func (ce *commandExecutor) ExecuteFn(ctx context.Context, cmdSpec *api.CommandSpec, defaultWorkingDir string, env map[string]string) api.ExecCommandFn {
-	log.Debugf("Going to execute command %v", cmdSpec.Cmd)
+	slog.Debug(fmt.Sprintf("Going to execute command %v", cmdSpec.Cmd))
 
 	execCmd := exec.CommandContext(ctx, cmdSpec.Cmd[0], cmdSpec.Cmd[1:]...)
 	ce.configureCommand(cmdSpec, execCmd, defaultWorkingDir, env)
@@ -53,27 +56,27 @@ func (ce *commandExecutor) ExecuteFn(ctx context.Context, cmdSpec *api.CommandSp
 
 func (ce *commandExecutor) configureCommand(cmd *api.CommandSpec, execCmd *exec.Cmd, defaultWorkingDir string, env map[string]string) {
 	if cmd.WorkingDirectory != "" {
-		log.Debugf("Setting command working directory to '%s'", cmd.WorkingDirectory)
+		slog.Debug(fmt.Sprintf("Setting command working directory to '%s'", cmd.WorkingDirectory))
 		execCmd.Dir = osutil.ExpandUserPath(cmd.WorkingDirectory)
 	} else {
 		if defaultWorkingDir != "" {
-			log.Debugf("Setting command working directory to '%s'", defaultWorkingDir)
+			slog.Debug(fmt.Sprintf("Setting command working directory to '%s'", defaultWorkingDir))
 			execCmd.Dir = osutil.ExpandUserPath(defaultWorkingDir)
 		}
 	}
 
 	if env != nil {
 		cmdEnv := toEnvVarsArray(env)
-		log.Debugf("Populating command environment variables '%v'", cmdEnv)
+		slog.Debug(fmt.Sprintf("Populating command environment variables '%v'", cmdEnv))
 		execCmd.Env = append(execCmd.Env, os.Environ()...)
 		execCmd.Env = append(execCmd.Env, cmdEnv...)
 	}
 
 	if ce.pipeStdout {
-		execCmd.Stdout = log.StandardLogger().Out
+		execCmd.Stdout = ce.outputWriter
 	}
 	if ce.pipeStderr {
-		execCmd.Stderr = log.StandardLogger().Out
+		execCmd.Stderr = ce.outputWriter
 	}
 }
 

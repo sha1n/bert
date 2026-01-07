@@ -4,107 +4,106 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"log/slog"
 	"testing"
 
 	"github.com/sha1n/gommons/pkg/test"
-	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestNewLogProgressListener(t *testing.T) {
-	expected := LoggingProgressListener{logger: log.StandardLogger()}
-
-	assert.Equal(t, expected, NewLoggingProgressListener())
+	assert.Equal(t, LoggingProgressListener{}, NewLoggingProgressListener())
 }
 
 func TestLogProgressListener_OnBenchmarkStart(t *testing.T) {
-	l := newInterceptableLogProgressListener()
+	l := NewLoggingProgressListener()
+	buf, restore := interceptSlog()
+	defer restore()
 
 	l.OnBenchmarkStart()
 
-	assert.NotEmpty(t, getLoggedString(l.logger))
+	assert.NotEmpty(t, buf.String())
 }
 
 func TestLogProgressListener_OnBenchmarkEnd(t *testing.T) {
-	l := newInterceptableLogProgressListener()
+	l := NewLoggingProgressListener()
+	buf, restore := interceptSlog()
+	defer restore()
 
 	l.OnBenchmarkEnd()
 
-	assert.NotEmpty(t, getLoggedString(l.logger))
+	assert.NotEmpty(t, buf.String())
 }
 
 func TestLogProgressListener_OnScenarioStart(t *testing.T) {
-	l := newInterceptableLogProgressListener()
+	l := NewLoggingProgressListener()
+	buf, restore := interceptSlog()
+	defer restore()
 	expectedScenarioID := test.RandomString()
 
 	l.OnScenarioStart(expectedScenarioID)
 
-	assert.Contains(t, getLoggedString(l.logger), expectedScenarioID)
+	assert.Contains(t, buf.String(), expectedScenarioID)
 }
 
 func TestLogProgressListener_OnScenarioEnd(t *testing.T) {
-	l := newInterceptableLogProgressListener()
+	l := NewLoggingProgressListener()
+	buf, restore := interceptSlog()
+	defer restore()
 	expectedScenarioID := test.RandomString()
 
 	l.OnScenarioEnd(expectedScenarioID)
 
-	assert.Contains(t, getLoggedString(l.logger), expectedScenarioID)
+	assert.Contains(t, buf.String(), expectedScenarioID)
 }
 
 func TestLogProgressListener_OnError(t *testing.T) {
-	l := newInterceptableLogProgressListener()
+	l := NewLoggingProgressListener()
+	buf, restore := interceptSlog()
+	defer restore()
 	expectedScenarioID := test.RandomString()
 	expectedError := errors.New(test.RandomString())
 
 	l.OnError(expectedScenarioID, expectedError)
 
-	actual := getLoggedString(l.logger)
+	actual := buf.String()
 	assert.Contains(t, actual, expectedScenarioID)
 	assert.Contains(t, actual, expectedError.Error())
 }
 
 func TestLogProgressListener_OnMessage(t *testing.T) {
-	l := newInterceptableLogProgressListener()
+	l := NewLoggingProgressListener()
+	buf, restore := interceptSlog()
+	defer restore()
 	expectedScenarioID := test.RandomString()
 	expectedMessage := test.RandomString()
 
 	l.OnMessage(expectedScenarioID, expectedMessage)
 
-	actual := getLoggedString(l.logger)
+	actual := buf.String()
 	assert.Contains(t, actual, expectedScenarioID)
 	assert.Contains(t, actual, expectedMessage)
 }
 
 func TestLogProgressListener_OnMessagef(t *testing.T) {
-	l := newInterceptableLogProgressListener()
+	l := NewLoggingProgressListener()
+	buf, restore := interceptSlog()
+	defer restore()
 	expectedScenarioID := test.RandomString()
 	expectedMessageFormat := "format: %s"
 	expectedMessageParam := test.RandomString()
 
 	l.OnMessagef(expectedScenarioID, expectedMessageFormat, expectedMessageParam)
 
-	actual := getLoggedString(l.logger)
+	actual := buf.String()
 	assert.Contains(t, actual, expectedScenarioID)
 	assert.Contains(t, actual, fmt.Sprintf(expectedMessageFormat, expectedMessageParam))
 }
 
-func newInterceptableLogProgressListener() LoggingProgressListener {
-	logger := newInterceptingLogger()
-	l := LoggingProgressListener{
-		logger: logger,
-	}
+func interceptSlog() (*bytes.Buffer, func()) {
+	original := slog.Default()
+	buf := new(bytes.Buffer)
+	slog.SetDefault(slog.New(slog.NewTextHandler(buf, nil)))
 
-	return l
-}
-
-func newInterceptingLogger() *log.Logger {
-	logger := log.New()
-	buffer := new(bytes.Buffer)
-	logger.Out = buffer
-
-	return logger
-}
-
-func getLoggedString(logger *log.Logger) string {
-	return logger.Out.(*bytes.Buffer).String()
+	return buf, func() { slog.SetDefault(original) }
 }

@@ -60,7 +60,7 @@ func TestBasicMdRaw(t *testing.T) {
 		t,
 		func(stdout, stderr string, err error) {
 			assert.NoError(t, err)
-			assert.Contains(t, stdout, "|NAME|")
+			assert.Contains(t, stdout, "| NAME |")
 			assert.Contains(t, stderr, expectedGoVersionOutput)
 		},
 		itConfigFileArgValue, "--format=md/raw",

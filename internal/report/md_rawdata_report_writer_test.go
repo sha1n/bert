@@ -1,10 +1,12 @@
 package report
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/sha1n/bert/api"
 	"github.com/stretchr/testify/assert"
@@ -24,8 +26,8 @@ func TestHandleMd(t *testing.T) {
 		allRecords[0],
 	)
 
-	assertRawTraceRecord(t, t1, allRecords[2])
-	assertRawTraceRecord(t, t2, allRecords[3])
+	assertMdTraceRecord(t, t1, allRecords[2])
+	assertMdTraceRecord(t, t2, allRecords[3])
 }
 
 func TestHandleMdWithoutHeaders(t *testing.T) {
@@ -35,8 +37,8 @@ func TestHandleMdWithoutHeaders(t *testing.T) {
 
 	assert.Equal(t, 2, len(allRecords))
 
-	assertRawTraceRecord(t, t1, allRecords[0])
-	assertRawTraceRecord(t, t2, allRecords[1])
+	assertMdTraceRecord(t, t1, allRecords[0])
+	assertMdTraceRecord(t, t2, allRecords[1])
 }
 
 func writeMdRawReport(t *testing.T, includeHeaders bool, traces ...api.Trace) [][]string {
@@ -49,10 +51,14 @@ func writeMdRawReport(t *testing.T, includeHeaders bool, traces ...api.Trace) []
 		records = make([][]string, expectedRows)
 		var mdBytes []byte
 		if mdBytes, err = ioutil.ReadAll(r); err == nil {
-			lines := strings.Split(strings.TrimSpace(string(mdBytes)), "\r\n")
+			lines := strings.Split(strings.TrimSpace(string(mdBytes)), "\n")
 			for i, line := range lines {
 				line = strings.Trim(line, "|")
-				records[i] = strings.Split(line, "|")
+				cells := strings.Split(line, "|")
+				for j, c := range cells {
+					cells[j] = strings.TrimSpace(c)
+				}
+				records[i] = cells
 			}
 		}
 		return records, err
@@ -64,4 +70,17 @@ func writeMdRawReport(t *testing.T, includeHeaders bool, traces ...api.Trace) []
 		includeHeaders,
 		traces...,
 	)
+}
+
+func assertMdTraceRecord(t *testing.T, trace api.Trace, actualRecord []string) {
+	expectedLabels := strings.Join(randomLabels, ",")
+
+	_, err := time.Parse(time.RFC3339, actualRecord[0])
+	assert.NoError(t, err)
+	assert.Equal(t, trace.ID(), actualRecord[1])
+	assert.Equal(t, expectedLabels, actualRecord[2])
+	assert.Equal(t, FormatReportDuration(func() (time.Duration, error) { return trace.PerceivedTime(), nil }), actualRecord[3])
+	assert.Equal(t, FormatReportDuration(func() (time.Duration, error) { return trace.UserCPUTime(), nil }), actualRecord[4])
+	assert.Equal(t, FormatReportDuration(func() (time.Duration, error) { return trace.SystemCPUTime(), nil }), actualRecord[5])
+	assert.Equal(t, fmt.Sprint(trace.Error() != nil), actualRecord[6])
 }

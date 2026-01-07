@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log/slog"
 	"os"
 	"os/signal"
 	"path"
@@ -20,7 +21,6 @@ import (
 	"github.com/sha1n/bert/pkg/specs"
 	"github.com/sha1n/bert/pkg/ui"
 	"github.com/sha1n/termite"
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -104,9 +104,9 @@ func runFn(ctx api.IOContext) func(*cobra.Command, []string) {
 	return func(cmd *cobra.Command, args []string) {
 		var err error
 		var closer io.Closer
-		configureOutput(cmd, log.ErrorLevel, ctx)
+		configureOutput(cmd, slog.LevelError, ctx)
 
-		log.Info("Starting bert...")
+		slog.Info("Starting bert...")
 
 		var spec api.BenchmarkSpec
 		spec, err = loadSpec(cmd, args)
@@ -120,7 +120,7 @@ func runFn(ctx api.IOContext) func(*cobra.Command, []string) {
 			tracer := exec.NewTracer(spec.Executions * len(spec.Scenarios))
 			reportHandler.Subscribe(tracer.Stream())
 
-			log.Info("Executing...")
+			slog.Info("Executing...")
 
 			// Create a context that is cancelled on interrupt signal
 			execCtx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
@@ -128,10 +128,10 @@ func runFn(ctx api.IOContext) func(*cobra.Command, []string) {
 
 			exec.Execute(execCtx, spec, resolveExecutionContext(cmd, spec, ctx, tracer))
 
-			log.Info("Finalizing report...")
+			slog.Info("Finalizing report...")
 			err = reportHandler.Finalize()
 
-			log.Info("Done")
+			slog.Info("Done")
 		}
 
 		CheckFatal(err)
@@ -235,7 +235,7 @@ func resolveExecutionContext(cmd *cobra.Command, spec api.BenchmarkSpec, ctx api
 
 	return api.NewExecutionContext(
 		tracer,
-		exec.NewCommandExecutor(pipeStdOut, pipeStdErr),
+		exec.NewCommandExecutor(pipeStdOut, pipeStdErr, ctx.StderrWriter),
 		resolveExecutionListener(cmd, spec, ctx),
 	)
 }
