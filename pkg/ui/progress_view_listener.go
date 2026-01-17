@@ -85,7 +85,8 @@ func NewProgressView(spec api.BenchmarkSpec, termDimensionsFn func() (int, int),
 		notificationsRowIndex := nextProgressBarRowIndex + 1
 		nextProgressBarRowIndex += 4
 
-		tick, cancel, _ := pBar.Start()
+		ctx, cancel := context.WithCancel(context.Background())
+		tick, _ := pBar.Start(ctx)
 
 		progressInfoByID[scenario.ID()] = &progressInfo{
 			minimalProgressInfo: minimalProgressInfo{
