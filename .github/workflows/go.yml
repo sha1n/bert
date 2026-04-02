@@ -15,12 +15,10 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v6
         with:
-          go-version: 1.24
+          go-version-file: go.mod
 
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@v9
-        with:
-          version: latest
+      - name: Run linting
+        run: make lint
 
       - name: Build
         run: make build
