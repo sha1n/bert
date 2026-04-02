@@ -86,7 +86,7 @@ go-lint:
 .PHONY: golangci-lint
 golangci-lint:
 	@echo "  >  Running golangci-lint..."
-	golangci-lint run
+	go tool github.com/golangci/golangci-lint/v2/cmd/golangci-lint run
 
 .PHONY: go-format
 go-format:
