@@ -1,6 +1,5 @@
 [![Go](https://github.com/sha1n/bert/actions/workflows/go.yml/badge.svg)](https://github.com/sha1n/bert/actions/workflows/go.yml)
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/sha1n/bert)
-[![Go Report Card](https://goreportcard.com/badge/sha1n/bert)](https://goreportcard.com/report/sha1n/bert) 
 [![Coverage Status](https://coveralls.io/repos/github/sha1n/bert/badge.svg)](https://coveralls.io/github/sha1n/bert?branch=master)
 [![Release](https://img.shields.io/github/release/sha1n/bert.svg?style=flat-square)](https://github.com/sha1n/bert/releases)
 [![Release Drafter](https://github.com/sha1n/bert/actions/workflows/release-drafter.yml/badge.svg)](https://github.com/sha1n/bert/actions/workflows/release-drafter.yml)
