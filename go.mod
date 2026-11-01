@@ -7,7 +7,7 @@ require (
 	github.com/go-playground/locales v0.14.2
 	github.com/go-playground/universal-translator v0.18.2
 	github.com/go-playground/validator/v10 v10.30.5
-	github.com/montanaflynn/stats v0.12.7
+	github.com/montanaflynn/stats v0.14.0
 	github.com/sha1n/gommons v0.0.19
 	github.com/sha1n/termite v1.1.0
 	github.com/spf13/cobra v1.10.2
